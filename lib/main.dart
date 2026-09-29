@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+// --- 💡 CONSTANTES GLOBALES DE ESTILO ---
+const double radius12 = 12.0; // Definida aquí para ser accesible globalmente
+
 void main() {
   runApp(const AnythingsHubApp());
 }
@@ -12,7 +15,7 @@ class AnythingsHubApp extends StatelessWidget {
   static const Color elementoSecundarioGrisIndigo = Color(0xFF3A415A);
   static const Color acentoSuavePomeloApagado = Color(0xFFE0856F);
   static const Color textoPrincipalClaro = Color(0xFFC5C9D6);
-  static const Color textoSecundario = Color(0xFF8F94A8); // Añadido para mejor jerarquía
+  static const Color textoSecundario = Color(0xFF8F94A8);
 
   @override
   Widget build(BuildContext context) {
@@ -20,39 +23,26 @@ class AnythingsHubApp extends StatelessWidget {
       title: 'Anythings Hub',
       debugShowCheckedModeBanner: false,
 
-      // --- 🚀 CONFIGURACIÓN GLOBAL DEL TEMA (Aplica la paleta a toda la app) ---
+      // --- 🚀 CONFIGURACIÓN GLOBAL DEL TEMA ---
       theme: ThemeData(
-        // Usamos el modo oscuro base
         brightness: Brightness.dark,
         scaffoldBackgroundColor: fondoIndigoOscuroMate,
 
-        // Definimos el ColorScheme oficial de la app
+        // Definimos el ColorScheme oficial
         colorScheme: const ColorScheme(
           brightness: Brightness.dark,
-          
-          // Fondo principal de la app (Scaffold)
           surface: fondoIndigoOscuroMate,
-          
-          // Color de fondo para tarjetas (Cards), diálogos, etc.
           onSurface: elementoSecundarioGrisIndigo,
-          
-          // Color principal para elementos destacados (Botones, switches activos)
           primary: acentoSuavePomeloApagado,
-          
-          // Color del texto principal sobre el color 'primary'
           onPrimary: fondoIndigoOscuroMate,
-          
-          // Otros colores necesarios para completar el esquema (usando tonos de la paleta o neutros)
           secondary: elementoSecundarioGrisIndigo,
           onSecondary: textoPrincipalClaro,
           error: Colors.redAccent,
           onError: Colors.white,
-          
-          // Fondo de las barras (AppBar, BottomNavigationBar)
-          surfaceContainerHighest: elementoSecundarioGrisIndigo, 
+          surfaceContainerHighest: elementoSecundarioGrisIndigo,
         ),
 
-        // Configuración Global de AppBar (aplica la paleta)
+        // Configuración Global de AppBar
         appBarTheme: const AppBarTheme(
           backgroundColor: fondoIndigoOscuroMate,
           elevation: 0,
@@ -65,30 +55,30 @@ class AnythingsHubApp extends StatelessWidget {
           iconTheme: IconThemeData(color: textoPrincipalClaro),
         ),
 
-        // Configuración Global de Card (usa onSurface automáticamente)
+        // Configuración Global de Card (USA LA CORRECCIÓN DE RADIUS AQUÍ)
         cardTheme: const CardTheme(
           color: elementoSecundarioGrisIndigo,
           elevation: 2,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.radius12),
+            borderRadius: BorderRadius.all(Radius.circular(radius12)), // ¡CORREGIDO!
           ),
         ),
 
-        // Configuración Global de Texto (usa los colores de texto)
+        // Configuración Global de Texto
         textTheme: const TextTheme(
           displayLarge: TextStyle(color: textoPrincipalClaro, fontSize: 32, fontWeight: FontWeight.bold),
           bodyLarge: TextStyle(color: textoPrincipalClaro, fontSize: 16),
           bodyMedium: TextStyle(color: textoSecundario, fontSize: 14),
         ),
 
-        // Color del cursor y selección de texto
+        // Color del cursor y selección
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: acentoSuavePomeloApagado,
-          selectionColor: Color(0x80E0856F), // Pomelo semi-transparente
+          selectionColor: Color(0x80E0856F),
           selectionHandleColor: acentoSuavePomeloApagado,
         ),
-        
-        // Usamos el botón flotante por defecto con el color primario
+
+        // Botón flotante
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: acentoSuavePomeloApagado,
           foregroundColor: fondoIndigoOscuroMate,
@@ -106,7 +96,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Obtenemos el esquema de colores actual para usarlo dinámicamente
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -114,18 +103,16 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Anythings Hub'),
       ),
-      body: Padding(
+      body: SingleChildScrollView( // Añadido para evitar desbordamiento si hay mucho contenido
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título usando el estilo de texto global
             Text(
               'Bienvenido de nuevo',
               style: textTheme.displayLarge,
             ),
             const SizedBox(height: 10),
-            // Subtítulo usando el estilo de cuerpo medio global
             Text(
               'Tu centro de control total',
               style: textTheme.bodyMedium,
@@ -134,7 +121,7 @@ class HomeScreen extends StatelessWidget {
 
             // --- EJEMPLO DE USO DE LA PALETA ---
 
-            // 1. Tarjeta (Card) usando el color de fondo de tarjeta definido en el tema
+            // 1. Tarjeta (Card)
             const Card(
               child: Padding(
                 padding: EdgeInsets.all(20.0),
@@ -169,7 +156,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // 2. Botón de Acción (ElevatedButton) usando el color primario
+            // 2. Botón de Acción (ElevatedButton)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -177,8 +164,8 @@ class HomeScreen extends StatelessWidget {
                   // Acción
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary, // Usa #E0856F
-                  foregroundColor: colorScheme.onPrimary, // Usa #1E2238
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
@@ -192,7 +179,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-             // 3. Botón de Texto (TextButton) usando el color primario
+             // 3. Botón de Texto (TextButton)
             Center(
               child: TextButton(
                 onPressed: () {
@@ -207,7 +194,6 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      // Botón flotante usando el tema por defecto
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Acción flotante
@@ -217,6 +203,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
-// --- 💡 CONSTANTE LOCAL PARA BORDES (Opcional, para limpieza) ---
-const double radius12 = 12.0;
