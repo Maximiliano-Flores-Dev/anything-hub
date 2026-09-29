@@ -7,6 +7,20 @@ void main() {
   runApp(const AnythingsHubApp());
 }
 
+class SystemLogger {
+  static final List<String> _logs = [];
+
+  static void log(String event) {
+    final timestamp = DateTime.now().toIso8601String().split('T').last.substring(0, 8);
+    final formattedLog = "[$timestamp] $event";
+    _logs.insert(0, formattedLog);
+  }
+
+  static List<String> getLogs() {
+    return _logs;
+  }
+}
+
 class AnythingsHubApp extends StatelessWidget {
   const AnythingsHubApp({super.key});
 
@@ -45,6 +59,7 @@ class _HubDashboardViewState extends State<HubDashboardView> {
   @override
   void initState() {
     super.initState();
+    SystemLogger.log("Iniciando secuencia de arranque del Hub...");
     _loadConfiguration();
   }
 
@@ -56,11 +71,13 @@ class _HubDashboardViewState extends State<HubDashboardView> {
         _config = decodedData;
         _isLoading = false;
       });
+      SystemLogger.log("Archivo config.json cargado exitosamente.");
     } catch (e) {
       setState(() {
         _config = {"error": "No se pudo cargar config.json"};
         _isLoading = false;
       });
+      SystemLogger.log("Error crítico: Falló la lectura de config.json");
     }
   }
 
@@ -102,6 +119,37 @@ class _HubDashboardViewState extends State<HubDashboardView> {
                     child: Text(
                       const JsonEncoder.withIndent('  ').convert(_config),
                       style: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'SYSTEM AUDIT LOGS:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF38BDF8),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    height: 150,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0F172A),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: ListView.builder(
+                      itemCount: SystemLogger.getLogs().length,
+                      itemBuilder: (context, index) {
+                        return Text(
+                          SystemLogger.getLogs()[index],
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'monospace',
+                            color: Color(0xFF34D399),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
