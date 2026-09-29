@@ -28,7 +28,7 @@ jobs:
           cache: true
 
       - name: Generate Native Project Files
-        run: flutter create . --org com.anything.hub --platforms=android --overwrite
+        run: flutter create . --project-name anything_hub --org com.anything.hub --platforms=android --overwrite
 
       - name: Install dependencies
         run: flutter pub get
