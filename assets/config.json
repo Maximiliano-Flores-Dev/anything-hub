@@ -1,0 +1,12 @@
+{
+  "app_name": "Anythings Hub",
+  "version": "1.0.0",
+  "environment": "production",
+  "local_mode": true,
+  "telemetry_enabled": false,
+  "modules": {
+    "dashboard": true,
+    "local_sync": true,
+    "security_layer": true
+  }
+}
