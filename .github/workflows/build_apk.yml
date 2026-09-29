@@ -27,6 +27,12 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Ensure Android Native Structure Exists
+        run: |
+          if [ ! -d "android" ]; then
+            flutter create . --project-name anything_hub --org com.anything.hub --platforms=android
+          fi
+
       - name: Install dependencies
         run: flutter pub get
 
