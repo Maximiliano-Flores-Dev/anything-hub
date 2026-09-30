@@ -131,7 +131,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                               DashboardCard(
                                 title: "Mis Aplicaciones",
                                 subtitle: "Gestiona y abre tus apps",
-                                assetPath: "assets/images/card_apps.png", // Reemplaza con tu ruta PNG
+                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 08_55_20 p.m..png", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Carpetas del Proyecto",
@@ -141,17 +141,17 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                               DashboardCard(
                                 title: "Webs Rápidas",
                                 subtitle: "Tus sitios favoritos, al instante",
-                                assetPath: "assets/images/card_webs.png", // Reemplaza con tu ruta PNG
+                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 09_04_13 p.m..png", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Favoritos",
                                 subtitle: "Todo lo que te importa",
-                                assetPath: "assets/images/card_star.png", // Reemplaza con tu ruta PNG
+                                assetPath: "", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Gestión de Archivos",
                                 subtitle: "Explora, organiza y accede rápido",
-                                assetPath: "assets/images/card_files.png", // Reemplaza con tu ruta PNG
+                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 08_57_55 p.m..png", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Modos de Rendimiento",
