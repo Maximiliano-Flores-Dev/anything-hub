@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// --- 💡 CONSTANTES GLOBALES DE ESTILO ---
 const double radius12 = 12.0;
 
 void main() {
@@ -10,7 +9,6 @@ void main() {
 class AnythingsHubApp extends StatelessWidget {
   const AnythingsHubApp({super.key});
 
-  // --- 🎨 PALETA DE COLORES ---
   static const Color fondoIndigoOscuroMate = Color(0xFF1E2238);
   static const Color elementoSecundarioGrisIndigo = Color(0xFF3A415A);
   static const Color acentoSuavePomeloApagado = Color(0xFFE0856F);
@@ -36,17 +34,12 @@ class AnythingsHubApp extends StatelessWidget {
           error: Colors.redAccent,
           onError: Colors.white,
         ),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: textoPrincipalClaro),
-          bodyMedium: TextStyle(color: textoSecundario),
-        ),
       ),
       home: const MainLayoutScreen(),
     );
   }
 }
 
-// --- 📱 LAYOUT PRINCIPAL (Side Menu + Contenido + Footer) ---
 class MainLayoutScreen extends StatefulWidget {
   const MainLayoutScreen({super.key});
 
@@ -55,7 +48,7 @@ class MainLayoutScreen extends StatefulWidget {
 }
 
 class _MainLayoutScreenState extends State<MainLayoutScreen> {
-  int _selectedIndex = 0; // Para el Footer Navigation
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +56,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
       body: SafeArea(
         child: Row(
           children: [
-            // --- 📁 1. SIDE MENU (Izquierda) ---
+            // --- SIDE MENU ---
             Container(
               width: 95,
               color: AnythingsHubApp.fondoIndigoOscuroMate,
@@ -79,18 +72,16 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
               ),
             ),
 
-            // --- 🖥️ 2. CONTENIDO PRINCIPAL Y FOOTER ---
+            // --- CONTENIDO PRINCIPAL ---
             Expanded(
               child: Column(
                 children: [
-                  // Área scrolleable del Dashboard (Título + 6 Tarjetas + Botón Gestión)
                   Expanded(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Cabecera superior con título y engranaje
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -128,7 +119,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                           ),
                           const SizedBox(height: 16),
 
-                          // --- 🧊 3. LAS 6 TARJETAS (Grid 2 columnas) ---
+                          // --- GRID DE 6 TARJETAS CON ASSETS ---
                           GridView.count(
                             crossAxisCount: 2,
                             shrinkWrap: true,
@@ -140,38 +131,38 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                               DashboardCard(
                                 title: "Mis Aplicaciones",
                                 subtitle: "Gestiona y abre tus apps",
-                                iconOrMock: Icons.grid_view_rounded,
+                                assetPath: "assets/images/card_apps.png", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Carpetas del Proyecto",
                                 subtitle: "Acceso rápido a tus proyectos",
-                                iconOrMock: Icons.folder_special_rounded,
+                                assetPath: "assets/images/card_folders.png", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Webs Rápidas",
                                 subtitle: "Tus sitios favoritos, al instante",
-                                iconOrMock: Icons.public_rounded,
+                                assetPath: "assets/images/card_webs.png", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Favoritos",
                                 subtitle: "Todo lo que te importa",
-                                iconOrMock: Icons.star_border_rounded,
+                                assetPath: "assets/images/card_star.png", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Gestión de Archivos",
                                 subtitle: "Explora, organiza y accede rápido",
-                                iconOrMock: Icons.folder_copy_rounded,
+                                assetPath: "assets/images/card_files.png", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Modos de Rendimiento",
                                 subtitle: "Ajusta el rendimiento de tu dispositivo",
-                                iconOrMock: Icons.memory_rounded,
+                                assetPath: "assets/images/card_perf.png", // Reemplaza con tu ruta PNG
                               ),
                             ],
                           ),
                           const SizedBox(height: 20),
 
-                          // Botón principal "Gestionar Todo"
+                          // Botón principal
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
@@ -210,7 +201,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                     ),
                   ),
 
-                  // --- 🧭 4. FOOTER MENU (Inferior) ---
+                  // --- FOOTER MENU ---
                   Container(
                     height: 60,
                     decoration: const BoxDecoration(
@@ -247,7 +238,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
           ],
         ),
       ),
-      // --- ➕ 5. BOTÓN FLOTANTE CON ACCESOS RÁPIDOS SIMULADOS ---
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: AnythingsHubApp.acentoSuavePomeloApagado,
@@ -256,7 +246,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
     );
   }
 
-  // Widget auxiliar para los elementos del menú lateral
   Widget _buildSideMenuItem(IconData icon, String label, bool isActive) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -287,17 +276,17 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
   }
 }
 
-// --- 🧱 WIDGET PARA LAS TARJETAS DEL DASHBOARD ---
+// --- WIDGET DE TARJETA ADAPTADO PARA IMÁGENES PNG ---
 class DashboardCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  final IconData iconOrMock;
+  final String assetPath;
 
   const DashboardCard({
     super.key,
     required this.title,
     required this.subtitle,
-    required this.iconOrMock,
+    required this.assetPath,
   });
 
   @override
@@ -312,13 +301,20 @@ class DashboardCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Espacio superior para la vista previa o icono simulado
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(iconOrMock, size: 36, color: AnythingsHubApp.acentoSuavePomeloApagado),
-            ],
+          // Imagen 3D con transparencia en lugar de icono plano
+          Expanded(
+            child: Center(
+              child: Image.asset(
+                assetPath,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback visual por si aún no has copiado la imagen
+                  return const Icon(Icons.broken_image, size: 36, color: AnythingsHubApp.acentoSuavePomeloApagado);
+                },
+              ),
+            ),
           ),
+          const SizedBox(height: 8),
           // Textos de la tarjeta y flecha
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
