@@ -56,7 +56,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
       body: SafeArea(
         child: Row(
           children: [
-            // --- NUEVA SIDEBAR EXPANDIBLE POR GESTOS ---
+            // --- SIDEBAR EXPANDIBLE INTERACTIVA ---
             const CollapsibleSidebar(),
 
             // --- CONTENIDO PRINCIPAL ---
@@ -234,7 +234,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
   }
 }
 
-// --- COMPONENTE DE SIDEBAR EXPANDIBLE CON EFECTO SOLITARIO / GOOGLE FOTOS ---
+// --- SIDEBAR EXPANDIBLE CON CUADRÍCULA 2X2 Y GESTOS ---
 class CollapsibleSidebar extends StatefulWidget {
   const CollapsibleSidebar({super.key});
 
@@ -257,7 +257,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
     );
     _expandAnimation = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOutBack, // Curva elástica que simula el despliegue de cartas
+      curve: Curves.easeOutBack,
     );
   }
 
@@ -282,25 +282,21 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragEnd: (details) {
-        // Si arrastra hacia la derecha (velocidad positiva o delta), expande
         if (details.primaryVelocity! > 200 && !_isExpanded) {
           _toggleSidebar();
-        } 
-        // Si arrastra hacia la izquierda, contrae
-        else if (details.primaryVelocity! < -200 && _isExpanded) {
+        } else if (details.primaryVelocity! < -200 && _isExpanded) {
           _toggleSidebar();
         }
       },
       child: AnimatedBuilder(
         animation: _expandAnimation,
         builder: (context, child) {
-          // El ancho varía de manera fluida sin cambiar la posición fija en el Row
-          double currentWidth = 85.0 + (_expandAnimation.value * 55.0); // De 85 a 140 px
+          double currentWidth = 85.0 + (_expandAnimation.value * 75.0); // Ancho dinámico adaptado a matriz 2x2
 
           return Container(
             width: currentWidth,
             color: AnythingsHubApp.fondoIndigoOscuroMate,
-            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -342,49 +338,60 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
     );
   }
 
-  // Widget para construir cada sección con el efecto de apilado (Google Fotos) y reparto (Solitario)
   Widget _buildAppGroupSection(IconData mainIcon, String label, List<IconData> groupIcons, bool isActive) {
     return GestureDetector(
-      onTap: _toggleSidebar, // Un toque alternará la expansión de la barra
+      onTap: _toggleSidebar,
       child: SizedBox(
-        height: 75, // Altura reservada para el stack de cartas colapsado y expandido
+        height: 85, // Altura reservada para el stack y la matriz expandida
         child: Stack(
-          alignment: Alignment.center,
+          alignment: Alignment.topLeft,
           clipBehavior: Clip.none,
           children: List.generate(groupIcons.length, (index) {
-            // Animación escalonada (Staggered) para el efecto "repartija de cartas"
             double t = _expandAnimation.value;
-            
-            // En estado colapsado: se apilan con un leve desplazamiento (efecto Google Fotos)
-            // En estado expandido: se abren en abanico / rejilla vertical o horizontal
-            double verticalOffset = index * (12.0 * t);
-            double horizontalOffset = index * (6.0 * t);
-            double scale = 1.0 - (index * 0.03 * (1 - t));
+
+            // Formato de cuadrícula 2x2 al expandirse:
+            // 1. (col 0, row 0)   2. (col 1, row 0)
+            // 3. (col 0, row 1)   4. (col 1, row 1)
+            int col = index % 2;
+            int row = index ~/ 2;
+
+            // Posición colapsada (Apilado estilo Google Fotos)
+            double collapsedLeft = index * 3.0;
+            double collapsedTop = index * 4.0;
+
+            // Posición expandida (Matriz 2x2)
+            double expandedLeft = col * 36.0 + 4.0;
+            double expandedTop = row * 36.0 + 4.0;
+
+            double currentLeft = collapsedLeft + (expandedLeft - collapsedLeft) * t;
+            double currentTop = collapsedTop + (expandedTop - collapsedTop) * t;
+
+            double scale = 1.0 - ((3 - index) * 0.02 * (1 - t));
 
             return Positioned(
-              top: verticalOffset,
-              left: horizontalOffset,
+              left: currentLeft,
+              top: currentTop,
               child: Transform.scale(
                 scale: scale,
                 child: Container(
-                  width: 46,
-                  height: 46,
+                  width: 34,
+                  height: 34,
                   decoration: BoxDecoration(
                     color: isActive && index == 0
                         ? AnythingsHubApp.acentoSuavePomeloApagado.withOpacity(0.3)
-                        : AnythingsHubApp.elementoSecundarioGrisIndigo.withOpacity(0.85),
-                    borderRadius: BorderRadius.circular(radius12),
+                        : AnythingsHubApp.elementoSecundarioGrisIndigo.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isActive && index == 0
                           ? AnythingsHubApp.acentoSuavePomeloApagado
                           : Colors.transparent,
-                      width: 1.5,
+                      width: 1.2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.4 + (index * 0.05)),
-                        blurRadius: 4 + (index * 2),
-                        offset: Offset(0, 2 + index.toDouble()),
+                        color: Colors.black.withOpacity(0.35 + (index * 0.05)),
+                        blurRadius: 3 + (index * 1.5),
+                        offset: Offset(0, 1 + index.toDouble()),
                       ),
                     ],
                   ),
@@ -394,7 +401,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                       color: isActive && index == 0
                           ? AnythingsHubApp.acentoSuavePomeloApagado
                           : AnythingsHubApp.textoPrincipalClaro,
-                      size: 20,
+                      size: 16,
                     ),
                   ),
                 ),
