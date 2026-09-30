@@ -136,7 +136,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                               DashboardCard(
                                 title: "Carpetas del Proyecto",
                                 subtitle: "Acceso rápido a tus proyectos",
-                                assetPath: "assets/images/card_folders.png", // Reemplaza con tu ruta PNG
+                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 08_57_55 p.m..png", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Webs Rápidas",
@@ -146,12 +146,12 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                               DashboardCard(
                                 title: "Favoritos",
                                 subtitle: "Todo lo que te importa",
-                                assetPath: "", // Reemplaza con tu ruta PNG
+                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 10_15_46 p.m..png", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Gestión de Archivos",
                                 subtitle: "Explora, organiza y accede rápido",
-                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 08_57_55 p.m..png", // Reemplaza con tu ruta PNG
+                                assetPath: "", // Reemplaza con tu ruta PNG
                               ),
                               DashboardCard(
                                 title: "Modos de Rendimiento",
