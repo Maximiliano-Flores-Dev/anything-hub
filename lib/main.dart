@@ -56,21 +56,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
       body: SafeArea(
         child: Row(
           children: [
-            // --- SIDE MENU ---
-            Container(
-              width: 95,
-              color: AnythingsHubApp.fondoIndigoOscuroMate,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildSideMenuItem(Icons.access_time_rounded, "Recientes", true),
-                  _buildSideMenuItem(Icons.folder_open_rounded, "Carpetas Frecuentes", false),
-                  _buildSideMenuItem(Icons.web_rounded, "Webs Guardadas", false),
-                  _buildSideMenuItem(Icons.apps_rounded, "Mis Aplicaciones", false),
-                  _buildSideMenuItem(Icons.star_rounded, "Favoritos", false),
-                ],
-              ),
-            ),
+            // --- NUEVA SIDEBAR EXPANDIBLE POR GESTOS ---
+            const CollapsibleSidebar(),
 
             // --- CONTENIDO PRINCIPAL ---
             Expanded(
@@ -131,32 +118,32 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                               DashboardCard(
                                 title: "Mis Aplicaciones",
                                 subtitle: "Gestiona y abre tus apps",
-                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 08_55_20 p.m..png", // Reemplaza con tu ruta PNG
+                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 08_55_20 p.m..png",
                               ),
                               DashboardCard(
                                 title: "Carpetas del Proyecto",
                                 subtitle: "Acceso rápido a tus proyectos",
-                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 08_57_55 p.m..png", // Reemplaza con tu ruta PNG
+                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 08_57_55 p.m..png",
                               ),
                               DashboardCard(
                                 title: "Webs Rápidas",
                                 subtitle: "Tus sitios favoritos, al instante",
-                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 09_04_13 p.m..png", // Reemplaza con tu ruta PNG
+                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 09_04_13 p.m..png",
                               ),
                               DashboardCard(
                                 title: "Favoritos",
                                 subtitle: "Todo lo que te importa",
-                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 10_15_46 p.m..png", // Reemplaza con tu ruta PNG
+                                assetPath: "assets/images/ChatGPT Image 29 sept 2026, 10_15_46 p.m..png",
                               ),
                               DashboardCard(
                                 title: "Gestión de Archivos",
                                 subtitle: "Explora, organiza y accede rápido",
-                                assetPath: "", // Reemplaza con tu ruta PNG
+                                assetPath: "",
                               ),
                               DashboardCard(
                                 title: "Modos de Rendimiento",
                                 subtitle: "Ajusta el rendimiento de tu dispositivo",
-                                assetPath: "assets/images/card_perf.png", // Reemplaza con tu ruta PNG
+                                assetPath: "assets/images/card_perf.png",
                               ),
                             ],
                           ),
@@ -245,33 +232,177 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
       ),
     );
   }
+}
 
-  Widget _buildSideMenuItem(IconData icon, String label, bool isActive) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: isActive ? AnythingsHubApp.acentoSuavePomeloApagado.withOpacity(0.2) : AnythingsHubApp.elementoSecundarioGrisIndigo.withOpacity(0.4),
-            borderRadius: BorderRadius.circular(radius12),
-          ),
-          child: Icon(
-            icon,
-            color: isActive ? AnythingsHubApp.acentoSuavePomeloApagado : AnythingsHubApp.textoPrincipalClaro,
-            size: 24,
-          ),
+// --- COMPONENTE DE SIDEBAR EXPANDIBLE CON EFECTO SOLITARIO / GOOGLE FOTOS ---
+class CollapsibleSidebar extends StatefulWidget {
+  const CollapsibleSidebar({super.key});
+
+  @override
+  State<CollapsibleSidebar> createState() => _CollapsibleSidebarState();
+}
+
+class _CollapsibleSidebarState extends State<CollapsibleSidebar>
+    with SingleTickerProviderStateMixin {
+  bool _isExpanded = false;
+  late AnimationController _controller;
+  late Animation<double> _expandAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutBack, // Curva elástica que simula el despliegue de cartas
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _toggleSidebar() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        // Si arrastra hacia la derecha (velocidad positiva o delta), expande
+        if (details.primaryVelocity! > 200 && !_isExpanded) {
+          _toggleSidebar();
+        } 
+        // Si arrastra hacia la izquierda, contrae
+        else if (details.primaryVelocity! < -200 && _isExpanded) {
+          _toggleSidebar();
+        }
+      },
+      child: AnimatedBuilder(
+        animation: _expandAnimation,
+        builder: (context, child) {
+          // El ancho varía de manera fluida sin cambiar la posición fija en el Row
+          double currentWidth = 85.0 + (_expandAnimation.value * 55.0); // De 85 a 140 px
+
+          return Container(
+            width: currentWidth,
+            color: AnythingsHubApp.fondoIndigoOscuroMate,
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildAppGroupSection(
+                  Icons.access_time_rounded, 
+                  "Recientes", 
+                  [Icons.alarm, Icons.history, Icons.timer, Icons.update], 
+                  true
+                ),
+                _buildAppGroupSection(
+                  Icons.folder_open_rounded, 
+                  "Carpetas", 
+                  [Icons.folder, Icons.folder_special, Icons.folder_shared, Icons.snippet_folder], 
+                  false
+                ),
+                _buildAppGroupSection(
+                  Icons.web_rounded, 
+                  "Webs", 
+                  [Icons.public, Icons.language, Icons.bookmark, Icons.link], 
+                  false
+                ),
+                _buildAppGroupSection(
+                  Icons.apps_rounded, 
+                  "Apps", 
+                  [Icons.extension, Icons.widgets, Icons.dashboard, Icons.category], 
+                  false
+                ),
+                _buildAppGroupSection(
+                  Icons.star_rounded, 
+                  "Favoritos", 
+                  [Icons.star, Icons.star_border, Icons.grade, Icons.auto_awesome], 
+                  false
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Widget para construir cada sección con el efecto de apilado (Google Fotos) y reparto (Solitario)
+  Widget _buildAppGroupSection(IconData mainIcon, String label, List<IconData> groupIcons, bool isActive) {
+    return GestureDetector(
+      onTap: _toggleSidebar, // Un toque alternará la expansión de la barra
+      child: SizedBox(
+        height: 75, // Altura reservada para el stack de cartas colapsado y expandido
+        child: Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: List.generate(groupIcons.length, (index) {
+            // Animación escalonada (Staggered) para el efecto "repartija de cartas"
+            double t = _expandAnimation.value;
+            
+            // En estado colapsado: se apilan con un leve desplazamiento (efecto Google Fotos)
+            // En estado expandido: se abren en abanico / rejilla vertical o horizontal
+            double verticalOffset = index * (12.0 * t);
+            double horizontalOffset = index * (6.0 * t);
+            double scale = 1.0 - (index * 0.03 * (1 - t));
+
+            return Positioned(
+              top: verticalOffset,
+              left: horizontalOffset,
+              child: Transform.scale(
+                scale: scale,
+                child: Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: isActive && index == 0
+                        ? AnythingsHubApp.acentoSuavePomeloApagado.withOpacity(0.3)
+                        : AnythingsHubApp.elementoSecundarioGrisIndigo.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(radius12),
+                    border: Border.all(
+                      color: isActive && index == 0
+                          ? AnythingsHubApp.acentoSuavePomeloApagado
+                          : Colors.transparent,
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.4 + (index * 0.05)),
+                        blurRadius: 4 + (index * 2),
+                        offset: Offset(0, 2 + index.toDouble()),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Icon(
+                      index == 0 ? mainIcon : groupIcons[index],
+                      color: isActive && index == 0
+                          ? AnythingsHubApp.acentoSuavePomeloApagado
+                          : AnythingsHubApp.textoPrincipalClaro,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: isActive ? AnythingsHubApp.textoPrincipalClaro : AnythingsHubApp.textoSecundario,
-            fontSize: 10,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -301,21 +432,18 @@ class DashboardCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Imagen 3D con transparencia en lugar de icono plano
           Expanded(
             child: Center(
               child: Image.asset(
                 assetPath,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
-                  // Fallback visual por si aún no has copiado la imagen
                   return const Icon(Icons.broken_image, size: 36, color: AnythingsHubApp.acentoSuavePomeloApagado);
                 },
               ),
             ),
           ),
           const SizedBox(height: 8),
-          // Textos de la tarjeta y flecha
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
