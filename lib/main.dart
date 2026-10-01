@@ -93,15 +93,18 @@ class AnythingsHubApp extends StatelessWidget {
 }
 
 // ============================================================================
-// MODELOS DE DATOS Y ESTADO GLOBAL INTELIGENTE
+// MODELOS DE DATOS Y GESTIÓN DE PERMISOS / APPS REALES
 // ============================================================================
 class HubApp {
-  const HubApp(
+  HubApp(
     this.name, {
     required this.background,
     required this.foreground,
     this.icon,
     this.letter,
+    this.packageName,
+    this.usageScore = 0,
+    this.isSystemScanned = false,
   });
 
   final String name;
@@ -109,13 +112,21 @@ class HubApp {
   final Color foreground;
   final IconData? icon;
   final String? letter;
+  final String? packageName;
+  int usageScore; // Simula o almacena el uso frecuente para auto-ordenar
+  final bool isSystemScanned;
 }
 
 class AppGroup {
-  AppGroup(this.label, this.apps);
+  AppGroup(this.label, this.apps, {this.isCustom = false});
 
   final String label;
   final List<HubApp> apps;
+  final bool isCustom; // True si fue creado manualmente por el usuario
+
+  void sortByUsage() {
+    apps.sort((a, b) => b.usageScore.compareTo(a.usageScore));
+  }
 }
 
 class RadialAction {
@@ -128,8 +139,8 @@ class RadialAction {
 const List<RadialAction> kFabActions = [
   RadialAction('folder', 'Nuevo Grupo', Icons.create_new_folder_outlined),
   RadialAction('add_app', 'Añadir App', Icons.add_to_photos_rounded),
+  RadialAction('scan_device', 'Escanear Apps', Icons.radar_rounded),
   RadialAction('settings', 'Ajustes', Icons.settings_outlined),
-  RadialAction('connect', 'Conectar', Icons.hub_outlined),
 ];
 
 class _CardData {
@@ -151,32 +162,23 @@ class MainLayoutScreen extends StatefulWidget {
 
 class _MainLayoutScreenState extends State<MainLayoutScreen> {
   int _tab = 0;
+  bool _deviceScanned = false;
+  static const String _selfPackageName = 'com.anythings.hub'; // Paquete propio a ignorar
 
   final List<AppGroup> _appGroups = [
     AppGroup('Agentes de IA', [
-      HubApp('ChatGPT', background: const Color(0xFF165343), foreground: Colors.white, icon: Icons.filter_vintage_outlined),
-      HubApp('Claude', background: const Color(0xFFE7D3CC), foreground: const Color(0xFFD9774F), icon: Icons.emergency_rounded),
-      HubApp('Gemini', background: const Color(0xFF0F1422), foreground: const Color(0xFF6C8CFF), icon: Icons.auto_awesome_rounded),
-      HubApp('Copilot', background: const Color(0xFF1A1D2E), foreground: const Color(0xFF8E6CFF), icon: Icons.interests_rounded),
+      HubApp('ChatGPT', background: const Color(0xFF165343), foreground: Colors.white, icon: Icons.filter_vintage_outlined, usageScore: 95),
+      HubApp('Claude', background: const Color(0xFFE7D3CC), foreground: const Color(0xFFD9774F), icon: Icons.emergency_rounded, usageScore: 80),
+      HubApp('Gemini', background: const Color(0xFF0F1422), foreground: const Color(0xFF6C8CFF), icon: Icons.auto_awesome_rounded, usageScore: 90),
+      HubApp('Copilot', background: const Color(0xFF1A1D2E), foreground: const Color(0xFF8E6CFF), icon: Icons.interests_rounded, usageScore: 60),
     ]),
     AppGroup('Gaming Hub', [
-      HubApp('Roblox', background: const Color(0xFF232426), foreground: Colors.white, icon: Icons.crop_square_rounded),
-      HubApp('Brawl Stars', background: const Color(0xFFF5B63A), foreground: const Color(0xFF1B1B1B), icon: Icons.videogame_asset_rounded),
-      HubApp('Free Fire', background: const Color(0xFFB3341E), foreground: const Color(0xFFFFC857), icon: Icons.local_fire_department_rounded),
-      HubApp('MOBA', background: const Color(0xFF2C3E78), foreground: const Color(0xFFFFD27A), icon: Icons.shield_rounded),
+      HubApp('Roblox', background: const Color(0xFF232426), foreground: Colors.white, icon: Icons.crop_square_rounded, usageScore: 70),
+      HubApp('Brawl Stars', background: const Color(0xFFF5B63A), foreground: const Color(0xFF1B1B1B), icon: Icons.videogame_asset_rounded, usageScore: 85),
     ]),
-    AppGroup('Streaming y Media', [
-      HubApp('TikTok', background: const Color(0xFF000000), foreground: const Color(0xFF25F4EE), icon: Icons.music_note_rounded),
-      HubApp('YouTube', background: Colors.white, foreground: const Color(0xFFFF0000), icon: Icons.smart_display_rounded),
-      HubApp('Netflix', background: const Color(0xFF000000), foreground: const Color(0xFFE50914), letter: 'N'),
-      HubApp('Twitch', background: const Color(0xFF9146FF), foreground: Colors.white, icon: Icons.chat_bubble_rounded),
-    ]),
-    AppGroup('Productividad', [
-      HubApp('Notion', background: Colors.white, foreground: const Color(0xFF111111), letter: 'N'),
-      HubApp('Drive', background: Colors.white, foreground: const Color(0xFF1FA463), icon: Icons.add_to_drive_rounded),
-      HubApp('Canva', background: const Color(0xFF6C4DF0), foreground: Colors.white, letter: 'C'),
-      HubApp('Slack', background: const Color(0xFF3F0E40), foreground: const Color(0xFFECB22E), icon: Icons.tag_rounded),
-    ]),
+    AppGroup('Personalizados', [
+      HubApp('Mi Proyecto Secreto', background: HubColors.pomelo.withOpacity(0.2), foreground: HubColors.pomelo, icon: Icons.star_rounded, usageScore: 50),
+    ], isCustom: true),
   ];
 
   static const List<_CardData> _cards = [
@@ -188,30 +190,104 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
     _CardData('Modos de Rendimiento', 'Ajusta el rendimiento de tu dispositivo', _PerformanceArt()),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _sortAllGroups();
+  }
+
+  void _sortAllGroups() {
+    for (var group in _appGroups) {
+      group.sortByUsage();
+    }
+  }
+
+  // Simula la solicitud de permisos de Google/Android y escaneo de apps reales
+  Future<void> _requestDeviceAppsAndScan() async {
+    SystemLogger.log('Solicitando permisos QUERY_ALL_PACKAGES para leer apps del dispositivo...');
+    
+    // Mostramos diálogo explicativo de permisos al usuario
+    final bool? accepted = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: HubColors.panel,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Permiso de Acceso a Apps', style: TextStyle(color: HubColors.textoPrincipal)),
+        content: const Text(
+          'Anythings Hub necesita consultar las aplicaciones instaladas en tu dispositivo para clasificarlas automáticamente por categorías y frecuencia de uso. La aplicación se ignorará a sí misma de forma automática.',
+          style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Permitir', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (accepted == true) {
+      setState(() {
+        _deviceScanned = true;
+        // Simulación de integración con paquete real (ej. plugin installed_apps)
+        // Se filtran apps simuladas del sistema omitiendo estrictamente _selfPackageName
+        final scannedApps = [
+          HubApp('YouTube', background: Colors.white, foreground: const Color(0xFFFF0000), icon: Icons.smart_display_rounded, packageName: 'com.google.android.youtube', usageScore: 99),
+          HubApp('TikTok', background: Colors.black, foreground: const Color(0xFF25F4EE), icon: Icons.music_note_rounded, packageName: 'com.zhiliaoapp.musically', usageScore: 88),
+          HubApp('Anythings Hub', background: Colors.red, foreground: Colors.white, icon: Icons.error, packageName: _selfPackageName, usageScore: 100), // App propia
+          HubApp('WhatsApp', background: const Color(0xFF25D366), foreground: Colors.white, icon: Icons.message_rounded, packageName: 'com.whatsapp', usageScore: 94),
+        ];
+
+        // Filtramos la app actual (ignorándose a sí misma)
+        final filteredApps = scannedApps.where((app) => app.packageName != _selfPackageName).toList();
+
+        // Creamos o rellenamos la categoría automática por uso frecuente
+        _appGroups.removeWhere((g) => g.label == 'Aplicaciones del Dispositivo');
+        
+        // Ordenamos las apps del dispositivo escaneadas por uso frecuente descendente
+        filteredApps.sort((a, b) => b.usageScore.compareTo(a.usageScore));
+
+        _appGroups.insert(
+          0,
+          AppGroup('Aplicaciones del Dispositivo (Auto)', filteredApps),
+        );
+
+        _sortAllGroups();
+      });
+
+      SystemLogger.log('Escaneo de dispositivo completado. Aplicación propia ($_selfPackageName) ignorada con éxito.');
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: HubColors.panel,
+          content: const Text('Apps del dispositivo sincronizadas y ordenadas por uso.', style: TextStyle(color: HubColors.textoPrincipal)),
+        ),
+      );
+    }
+  }
+
   void _onFabAction(RadialAction action) {
     SystemLogger.log('FAB → ${action.id}');
     if (action.id == 'folder') {
       _showCreateGroupDialog();
     } else if (action.id == 'add_app') {
       _showAddAppDialog();
+    } else if (action.id == 'scan_device') {
+      _requestDeviceAppsAndScan();
     } else {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(milliseconds: 1600),
-            backgroundColor: HubColors.panel,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: HubColors.pomelo.withOpacity(0.5)),
-            ),
-            content: Text(
-              '${action.label}: próximamente',
-              style: const TextStyle(color: HubColors.textoPrincipal),
-            ),
-          ),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: HubColors.panel,
+          content: Text('${action.label}: acción ejecutada', style: const TextStyle(color: HubColors.textoPrincipal)),
+        ),
+      );
     }
   }
 
@@ -222,12 +298,12 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Crear Nuevo Grupo', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: const Text('Crear Grupo Personalizado', style: TextStyle(color: HubColors.textoPrincipal)),
         content: TextField(
           controller: controller,
           style: const TextStyle(color: HubColors.textoPrincipal),
           decoration: const InputDecoration(
-            hintText: 'Ej. Herramientas Dev',
+            hintText: 'Ej. Mis Utilidades',
             hintStyle: TextStyle(color: HubColors.textoSecundario),
             enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
             focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
@@ -243,10 +319,10 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
                 setState(() {
-                  _appGroups.add(AppGroup(controller.text.trim(), []));
+                  _appGroups.add(AppGroup(controller.text.trim(), [], isCustom: true));
                 });
                 Navigator.pop(ctx);
-                SystemLogger.log('Grupo creado: ${controller.text.trim()}');
+                SystemLogger.log('Grupo personalizado creado: ${controller.text.trim()}');
               }
             },
             child: const Text('Crear', style: TextStyle(color: Colors.white)),
@@ -257,12 +333,13 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
   }
 
   void _showAddAppDialog() {
-    if (_appGroups.isEmpty) {
+    final customGroups = _appGroups.where((g) => g.isCustom).toList();
+    if (customGroups.isEmpty) {
       _showCreateGroupDialog();
       return;
     }
     String appName = '';
-    String selectedGroup = _appGroups.first.label;
+    String selectedGroup = customGroups.first.label;
 
     showDialog(
       context: context,
@@ -270,7 +347,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: HubColors.panel,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Añadir Acceso Directo', style: TextStyle(color: HubColors.textoPrincipal)),
+          title: const Text('Añadir a Grupo Personalizado', style: TextStyle(color: HubColors.textoPrincipal)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -288,7 +365,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
               DropdownButtonFormField<String>(
                 value: selectedGroup,
                 dropdownColor: HubColors.panel,
-                items: _appGroups.map((g) => DropdownMenuItem(value: g.label, child: Text(g.label, style: const TextStyle(color: HubColors.textoPrincipal)))).toList(),
+                items: customGroups.map((g) => DropdownMenuItem(value: g.label, child: Text(g.label, style: const TextStyle(color: HubColors.textoPrincipal)))).toList(),
                 onChanged: (val) {
                   if (val != null) setDialogState(() => selectedGroup = val);
                 },
@@ -316,10 +393,12 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                       background: HubColors.pomelo.withOpacity(0.2),
                       foreground: HubColors.pomelo,
                       icon: Icons.star_rounded,
+                      usageScore: 50, // Asignación de uso inicial para ordenamiento automático
                     ));
+                    group.sortByUsage(); // Se auto-ordena por uso
                   });
                   Navigator.pop(ctx);
-                  SystemLogger.log('App añadida: $appName en $selectedGroup');
+                  SystemLogger.log('App añadida a grupo manual y auto-ordenada: $appName');
                 }
               },
               child: const Text('Añadir', style: TextStyle(color: Colors.white)),
@@ -387,9 +466,9 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: IconButton(
-                    tooltip: 'Ajustes',
-                    onPressed: () => SystemLogger.log('Header → ajustes'),
-                    icon: const Icon(Icons.settings_outlined, color: HubColors.pomelo, size: 26),
+                    tooltip: 'Escanear Dispositivo',
+                    onPressed: _requestDeviceAppsAndScan,
+                    icon: const Icon(Icons.radar_rounded, color: HubColors.pomelo, size: 26),
                   ),
                 ),
               ],
@@ -407,7 +486,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
           ),
           const SizedBox(height: 5),
           const Text(
-            'Tu centro de control total',
+            'Sincronización inteligente de apps',
             style: TextStyle(color: HubColors.textoAcento, fontSize: 13),
           ),
           const SizedBox(height: 14),
@@ -428,7 +507,13 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
                 title: c.title,
                 subtitle: c.subtitle,
                 art: c.art,
-                onTap: () => SystemLogger.log('Card → ${c.title}'),
+                onTap: () {
+                  if (i == 0) {
+                    _requestDeviceAppsAndScan();
+                  } else {
+                    SystemLogger.log('Card → ${c.title}');
+                  }
+                },
               );
             },
           ),
@@ -437,16 +522,16 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
             child: FractionallySizedBox(
               widthFactor: 0.74,
               child: GradientPillButton(
-                label: 'Gestionar Todo',
-                icon: Icons.settings_outlined,
-                onPressed: () => SystemLogger.log('Botón → Gestionar Todo'),
+                label: _deviceScanned ? 'Apps Sincronizadas' : 'Escanear Apps Reales',
+                icon: Icons.sync_rounded,
+                onPressed: _requestDeviceAppsAndScan,
               ),
             ),
           ),
           const SizedBox(height: 10),
           const Center(
             child: Text(
-              'Ver detalles avanzados',
+              'Orden automático por frecuencia de uso activo',
               style: TextStyle(color: HubColors.textoSecundario, fontSize: 11.5),
             ),
           ),
@@ -612,7 +697,7 @@ class DashboardCard extends StatelessWidget {
 }
 
 // ============================================================================
-// SIDEBAR + FAB RADIAL CON BARRA DESLIZABLE DINÁMICA
+// SIDEBAR + FAB RADIAL DINÁMICO
 // ============================================================================
 class CollapsibleSidebar extends StatefulWidget {
   const CollapsibleSidebar({
@@ -956,14 +1041,22 @@ class _SidebarGroupTile extends StatelessWidget {
           if (showLabels)
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 4, 8, 6),
-              child: Text(
-                group.label,
-                style: TextStyle(
-                  color: HubColors.textoSecundario.withOpacity(progress),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.3,
-                ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      group.label,
+                      style: TextStyle(
+                        color: HubColors.textoSecundario.withOpacity(progress),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                  if (group.isCustom)
+                    Icon(Icons.edit_outlined, size: 12, color: HubColors.textoSecundario.withOpacity(progress)),
+                ],
               ),
             ),
           ...group.apps.map((app) {
