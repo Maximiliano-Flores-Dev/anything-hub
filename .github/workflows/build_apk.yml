@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
-          java-version: '11' # Cambiamos a Java 11 para evitar conflictos de Groovy/XML con Flutter
+          java-version: '17' # Requerido por Gradle moderno
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -34,6 +34,16 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Fix Groovy compatibility for Flutter SDK
+        run: |
+          # Parche dinámico para evitar el error de groovy.xml.QName en Gradle moderno con Java 17
+          FLUTTER_GROOVY_FILE="$HOME/.pub-cache/hosted/pub.dartlang.org/... 2>/dev/null || find $RUNNER_TOOL_CACHE/flutter -name "flutter.groovy" | head -n 1"
+          TARGET_FILE=$(find $RUNNER_TOOL_CACHE/flutter -name "flutter.groovy" | head -n 1)
+          if [ -f "$TARGET_FILE" ]; then
+            echo "Parcheando archivo: $TARGET_FILE"
+            sed -i 's/import groovy.xml.QName//g' "$TARGET_FILE"
+          fi
 
       - name: Build Split APKs Release
         run: flutter build apk --release --split-per-abi
