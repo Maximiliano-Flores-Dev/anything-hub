@@ -1,10 +1,10 @@
-name: Build Flutter APK
+name: Build and Release Flutter APK
 
 on:
   push:
     branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
+    tags:
+      - 'v*' # Se disparará también automáticamente cuando crees una etiqueta tipo v1.0.0
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.0'
+          flutter-version: '3.22.3'
           cache: true
 
       - name: Ensure Android Native Structure Exists
@@ -32,32 +32,23 @@ jobs:
             flutter create . --project-name anything_hub --org com.anything.hub --platforms=android
           fi
 
-      - name: Patch Flutter Groovy Compatibility Error
-        run: |
-          # Localizamos y parchamos el archivo flutter.groovy en el toolchain de Flutter para evitar el error de QName
-          FLUTTER_GROOVY_PATH=$(find $HOME/flutter -name "flutter.groovy" 2>/dev/null || find /opt/hostedtoolcache/flutter -name "flutter.groovy" 2>/dev/null)
-          if [ -f "$FLUTTER_GROOVY_PATH" ]; then
-            echo "Patching $FLUTTER_GROOVY_PATH"
-            sed -i 's/import groovy.xml.QName//g' "$FLUTTER_GROOVY_PATH"
-          else
-            echo "Flutter groovy file not found via find, checking standard toolcache..."
-            # Ruta alternativa común en GitHub Actions runners
-            ALT_PATH="/opt/hostedtoolcache/flutter/stable-3.29.0-x64/flutter/packages/flutter_tools/gradle/src/main/groovy/flutter.groovy"
-            if [ -f "$ALT_PATH" ]; then
-              sed -i 's/import groovy.xml.QName//g' "$ALT_PATH"
-              echo "Patched successfully at alternative path."
-            fi
-          fi
-
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Split APKs Release
         run: flutter build apk --release --split-per-abi
 
-      - name: Upload Split APK artifacts
+      - name: Upload Split APK artifacts to Actions
         uses: actions/upload-artifact@v4
         with:
           name: app-release-abis
           path: build/app/outputs/flutter-apk/*.apk
+
+      - name: Create GitHub Release and Upload APKs
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v') # Se ejecuta solo cuando subes un Tag (ej: git tag v1.0.0 && git push --tags)
+        with:
+          files: build/app/outputs/flutter-apk/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
