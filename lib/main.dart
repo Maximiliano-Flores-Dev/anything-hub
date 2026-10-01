@@ -18,7 +18,7 @@ void main() {
 }
 
 // ============================================================================
-// LOGGER (stub para no depender del package)
+// LOGGER
 // ============================================================================
 class SystemLogger {
   static void log(String message) {
@@ -28,7 +28,7 @@ class SystemLogger {
 }
 
 // ============================================================================
-// PALETA (medida sobre el mockup)
+// PALETA DE COLORES
 // ============================================================================
 abstract final class HubColors {
   static const Color fondoPrincipal = Color(0xFF040A16);
@@ -93,7 +93,7 @@ class AnythingsHubApp extends StatelessWidget {
 }
 
 // ============================================================================
-// DATOS
+// MODELOS DE DATOS Y ESTADO GLOBAL INTELIGENTE
 // ============================================================================
 class HubApp {
   const HubApp(
@@ -112,38 +112,11 @@ class HubApp {
 }
 
 class AppGroup {
-  const AppGroup(this.label, this.apps);
+  AppGroup(this.label, this.apps);
 
   final String label;
   final List<HubApp> apps;
 }
-
-const List<AppGroup> kAppGroups = [
-  AppGroup('Agentes de IA', [
-    HubApp('ChatGPT', background: Color(0xFF165343), foreground: Colors.white, icon: Icons.filter_vintage_outlined),
-    HubApp('Claude', background: Color(0xFFE7D3CC), foreground: Color(0xFFD9774F), icon: Icons.emergency_rounded),
-    HubApp('Gemini', background: Color(0xFF0F1422), foreground: Color(0xFF6C8CFF), icon: Icons.auto_awesome_rounded),
-    HubApp('Copilot', background: Color(0xFF1A1D2E), foreground: Color(0xFF8E6CFF), icon: Icons.interests_rounded),
-  ]),
-  AppGroup('Gaming Hub', [
-    HubApp('Roblox', background: Color(0xFF232426), foreground: Colors.white, icon: Icons.crop_square_rounded),
-    HubApp('Brawl Stars', background: Color(0xFFF5B63A), foreground: Color(0xFF1B1B1B), icon: Icons.videogame_asset_rounded),
-    HubApp('Free Fire', background: Color(0xFFB3341E), foreground: Color(0xFFFFC857), icon: Icons.local_fire_department_rounded),
-    HubApp('MOBA', background: Color(0xFF2C3E78), foreground: Color(0xFFFFD27A), icon: Icons.shield_rounded),
-  ]),
-  AppGroup('Streaming y Media', [
-    HubApp('TikTok', background: Color(0xFF000000), foreground: Color(0xFF25F4EE), icon: Icons.music_note_rounded),
-    HubApp('YouTube', background: Colors.white, foreground: Color(0xFFFF0000), icon: Icons.smart_display_rounded),
-    HubApp('Netflix', background: Color(0xFF000000), foreground: Color(0xFFE50914), letter: 'N'),
-    HubApp('Twitch', background: Color(0xFF9146FF), foreground: Colors.white, icon: Icons.chat_bubble_rounded),
-  ]),
-  AppGroup('Productividad', [
-    HubApp('Notion', background: Colors.white, foreground: Color(0xFF111111), letter: 'N'),
-    HubApp('Drive', background: Colors.white, foreground: Color(0xFF1FA463), icon: Icons.add_to_drive_rounded),
-    HubApp('Canva', background: Color(0xFF6C4DF0), foreground: Colors.white, letter: 'C'),
-    HubApp('Slack', background: Color(0xFF3F0E40), foreground: Color(0xFFECB22E), icon: Icons.tag_rounded),
-  ]),
-];
 
 class RadialAction {
   const RadialAction(this.id, this.label, this.icon);
@@ -153,10 +126,10 @@ class RadialAction {
 }
 
 const List<RadialAction> kFabActions = [
-  RadialAction('folder', 'Carpeta', Icons.folder_open_outlined),
+  RadialAction('folder', 'Nuevo Grupo', Icons.create_new_folder_outlined),
+  RadialAction('add_app', 'Añadir App', Icons.add_to_photos_rounded),
   RadialAction('settings', 'Ajustes', Icons.settings_outlined),
   RadialAction('connect', 'Conectar', Icons.hub_outlined),
-  RadialAction('block', 'Bloquear', Icons.block_rounded),
 ];
 
 class _CardData {
@@ -179,6 +152,33 @@ class MainLayoutScreen extends StatefulWidget {
 class _MainLayoutScreenState extends State<MainLayoutScreen> {
   int _tab = 0;
 
+  final List<AppGroup> _appGroups = [
+    AppGroup('Agentes de IA', [
+      HubApp('ChatGPT', background: const Color(0xFF165343), foreground: Colors.white, icon: Icons.filter_vintage_outlined),
+      HubApp('Claude', background: const Color(0xFFE7D3CC), foreground: const Color(0xFFD9774F), icon: Icons.emergency_rounded),
+      HubApp('Gemini', background: const Color(0xFF0F1422), foreground: const Color(0xFF6C8CFF), icon: Icons.auto_awesome_rounded),
+      HubApp('Copilot', background: const Color(0xFF1A1D2E), foreground: const Color(0xFF8E6CFF), icon: Icons.interests_rounded),
+    ]),
+    AppGroup('Gaming Hub', [
+      HubApp('Roblox', background: const Color(0xFF232426), foreground: Colors.white, icon: Icons.crop_square_rounded),
+      HubApp('Brawl Stars', background: const Color(0xFFF5B63A), foreground: const Color(0xFF1B1B1B), icon: Icons.videogame_asset_rounded),
+      HubApp('Free Fire', background: const Color(0xFFB3341E), foreground: const Color(0xFFFFC857), icon: Icons.local_fire_department_rounded),
+      HubApp('MOBA', background: const Color(0xFF2C3E78), foreground: const Color(0xFFFFD27A), icon: Icons.shield_rounded),
+    ]),
+    AppGroup('Streaming y Media', [
+      HubApp('TikTok', background: const Color(0xFF000000), foreground: const Color(0xFF25F4EE), icon: Icons.music_note_rounded),
+      HubApp('YouTube', background: Colors.white, foreground: const Color(0xFFFF0000), icon: Icons.smart_display_rounded),
+      HubApp('Netflix', background: const Color(0xFF000000), foreground: const Color(0xFFE50914), letter: 'N'),
+      HubApp('Twitch', background: const Color(0xFF9146FF), foreground: Colors.white, icon: Icons.chat_bubble_rounded),
+    ]),
+    AppGroup('Productividad', [
+      HubApp('Notion', background: Colors.white, foreground: const Color(0xFF111111), letter: 'N'),
+      HubApp('Drive', background: Colors.white, foreground: const Color(0xFF1FA463), icon: Icons.add_to_drive_rounded),
+      HubApp('Canva', background: const Color(0xFF6C4DF0), foreground: Colors.white, letter: 'C'),
+      HubApp('Slack', background: const Color(0xFF3F0E40), foreground: const Color(0xFFECB22E), icon: Icons.tag_rounded),
+    ]),
+  ];
+
   static const List<_CardData> _cards = [
     _CardData('Mis Aplicaciones', 'Gestiona, descarga y abre tus apps en un solo lugar', _AppsArt()),
     _CardData('Carpetas del Proyecto', 'Acceso rápido a tus proyectos', _SheetsArt()),
@@ -189,24 +189,145 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
   ];
 
   void _onFabAction(RadialAction action) {
-    SystemLogger.log('FAB → ${action.label}');
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(milliseconds: 1600),
-          backgroundColor: HubColors.panel,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: HubColors.pomelo.withOpacity(0.5)),
+    SystemLogger.log('FAB → ${action.id}');
+    if (action.id == 'folder') {
+      _showCreateGroupDialog();
+    } else if (action.id == 'add_app') {
+      _showAddAppDialog();
+    } else {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(milliseconds: 1600),
+            backgroundColor: HubColors.panel,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: HubColors.pomelo.withOpacity(0.5)),
+            ),
+            content: Text(
+              '${action.label}: próximamente',
+              style: const TextStyle(color: HubColors.textoPrincipal),
+            ),
           ),
-          content: Text(
-            '${action.label}: próximamente',
-            style: const TextStyle(color: HubColors.textoPrincipal),
+        );
+    }
+  }
+
+  void _showCreateGroupDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: HubColors.panel,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Crear Nuevo Grupo', style: TextStyle(color: HubColors.textoPrincipal)),
+        content: TextField(
+          controller: controller,
+          style: const TextStyle(color: HubColors.textoPrincipal),
+          decoration: const InputDecoration(
+            hintText: 'Ej. Herramientas Dev',
+            hintStyle: TextStyle(color: HubColors.textoSecundario),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
           ),
         ),
-      );
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                setState(() {
+                  _appGroups.add(AppGroup(controller.text.trim(), []));
+                });
+                Navigator.pop(ctx);
+                SystemLogger.log('Grupo creado: ${controller.text.trim()}');
+              }
+            },
+            child: const Text('Crear', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddAppDialog() {
+    if (_appGroups.isEmpty) {
+      _showCreateGroupDialog();
+      return;
+    }
+    String appName = '';
+    String selectedGroup = _appGroups.first.label;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: HubColors.panel,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Añadir Acceso Directo', style: TextStyle(color: HubColors.textoPrincipal)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                onChanged: (val) => appName = val,
+                style: const TextStyle(color: HubColors.textoPrincipal),
+                decoration: const InputDecoration(
+                  hintText: 'Nombre de la aplicación',
+                  hintStyle: TextStyle(color: HubColors.textoSecundario),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
+                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
+                ),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedGroup,
+                dropdownColor: HubColors.panel,
+                items: _appGroups.map((g) => DropdownMenuItem(value: g.label, child: Text(g.label, style: const TextStyle(color: HubColors.textoPrincipal)))).toList(),
+                onChanged: (val) {
+                  if (val != null) setDialogState(() => selectedGroup = val);
+                },
+                decoration: const InputDecoration(
+                  labelText: 'Seleccionar Grupo',
+                  labelStyle: TextStyle(color: HubColors.textoSecundario),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),
+              onPressed: () {
+                if (appName.trim().isNotEmpty) {
+                  setState(() {
+                    final group = _appGroups.firstWhere((g) => g.label == selectedGroup);
+                    group.apps.add(HubApp(
+                      appName.trim(),
+                      background: HubColors.pomelo.withOpacity(0.2),
+                      foreground: HubColors.pomelo,
+                      icon: Icons.star_rounded,
+                    ));
+                  });
+                  Navigator.pop(ctx);
+                  SystemLogger.log('App añadida: $appName en $selectedGroup');
+                }
+              },
+              child: const Text('Añadir', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -221,6 +342,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
           children: [
             CollapsibleSidebar(
               screenWidth: screenWidth,
+              appGroups: _appGroups,
               onActionSelected: _onFabAction,
             ),
             Expanded(
@@ -443,7 +565,6 @@ class DashboardCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // FittedBox evita el "Mis Aplica..."
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               alignment: Alignment.centerLeft,
@@ -491,16 +612,18 @@ class DashboardCard extends StatelessWidget {
 }
 
 // ============================================================================
-// SIDEBAR + FAB RADIAL (mantener + arrastrar)
+// SIDEBAR + FAB RADIAL CON BARRA DESLIZABLE DINÁMICA
 // ============================================================================
 class CollapsibleSidebar extends StatefulWidget {
   const CollapsibleSidebar({
     super.key,
     required this.screenWidth,
+    required this.appGroups,
     required this.onActionSelected,
   });
 
   final double screenWidth;
+  final List<AppGroup> appGroups;
   final ValueChanged<RadialAction> onActionSelected;
 
   @override
@@ -516,7 +639,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   double _dragStartWidth = _minWidth;
   bool _isOpen = false;
 
-  // FAB radial
   OverlayEntry? _overlayEntry;
   bool _menuOpen = false;
   Offset _pointer = Offset.zero;
@@ -551,7 +673,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
     setState(() => _isOpen = !_isOpen);
   }
 
-  // ---------- Radial menu ----------
   void _openMenu(Offset globalPos) {
     if (_menuOpen) return;
     _menuOpen = true;
@@ -606,16 +727,13 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   Offset? _fabGlobalCenter() {
     final box = context.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize) return null;
-    // FAB está abajo-izquierda del sidebar
     final local = Offset(_currentWidth / 2, box.size.height - 28 - 28);
     return box.localToGlobal(local);
   }
 
   Offset _actionPosition(Offset fabCenter, int index) {
-    // Botones más pequeños encima y al lado del +
-    // Distribución vertical hacia arriba + un poco a la derecha
     const baseRadius = 72.0;
-    final angle = -math.pi / 2 + (index * 0.55); // de arriba hacia abajo-derecha
+    final angle = -math.pi / 2 + (index * 0.55);
     return Offset(
       fabCenter.dx + math.cos(angle) * baseRadius,
       fabCenter.dy + math.sin(angle) * baseRadius,
@@ -629,7 +747,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
       color: Colors.transparent,
       child: Stack(
         children: [
-          // backdrop para cerrar al tocar fuera
           Positioned.fill(
             child: GestureDetector(
               onTap: () => _closeMenu(),
@@ -637,7 +754,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
               child: const ColoredBox(color: Color(0x66000000)),
             ),
           ),
-          // botones de acción
           ...List.generate(kFabActions.length, (i) {
             final pos = _actionPosition(fabCenter, i);
             final selected = _hoveredIndex == i;
@@ -715,7 +831,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
             color: HubColors.fondoSidebar,
             child: Column(
               children: [
-                // Header del sidebar
                 SizedBox(
                   height: 52,
                   child: progress > 0.55
@@ -727,7 +842,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Apps',
+                                  'Aplicaciones',
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     color: HubColors.textoPrincipal.withOpacity(progress),
@@ -755,13 +870,12 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                         ),
                 ),
                 Divider(height: 1, color: HubColors.linea.withOpacity(0.6)),
-                // Lista de grupos / apps
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: kAppGroups.length,
+                    itemCount: widget.appGroups.length,
                     itemBuilder: (context, gi) {
-                      final group = kAppGroups[gi];
+                      final group = widget.appGroups[gi];
                       return _SidebarGroupTile(
                         group: group,
                         progress: progress,
@@ -770,7 +884,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                     },
                   ),
                 ),
-                // FAB circular abajo-izquierda
                 Padding(
                   padding: const EdgeInsets.only(bottom: 18, top: 8),
                   child: _buildFab(),
