@@ -23,7 +23,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.1'
+          flutter-version: '3.29.0' # O puedes usar 'stable' para la última versión disponible
           channel: 'stable'
           cache: true
 
@@ -33,11 +33,11 @@ jobs:
             flutter create . --project-name anything_hub --org com.anything.hub --platforms=android
           fi
 
-      - name: Downgrade Gradle to 8.8 for Groovy Compatibility
+      - name: Set Gradle Version to 9.3.1 (Required by AGP)
         run: |
           PROP_FILE="android/gradle/wrapper/gradle-wrapper.properties"
           if [ -f "$PROP_FILE" ]; then
-            sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.8-bin.zip|g' "$PROP_FILE"
+            sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-9.3.1-bin.zip|g' "$PROP_FILE"
           fi
 
       - name: Install dependencies
