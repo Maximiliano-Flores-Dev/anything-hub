@@ -199,7 +199,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
           backgroundColor: HubColors.panel,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: HubColors.pomelo.withValues(alpha: 0.5)),
+            side: BorderSide(color: HubColors.pomelo.withOpacity(0.5)),
           ),
           content: Text(
             '${action.label}: próximamente',
@@ -358,7 +358,7 @@ class GradientPillButton extends StatelessWidget {
         borderRadius: shape,
         boxShadow: [
           BoxShadow(
-            color: HubColors.pomelo.withValues(alpha: 0.28),
+            color: HubColors.pomelo.withOpacity(0.28),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -476,7 +476,7 @@ class DashboardCard extends StatelessWidget {
                       Icon(
                         Icons.north_east_rounded,
                         size: 14,
-                        color: HubColors.textoSecundario.withValues(alpha: 0.8),
+                        color: HubColors.textoSecundario.withOpacity(0.8),
                       ),
                     ],
                   ),
@@ -658,12 +658,12 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                     border: Border.all(
                       color: selected
                           ? HubColors.pomelo
-                          : HubColors.linea.withValues(alpha: 0.8),
+                          : HubColors.linea.withOpacity(0.8),
                       width: 1.2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.45),
+                        color: Colors.black.withOpacity(0.45),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -730,7 +730,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                                   'Apps',
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: HubColors.textoPrincipal.withValues(alpha: progress),
+                                    color: HubColors.textoPrincipal.withOpacity(progress),
                                     fontWeight: FontWeight.w600,
                                     fontSize: 15,
                                   ),
@@ -741,7 +741,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                                 onPressed: _toggle,
                                 icon: Icon(
                                   Icons.chevron_left_rounded,
-                                  color: HubColors.textoSecundario.withValues(alpha: progress),
+                                  color: HubColors.textoSecundario.withOpacity(progress),
                                 ),
                               ),
                             ],
@@ -754,7 +754,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                           ),
                         ),
                 ),
-                Divider(height: 1, color: HubColors.linea.withValues(alpha: 0.6)),
+                Divider(height: 1, color: HubColors.linea.withOpacity(0.6)),
                 // Lista de grupos / apps
                 Expanded(
                   child: ListView.builder(
@@ -806,7 +806,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
             gradient: HubColors.degradadoDiagonal,
             boxShadow: [
               BoxShadow(
-                color: HubColors.pomelo.withValues(alpha: 0.45),
+                color: HubColors.pomelo.withOpacity(0.45),
                 blurRadius: 18,
                 offset: const Offset(0, 6),
               ),
@@ -846,7 +846,7 @@ class _SidebarGroupTile extends StatelessWidget {
               child: Text(
                 group.label,
                 style: TextStyle(
-                  color: HubColors.textoSecundario.withValues(alpha: progress),
+                  color: HubColors.textoSecundario.withOpacity(progress),
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.3,
@@ -869,7 +869,7 @@ class _SidebarGroupTile extends StatelessWidget {
                         app.name,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: HubColors.textoPrincipal.withValues(alpha: progress),
+                          color: HubColors.textoPrincipal.withOpacity(progress),
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
@@ -1005,9 +1005,9 @@ class _AppsArt extends StatelessWidget {
       width: 30,
       height: 30,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.18),
+        color: color.withOpacity(0.18),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.45)),
+        border: Border.all(color: color.withOpacity(0.45)),
       ),
       child: Icon(icon, size: 16, color: color),
     );
@@ -1044,9 +1044,9 @@ class _SheetsArt extends StatelessWidget {
       width: size,
       height: size * 0.78,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.2),
+        color: color.withOpacity(0.2),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.7), width: 1.4),
+        border: Border.all(color: color.withOpacity(0.7), width: 1.4),
       ),
       child: Align(
         alignment: Alignment.topLeft,
@@ -1055,7 +1055,7 @@ class _SheetsArt extends StatelessWidget {
           height: 8,
           margin: const EdgeInsets.only(left: 4, top: 4),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.55),
+            color: color.withOpacity(0.55),
             borderRadius: BorderRadius.circular(3),
           ),
         ),
@@ -1114,9 +1114,9 @@ class _PerformanceArt extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
+        color: color.withOpacity(0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
+        border: Border.all(color: color.withOpacity(0.5)),
       ),
       child: Text(
         label,
