@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -102,7 +104,9 @@ class HubApp {
     required this.foreground,
     this.icon,
     this.letter,
+    this.iconBytes,
     this.packageName,
+    this.category = 'other',
     this.usageScore = 0,
     this.isSystemScanned = false,
   });
@@ -112,21 +116,133 @@ class HubApp {
   final Color foreground;
   final IconData? icon;
   final String? letter;
+  final Uint8List? iconBytes; // Ícono real de la app instalada (PNG)
   final String? packageName;
-  int usageScore; // Simula o almacena el uso frecuente para auto-ordenar
+  final String category; // Id de categoría automática (ver kAutoCategories)
+  int usageScore; // Minutos en primer plano dentro de la ventana analizada
   final bool isSystemScanned;
 }
 
 class AppGroup {
-  AppGroup(this.label, this.apps, {this.isCustom = false});
+  AppGroup(this.label, this.apps, {this.isCustom = false, List<String>? packages})
+      : packages = packages ?? <String>[];
 
   final String label;
   final List<HubApp> apps;
   final bool isCustom; // True si fue creado manualmente por el usuario
+  final List<String> packages; // Membresía manual (solo grupos personalizados)
 
   void sortByUsage() {
-    apps.sort((a, b) => b.usageScore.compareTo(a.usageScore));
+    apps.sort((a, b) {
+      final byUsage = b.usageScore.compareTo(a.usageScore);
+      return byUsage != 0
+          ? byUsage
+          : a.name.toLowerCase().compareTo(b.name.toLowerCase());
+    });
   }
+}
+
+// ============================================================================
+// CATEGORÍAS AUTOMÁTICAS (PREESTABLECIDAS)
+// ============================================================================
+class AutoCategory {
+  const AutoCategory(this.id, this.label);
+  final String id;
+  final String label;
+}
+
+const List<AutoCategory> kAutoCategories = [
+  AutoCategory('ai', 'Agentes de IA'),
+  AutoCategory('game', 'Gaming Hub'),
+  AutoCategory('social', 'Social'),
+  AutoCategory('media', 'Multimedia'),
+  AutoCategory('productivity', 'Productividad'),
+  AutoCategory('maps', 'Mapas y Navegación'),
+  AutoCategory('news', 'Noticias'),
+  AutoCategory('other', 'Otras apps'),
+];
+
+// Android no tiene una categoría "IA", así que se detecta por palabras clave
+// en el package o el nombre. Edita esta lista a tu gusto.
+const List<String> kAiKeywords = [
+  'chatgpt', 'openai', 'claude', 'anthropic', 'gemini', 'copilot',
+  'perplexity', 'deepseek', 'grok', 'mistral',
+];
+
+// ============================================================================
+// PUENTE NATIVO ANDROID (MethodChannel propio, sin dependencias externas)
+// ============================================================================
+class DeviceAppInfo {
+  const DeviceAppInfo({
+    required this.packageName,
+    required this.name,
+    required this.category,
+    required this.usageMinutes,
+    this.icon,
+  });
+
+  final String packageName;
+  final String name;
+  final String category; // game, social, media, productivity, maps, news, undefined
+  final int usageMinutes;
+  final Uint8List? icon;
+}
+
+class DeviceAppsService {
+  static const MethodChannel _ch = MethodChannel('anythings.hub/device_apps');
+
+  static Future<T?> _call<T>(String method, [dynamic args]) async {
+    try {
+      return await _ch.invokeMethod<T>(method, args);
+    } on MissingPluginException {
+      return null; // Plataforma sin implementación nativa (iOS, web, escritorio)
+    } on PlatformException catch (e) {
+      SystemLogger.log('Canal nativo "$method" falló: ${e.message}');
+      return null;
+    }
+  }
+
+  static Future<String> selfPackage() async =>
+      await _call<String>('selfPackage') ?? '';
+
+  static Future<bool> hasUsageAccess() async =>
+      await _call<bool>('hasUsageAccess') ?? false;
+
+  static Future<void> openUsageAccessSettings() async {
+    await _call<Object?>('openUsageAccessSettings');
+  }
+
+  static Future<bool> launch(String packageName) async =>
+      await _call<bool>('launchApp', {'package': packageName}) ?? false;
+
+  static Future<String?> loadState() => _call<String>('loadState');
+
+  static Future<void> saveState(String json) async {
+    await _call<Object?>('saveState', {'json': json});
+  }
+
+  /// Devuelve null si el escaneo no es posible en esta plataforma.
+  static Future<List<DeviceAppInfo>?> listApps({int days = 14}) async {
+    final raw = await _call<List<dynamic>>('listApps', {'days': days});
+    if (raw == null) return null;
+    return raw.whereType<Map>().map((m) {
+      return DeviceAppInfo(
+        packageName: m['package'] as String,
+        name: m['name'] as String,
+        category: (m['category'] as String?) ?? 'undefined',
+        usageMinutes: ((m['usageMs'] as num?) ?? 0).toInt() ~/ 60000,
+        icon: m['icon'] as Uint8List?,
+      );
+    }).toList();
+  }
+}
+
+/// Decide a qué categoría automática pertenece una app real.
+String classifyApp(DeviceAppInfo app) {
+  final haystack = '${app.packageName} ${app.name}'.toLowerCase();
+  if (kAiKeywords.any(haystack.contains)) return 'ai';
+  final known = kAutoCategories.any((c) => c.id == app.category);
+  return known ? app.category : 'other';
 }
 
 class RadialAction {
@@ -160,26 +276,18 @@ class MainLayoutScreen extends StatefulWidget {
   State<MainLayoutScreen> createState() => _MainLayoutScreenState();
 }
 
-class _MainLayoutScreenState extends State<MainLayoutScreen> {
+class _MainLayoutScreenState extends State<MainLayoutScreen>
+    with WidgetsBindingObserver {
   int _tab = 0;
   bool _deviceScanned = false;
-  static const String _selfPackageName = 'com.anythings.hub'; // Paquete propio a ignorar
+  bool _consent = false; // El usuario aceptó que la app lea las apps instaladas
+  bool _scanning = false;
+  bool _awaitingUsageAccess = false; // Esperando que vuelva de Ajustes del sistema
+  bool _usagePromptDismissed = false; // Rechazó el acceso de uso en esta sesión
+  String _selfPackage = ''; // Lo entrega Android: nunca queda hardcodeado
 
-  final List<AppGroup> _appGroups = [
-    AppGroup('Agentes de IA', [
-      HubApp('ChatGPT', background: const Color(0xFF165343), foreground: Colors.white, icon: Icons.filter_vintage_outlined, usageScore: 95),
-      HubApp('Claude', background: const Color(0xFFE7D3CC), foreground: const Color(0xFFD9774F), icon: Icons.emergency_rounded, usageScore: 80),
-      HubApp('Gemini', background: const Color(0xFF0F1422), foreground: const Color(0xFF6C8CFF), icon: Icons.auto_awesome_rounded, usageScore: 90),
-      HubApp('Copilot', background: const Color(0xFF1A1D2E), foreground: const Color(0xFF8E6CFF), icon: Icons.interests_rounded, usageScore: 60),
-    ]),
-    AppGroup('Gaming Hub', [
-      HubApp('Roblox', background: const Color(0xFF232426), foreground: Colors.white, icon: Icons.crop_square_rounded, usageScore: 70),
-      HubApp('Brawl Stars', background: const Color(0xFFF5B63A), foreground: const Color(0xFF1B1B1B), icon: Icons.videogame_asset_rounded, usageScore: 85),
-    ]),
-    AppGroup('Personalizados', [
-      HubApp('Mi Proyecto Secreto', background: HubColors.pomelo.withOpacity(0.2), foreground: HubColors.pomelo, icon: Icons.star_rounded, usageScore: 50),
-    ], isCustom: true),
-  ];
+  final Map<String, HubApp> _catalog = {}; // packageName → app real
+  List<AppGroup> _appGroups = [];
 
   static const List<_CardData> _cards = [
     _CardData('Mis Aplicaciones', 'Gestiona, descarga y abre tus apps en un solo lugar', _AppsArt()),
@@ -193,83 +301,211 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
   @override
   void initState() {
     super.initState();
-    _sortAllGroups();
+    WidgetsBinding.instance.addObserver(this);
+    _bootstrap();
   }
 
-  void _sortAllGroups() {
-    for (var group in _appGroups) {
-      group.sortByUsage();
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Al volver desde Ajustes → "Acceso a datos de uso", reescaneamos solos.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _awaitingUsageAccess) {
+      _awaitingUsageAccess = false;
+      _requestDeviceAppsAndScan(userInitiated: false);
     }
   }
 
-  // Simula la solicitud de permisos de Google/Android y escaneo de apps reales
-  Future<void> _requestDeviceAppsAndScan() async {
-    SystemLogger.log('Solicitando permisos QUERY_ALL_PACKAGES para leer apps del dispositivo...');
-    
-    // Mostramos diálogo explicativo de permisos al usuario
-    final bool? accepted = await showDialog<bool>(
+  Future<void> _bootstrap() async {
+    _selfPackage = await DeviceAppsService.selfPackage();
+    await _loadState();
+    if (_consent) await _requestDeviceAppsAndScan(userInitiated: false);
+  }
+
+  // ---------------------------------------------------------------- Persistencia
+  Future<void> _loadState() async {
+    final raw = await DeviceAppsService.loadState();
+    if (raw == null) return;
+    try {
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      final groups = (data['groups'] as List<dynamic>? ?? []).map((g) {
+        final m = g as Map<String, dynamic>;
+        return AppGroup(
+          m['label'] as String,
+          <HubApp>[],
+          isCustom: true,
+          packages: List<String>.from(m['packages'] as List<dynamic>? ?? []),
+        );
+      }).toList();
+      if (!mounted) return;
+      setState(() {
+        _consent = data['consent'] == true;
+        _appGroups = groups;
+      });
+    } catch (e) {
+      SystemLogger.log('Estado guardado ilegible, se ignora: $e');
+    }
+  }
+
+  Future<void> _saveState() {
+    final json = jsonEncode({
+      'consent': _consent,
+      'groups': [
+        for (final g in _appGroups.where((g) => g.isCustom))
+          {'label': g.label, 'packages': g.packages},
+      ],
+    });
+    return DeviceAppsService.saveState(json);
+  }
+
+  // ------------------------------------------------------------------- Grupos
+  // Única fuente de verdad: catálogo real + membresías manuales → grupos.
+  // Una app asignada a un grupo personalizado sale de su categoría automática.
+  void _rebuildGroups() {
+    final customs = _appGroups.where((g) => g.isCustom).toList();
+    final claimed = <String>{for (final g in customs) ...g.packages};
+
+    for (final g in customs) {
+      g.apps
+        ..clear()
+        ..addAll(g.packages.map((p) => _catalog[p]).whereType<HubApp>());
+      g.sortByUsage();
+    }
+
+    final autoGroups = <AppGroup>[];
+    for (final c in kAutoCategories) {
+      final apps = _catalog.values
+          .where((a) => a.category == c.id && !claimed.contains(a.packageName))
+          .toList();
+      if (apps.isEmpty) continue;
+      autoGroups.add(AppGroup(c.label, apps)..sortByUsage());
+    }
+
+    _appGroups = [...autoGroups, ...customs];
+  }
+
+  // ------------------------------------------------------------------ Permisos
+  Future<bool> _confirmDialog({
+    required String title,
+    required String body,
+    required String confirmLabel,
+    String cancelLabel = 'Ahora no',
+  }) async {
+    final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Permiso de Acceso a Apps', style: TextStyle(color: HubColors.textoPrincipal)),
-        content: const Text(
-          'Anythings Hub necesita consultar las aplicaciones instaladas en tu dispositivo para clasificarlas automáticamente por categorías y frecuencia de uso. La aplicación se ignorará a sí misma de forma automática.',
-          style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+        title: Text(title, style: const TextStyle(color: HubColors.textoPrincipal)),
+        content: Text(
+          body,
+          style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+            child: Text(cancelLabel, style: const TextStyle(color: HubColors.textoSecundario)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Permitir', style: TextStyle(color: Colors.white)),
+            child: Text(confirmLabel, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
+    return ok == true;
+  }
 
-    if (accepted == true) {
-      setState(() {
-        _deviceScanned = true;
-        // Simulación de integración con paquete real (ej. plugin installed_apps)
-        // Se filtran apps simuladas del sistema omitiendo estrictamente _selfPackageName
-        final scannedApps = [
-          HubApp('YouTube', background: Colors.white, foreground: const Color(0xFFFF0000), icon: Icons.smart_display_rounded, packageName: 'com.google.android.youtube', usageScore: 99),
-          HubApp('TikTok', background: Colors.black, foreground: const Color(0xFF25F4EE), icon: Icons.music_note_rounded, packageName: 'com.zhiliaoapp.musically', usageScore: 88),
-          HubApp('Anythings Hub', background: Colors.red, foreground: Colors.white, icon: Icons.error, packageName: _selfPackageName, usageScore: 100), // App propia
-          HubApp('WhatsApp', background: const Color(0xFF25D366), foreground: Colors.white, icon: Icons.message_rounded, packageName: 'com.whatsapp', usageScore: 94),
-        ];
+  void _toast(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: HubColors.panel,
+        content: Text(message, style: const TextStyle(color: HubColors.textoPrincipal)),
+      ),
+    );
+  }
 
-        // Filtramos la app actual (ignorándose a sí misma)
-        final filteredApps = scannedApps.where((app) => app.packageName != _selfPackageName).toList();
-
-        // Creamos o rellenamos la categoría automática por uso frecuente
-        _appGroups.removeWhere((g) => g.label == 'Aplicaciones del Dispositivo');
-        
-        // Ordenamos las apps del dispositivo escaneadas por uso frecuente descendente
-        filteredApps.sort((a, b) => b.usageScore.compareTo(a.usageScore));
-
-        _appGroups.insert(
-          0,
-          AppGroup('Aplicaciones del Dispositivo (Auto)', filteredApps),
+  // Flujo: 1) consentimiento propio  2) acceso de uso (permiso especial de
+  // Android, se concede en Ajustes)  3) lectura de apps  4) clasificación.
+  Future<void> _requestDeviceAppsAndScan({bool userInitiated = true}) async {
+    if (_scanning) return;
+    _scanning = true;
+    try {
+      if (!_consent) {
+        if (!userInitiated) return;
+        final accepted = await _confirmDialog(
+          title: 'Permiso de Acceso a Apps',
+          body: 'Anythings Hub necesita consultar las aplicaciones instaladas en tu dispositivo para clasificarlas por categorías. Todo se procesa en el dispositivo y no se envía a ningún servidor. La aplicación se ignora a sí misma.',
+          confirmLabel: 'Permitir',
+          cancelLabel: 'Cancelar',
         );
+        if (!accepted || !mounted) return;
+        _consent = true;
+        await _saveState();
+      }
 
-        _sortAllGroups();
+      final usageOk = await DeviceAppsService.hasUsageAccess();
+      if (!usageOk && userInitiated && !_usagePromptDismissed) {
+        final goToSettings = await _confirmDialog(
+          title: 'Acceso a datos de uso',
+          body: 'Para ordenar tus apps por uso frecuente, Android requiere que actives "Acceso a datos de uso" para Anythings Hub en Ajustes. Te llevaré allí; al volver, el orden se actualiza solo. Sin este permiso se ordenan alfabéticamente.',
+          confirmLabel: 'Abrir Ajustes',
+        );
+        if (!mounted) return;
+        if (goToSettings) {
+          _awaitingUsageAccess = true;
+          await DeviceAppsService.openUsageAccessSettings();
+          return;
+        }
+        _usagePromptDismissed = true;
+      }
+
+      final found = await DeviceAppsService.listApps();
+      if (!mounted) return;
+      if (found == null) {
+        if (userInitiated) _toast('El escaneo de apps solo está disponible en Android.');
+        return;
+      }
+
+      _catalog.clear();
+      for (final d in found) {
+        if (d.packageName == _selfPackage) continue; // Se ignora a sí misma
+        _catalog[d.packageName] = HubApp(
+          d.name,
+          background: HubColors.panel,
+          foreground: HubColors.textoPrincipal,
+          letter: d.name.isNotEmpty ? d.name[0].toUpperCase() : '?',
+          iconBytes: d.icon,
+          packageName: d.packageName,
+          category: classifyApp(d),
+          usageScore: d.usageMinutes,
+          isSystemScanned: true,
+        );
+      }
+
+      setState(() {
+        _rebuildGroups();
+        _deviceScanned = true;
       });
 
-      SystemLogger.log('Escaneo de dispositivo completado. Aplicación propia ($_selfPackageName) ignorada con éxito.');
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: HubColors.panel,
-          content: const Text('Apps del dispositivo sincronizadas y ordenadas por uso.', style: TextStyle(color: HubColors.textoPrincipal)),
-        ),
-      );
+      SystemLogger.log('Escaneo completado: ${_catalog.length} apps (propia ignorada: $_selfPackage).');
+      _toast(usageOk
+          ? 'Apps sincronizadas y ordenadas por uso.'
+          : 'Apps sincronizadas (sin acceso de uso: orden alfabético).');
+    } finally {
+      _scanning = false;
     }
+  }
+
+  void _launchApp(HubApp app) {
+    final pkg = app.packageName;
+    if (pkg != null) DeviceAppsService.launch(pkg);
   }
 
   void _onFabAction(RadialAction action) {
@@ -317,12 +553,13 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),
             onPressed: () {
-              if (controller.text.trim().isNotEmpty) {
-                setState(() {
-                  _appGroups.add(AppGroup(controller.text.trim(), [], isCustom: true));
-                });
+              final name = controller.text.trim();
+              final duplicated = _appGroups.any((g) => g.label.toLowerCase() == name.toLowerCase());
+              if (name.isNotEmpty && !duplicated) {
+                setState(() => _appGroups.add(AppGroup(name, <HubApp>[], isCustom: true)));
+                _saveState();
                 Navigator.pop(ctx);
-                SystemLogger.log('Grupo personalizado creado: ${controller.text.trim()}');
+                SystemLogger.log('Grupo personalizado creado: $name');
               }
             },
             child: const Text('Crear', style: TextStyle(color: Colors.white)),
@@ -338,8 +575,16 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
       _showCreateGroupDialog();
       return;
     }
-    String appName = '';
-    String selectedGroup = customGroups.first.label;
+    if (_catalog.isEmpty) {
+      _toast('Primero escanea las apps del dispositivo.');
+      _requestDeviceAppsAndScan();
+      return;
+    }
+
+    var group = customGroups.first;
+    final selected = <String>{...group.packages};
+    final candidates = _catalog.values.toList()
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     showDialog(
       context: context,
@@ -347,35 +592,69 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: HubColors.panel,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Añadir a Grupo Personalizado', style: TextStyle(color: HubColors.textoPrincipal)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                onChanged: (val) => appName = val,
-                style: const TextStyle(color: HubColors.textoPrincipal),
-                decoration: const InputDecoration(
-                  hintText: 'Nombre de la aplicación',
-                  hintStyle: TextStyle(color: HubColors.textoSecundario),
-                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
-                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
+          title: const Text('Apps del Grupo', style: TextStyle(color: HubColors.textoPrincipal)),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: MediaQuery.sizeOf(context).height * 0.55,
+            child: Column(
+              children: [
+                DropdownButtonFormField<AppGroup>(
+                  value: group,
+                  dropdownColor: HubColors.panel,
+                  items: customGroups
+                      .map((g) => DropdownMenuItem(
+                            value: g,
+                            child: Text(g.label, style: const TextStyle(color: HubColors.textoPrincipal)),
+                          ))
+                      .toList(),
+                  onChanged: (val) {
+                    if (val == null) return;
+                    setDialogState(() {
+                      group = val;
+                      selected
+                        ..clear()
+                        ..addAll(val.packages);
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Seleccionar Grupo',
+                    labelStyle: TextStyle(color: HubColors.textoSecundario),
+                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: selectedGroup,
-                dropdownColor: HubColors.panel,
-                items: customGroups.map((g) => DropdownMenuItem(value: g.label, child: Text(g.label, style: const TextStyle(color: HubColors.textoPrincipal)))).toList(),
-                onChanged: (val) {
-                  if (val != null) setDialogState(() => selectedGroup = val);
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Seleccionar Grupo',
-                  labelStyle: TextStyle(color: HubColors.textoSecundario),
-                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: candidates.length,
+                    itemBuilder: (_, i) {
+                      final app = candidates[i];
+                      final pkg = app.packageName!;
+                      return CheckboxListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: HubColors.pomelo,
+                        checkColor: HubColors.fondoPrincipal,
+                        controlAffinity: ListTileControlAffinity.trailing,
+                        value: selected.contains(pkg),
+                        onChanged: (v) => setDialogState(() {
+                          if (v == true) {
+                            selected.add(pkg);
+                          } else {
+                            selected.remove(pkg);
+                          }
+                        }),
+                        secondary: _AppAvatar(app: app, size: 32),
+                        title: Text(
+                          app.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 13),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -385,23 +664,17 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),
               onPressed: () {
-                if (appName.trim().isNotEmpty) {
-                  setState(() {
-                    final group = _appGroups.firstWhere((g) => g.label == selectedGroup);
-                    group.apps.add(HubApp(
-                      appName.trim(),
-                      background: HubColors.pomelo.withOpacity(0.2),
-                      foreground: HubColors.pomelo,
-                      icon: Icons.star_rounded,
-                      usageScore: 50, // Asignación de uso inicial para ordenamiento automático
-                    ));
-                    group.sortByUsage(); // Se auto-ordena por uso
-                  });
-                  Navigator.pop(ctx);
-                  SystemLogger.log('App añadida a grupo manual y auto-ordenada: $appName');
-                }
+                setState(() {
+                  group.packages
+                    ..clear()
+                    ..addAll(selected);
+                  _rebuildGroups(); // Re-ordena por uso y saca las apps de su categoría automática
+                });
+                _saveState();
+                Navigator.pop(ctx);
+                SystemLogger.log('Grupo "${group.label}" actualizado: ${selected.length} apps');
               },
-              child: const Text('Añadir', style: TextStyle(color: Colors.white)),
+              child: const Text('Guardar', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -423,6 +696,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
               screenWidth: screenWidth,
               appGroups: _appGroups,
               onActionSelected: _onFabAction,
+              onAppTap: _launchApp,
             ),
             Expanded(
               child: Column(
@@ -705,11 +979,13 @@ class CollapsibleSidebar extends StatefulWidget {
     required this.screenWidth,
     required this.appGroups,
     required this.onActionSelected,
+    required this.onAppTap,
   });
 
   final double screenWidth;
   final List<AppGroup> appGroups;
   final ValueChanged<RadialAction> onActionSelected;
+  final ValueChanged<HubApp> onAppTap;
 
   @override
   State<CollapsibleSidebar> createState() => _CollapsibleSidebarState();
@@ -965,6 +1241,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                         group: group,
                         progress: progress,
                         width: w,
+                        onAppTap: widget.onAppTap,
                       );
                     },
                   ),
@@ -1024,14 +1301,18 @@ class _SidebarGroupTile extends StatelessWidget {
     required this.group,
     required this.progress,
     required this.width,
+    required this.onAppTap,
   });
 
   final AppGroup group;
   final double progress;
   final double width;
+  final ValueChanged<HubApp> onAppTap;
 
   @override
   Widget build(BuildContext context) {
+    // Las categorías automáticas vacías no se muestran; las personalizadas sí.
+    if (group.apps.isEmpty && !group.isCustom) return const SizedBox.shrink();
     final showLabels = progress > 0.45;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -1060,29 +1341,33 @@ class _SidebarGroupTile extends StatelessWidget {
               ),
             ),
           ...group.apps.map((app) {
-            return Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: showLabels ? 10 : 8,
-                vertical: 3,
-              ),
-              child: Row(
-                children: [
-                  _AppAvatar(app: app, size: showLabels ? 34 : 40),
-                  if (showLabels) ...[
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        app.name,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: HubColors.textoPrincipal.withOpacity(progress),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => onAppTap(app),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: showLabels ? 10 : 8,
+                  vertical: 3,
+                ),
+                child: Row(
+                  children: [
+                    _AppAvatar(app: app, size: showLabels ? 34 : 40),
+                    if (showLabels) ...[
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          app.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: HubColors.textoPrincipal.withOpacity(progress),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ],
-                ],
+                ),
               ),
             );
           }),
@@ -1100,6 +1385,19 @@ class _AppAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bytes = app.iconBytes;
+    if (bytes != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.memory(
+          bytes,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          gaplessPlayback: true,
+        ),
+      );
+    }
     return Container(
       width: size,
       height: size,
