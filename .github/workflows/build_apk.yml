@@ -23,8 +23,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
-          channel: 'stable'
+          flutter-version: '3.29.0' # Usamos una versión explícita para evitar el conflicto del canal con 'stable'
           cache: true
 
       - name: Ensure Android Native Structure Exists
