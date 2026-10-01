@@ -23,7 +23,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.0' # O puedes usar 'stable' para la última versión disponible
+          flutter-version: 'stable'
           channel: 'stable'
           cache: true
 
@@ -33,7 +33,7 @@ jobs:
             flutter create . --project-name anything_hub --org com.anything.hub --platforms=android
           fi
 
-      - name: Set Gradle Version to 9.3.1 (Required by AGP)
+      - name: Set Gradle Version for Compatibility
         run: |
           PROP_FILE="android/gradle/wrapper/gradle-wrapper.properties"
           if [ -f "$PROP_FILE" ]; then
@@ -43,12 +43,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK Release
-        run: flutter build apk --release
+      - name: Build Split APKs Release
+        run: flutter build apk --release --split-per-abi
 
-      - name: Upload APK artifact
+      - name: Upload Split APK artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: app-release-abis
+          path: build/app/outputs/flutter-apk/*.apk
           
