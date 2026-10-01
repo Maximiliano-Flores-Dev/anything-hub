@@ -18,18 +18,32 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
-          java-version: '17' # Exigido por Gradle moderno
+          java-version: '17'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.5' # Versión totalmente compatible con Java 17 y sin errores de Groovy XML
+          flutter-version: 'stable'
           cache: true
 
       - name: Ensure Android Native Structure Exists
         run: |
           if [ ! -d "android" ]; then
             flutter create . --project-name anything_hub --org com.anything.hub --platforms=android
+          fi
+
+      - name: Inject Modern Gradle and Plugins on the Fly
+        run: |
+          # 1. Actualizar el Gradle Wrapper a la versión 8.7 para soportar Java 17 nativamente
+          if [ -f "android/gradle/wrapper/gradle-wrapper.properties" ]; then
+            sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.7-bin.zip|g' android/gradle/wrapper/gradle-wrapper.properties
+          fi
+
+          # 2. Actualizar el Android Gradle Plugin (AGP) en el build.gradle raíz si existe
+          if [ -f "android/build.gradle" ]; then
+            sed -i 's/com.android.tools.build:gradle:.*/com.android.tools.build:gradle:8.3.0"/g' android/build.gradle
+          elif [ -f "android/settings.gradle" ]; then
+            sed -i 's/id "com.android.application" version ".*"/id "com.android.application" version "8.3.0"/g' android/settings.gradle
           fi
 
       - name: Install dependencies
@@ -51,3 +65,4 @@ jobs:
           files: build/app/outputs/flutter-apk/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
