@@ -1,6 +1,6 @@
 // Ajusta la línea `package` a tu applicationId real (android/app/build.gradle)
 // y deja este archivo en la carpeta que corresponda a ese package.
-package com.anythings.hub
+package com.example.anything_hub
 
 import android.app.AppOpsManager
 import android.app.usage.UsageStatsManager
