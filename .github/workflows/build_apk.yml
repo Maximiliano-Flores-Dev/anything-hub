@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main", "master" ]
     tags:
-      - 'v*' # Se disparará también automáticamente cuando crees una etiqueta tipo v1.0.0
+      - 'v*'
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '11' # Cambiamos a Java 11 para evitar conflictos de Groovy/XML con Flutter
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -46,7 +46,7 @@ jobs:
 
       - name: Create GitHub Release and Upload APKs
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/v') # Se ejecuta solo cuando subes un Tag (ej: git tag v1.0.0 && git push --tags)
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: build/app/outputs/flutter-apk/*.apk
         env:
