@@ -23,7 +23,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.1' # Actualizado a una versión que resuelve el conflicto de Groovy con Gradle
+          flutter-version: '3.27.1'
           channel: 'stable'
           cache: true
 
@@ -31,6 +31,13 @@ jobs:
         run: |
           if [ ! -d "android" ]; then
             flutter create . --project-name anything_hub --org com.anything.hub --platforms=android
+          fi
+
+      - name: Downgrade Gradle to 8.8 for Groovy Compatibility
+        run: |
+          PROP_FILE="android/gradle/wrapper/gradle-wrapper.properties"
+          if [ -f "$PROP_FILE" ]; then
+            sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.8-bin.zip|g' "$PROP_FILE"
           fi
 
       - name: Install dependencies
