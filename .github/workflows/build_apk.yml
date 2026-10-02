@@ -9,13 +9,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
@@ -23,27 +22,13 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          channel: stable
           cache: true
 
-      - name: Ensure Android Native Structure Exists
+      - name: Ensure Android Structure Exists
         run: |
           if [ ! -d "android" ]; then
             flutter create . --project-name anything_hub --org com.anything.hub --platforms=android
-          fi
-
-      - name: Inject Modern Gradle and Plugins on the Fly
-        run: |
-          # 1. Actualizar el Gradle Wrapper a la versión 8.7 para soportar Java 17 nativamente
-          if [ -f "android/gradle/wrapper/gradle-wrapper.properties" ]; then
-            sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.7-bin.zip|g' android/gradle/wrapper/gradle-wrapper.properties
-          fi
-
-          # 2. Actualizar el Android Gradle Plugin (AGP) en el build.gradle raíz si existe
-          if [ -f "android/build.gradle" ]; then
-            sed -i 's/com.android.tools.build:gradle:.*/com.android.tools.build:gradle:8.3.0"/g' android/build.gradle
-          elif [ -f "android/settings.gradle" ]; then
-            sed -i 's/id "com.android.application" version ".*"/id "com.android.application" version "8.3.0"/g' android/settings.gradle
           fi
 
       - name: Install dependencies
@@ -52,17 +37,16 @@ jobs:
       - name: Build Split APKs Release
         run: flutter build apk --release --split-per-abi
 
-      - name: Upload Split APK artifacts to Actions
+      - name: Upload Split APK artifacts
         uses: actions/upload-artifact@v4
         with:
           name: app-release-abis
           path: build/app/outputs/flutter-apk/*.apk
 
-      - name: Create GitHub Release and Upload APKs
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: build/app/outputs/flutter-apk/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
