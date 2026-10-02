@@ -34,6 +34,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Generate Custom App Icons
+        run: flutter pub run flutter_launcher_icons
+
       - name: Build Split APKs Release
         run: flutter build apk --release --split-per-abi
 
@@ -50,3 +53,4 @@ jobs:
           files: build/app/outputs/flutter-apk/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
