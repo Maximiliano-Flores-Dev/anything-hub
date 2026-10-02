@@ -24,10 +24,10 @@ flutter:
   assets:
     - assets/config.json
     - assets/images/
-    - assets/logo.png
+    - assets/mylogo.png
 
 flutter_launcher_icons:
-  image_path: "assets/logo.png"
+  image_path: "assets/mylogo.png"
   android: true
   ios: false
   image_path_android: "assets/mylogo.png"
