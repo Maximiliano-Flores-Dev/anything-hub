@@ -1365,7 +1365,10 @@ class _SidebarGroupTile extends StatelessWidget {
   final VoidCallback onExpand;
 
   static const int _maxShown = 4;
-  static const double _gap = 12;
+  // Tamaño fijo de cada logo en la cuadrícula (antes crecía con el sidebar).
+  // Es el único valor que hay que tocar para hacerlos más grandes o pequeños.
+  static const double _tileSize = 40;
+  static const double _gap = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -1401,11 +1404,11 @@ class _SidebarGroupTile extends StatelessWidget {
     );
   }
 
-  // Extendido: cuadrícula 2x2 centrada. El tamaño sale del ancho actual, así
-  // que nunca desborda mientras el sidebar se está abriendo.
+  // Extendido: cuadrícula 2x2 alineada a la izquierda, con la etiqueta del
+  // grupo ocupando todo el ancho. El tamaño del logo es fijo; solo se reduce si
+  // el sidebar aún está tan estrecho (a mitad de la animación) que no cabría.
   Widget _buildGrid(BuildContext context, List<HubApp> top) {
-    final tile = math.max(36.0, math.min(76.0, (width - 24 - _gap) / 2));
-    final gridWidth = tile * 2 + _gap;
+    final tile = math.max(28.0, math.min(_tileSize, (width - 28 - _gap) / 2));
     final hidden = group.apps.length - top.length;
 
     Widget cell(int i) {
@@ -1416,35 +1419,33 @@ class _SidebarGroupTile extends StatelessWidget {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => onAppTap(app),
-          child: _AppAvatar(app: app, size: tile, radius: tile * 0.24),
+          child: _AppAvatar(app: app, size: tile, radius: tile * 0.26),
         ),
       );
     }
 
-    return Center(
-      child: SizedBox(
-        width: gridWidth,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildLabel(context, hidden),
-            if (top.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(left: 2, top: 2),
-                child: Text(
-                  'Grupo vacío',
-                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
-                ),
-              )
-            else ...[
-              Row(children: [cell(0), const SizedBox(width: _gap), cell(1)]),
-              if (top.length > 2) ...[
-                const SizedBox(height: _gap),
-                Row(children: [cell(2), const SizedBox(width: _gap), cell(3)]),
-              ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildLabel(context, hidden),
+          if (top.isEmpty)
+            const Padding(
+              padding: EdgeInsets.only(left: 2, top: 2),
+              child: Text(
+                'Grupo vacío',
+                style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+              ),
+            )
+          else ...[
+            Row(children: [cell(0), const SizedBox(width: _gap), cell(1)]),
+            if (top.length > 2) ...[
+              const SizedBox(height: _gap),
+              Row(children: [cell(2), const SizedBox(width: _gap), cell(3)]),
             ],
           ],
-        ),
+        ],
       ),
     );
   }
@@ -1454,7 +1455,7 @@ class _SidebarGroupTile extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: hidden > 0 ? () => _showAll(context) : null,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(2, 2, 2, 8),
+        padding: const EdgeInsets.fromLTRB(0, 2, 0, 8),
         child: Row(
           children: [
             Expanded(
