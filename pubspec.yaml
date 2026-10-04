@@ -12,6 +12,13 @@ dependencies:
   cupertino_icons: ^1.0.6
   shared_preferences: ^2.2.3
   url_launcher: ^6.2.5
+  path: ^1.9.0
+  uuid: ^4.4.0
+  path_provider: ^2.1.4
+  flutter_secure_storage: ^9.2.2
+  crypto: ^3.0.5
+  http: ^1.2.2
+  app_links: ^6.3.2
 
 dev_dependencies:
   flutter_test:
@@ -31,4 +38,3 @@ flutter_launcher_icons:
   android: true
   ios: false
   image_path_android: "assets/mylogo.png"
-  
