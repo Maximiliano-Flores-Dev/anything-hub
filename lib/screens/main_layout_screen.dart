@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -456,7 +458,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
                             selected.remove(pkg);
                           }
                         }),
-                        secondary: _AppAvatar(app: app, size: 32),
+                        secondary: AppAvatar(app: app, size: 32),
                         title: Text(
                           app.name,
                           overflow: TextOverflow.ellipsis,

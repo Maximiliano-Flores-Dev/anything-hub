@@ -70,7 +70,7 @@ class _SidebarGroupTile extends StatelessWidget {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => onAppTap(app),
-          child: _AppAvatar(app: app, size: tile, radius: tile * 0.26),
+          child: AppAvatar(app: app, size: tile, radius: tile * 0.26),
         ),
       );
     }
@@ -189,7 +189,7 @@ class _SidebarGroupTile extends StatelessWidget {
                       },
                       child: Column(
                         children: [
-                          _AppAvatar(app: app, size: 52, radius: 13),
+                          AppAvatar(app: app, size: 52, radius: 13),
                           const SizedBox(height: 6),
                           Text(
                             app.name,
@@ -257,7 +257,7 @@ class _AppStackIcons extends StatelessWidget {
               top: (n - 1 - i) * _dy,
               child: Stack(
                 children: [
-                  _AppAvatar(app: apps[i], size: size, radius: radius),
+                  AppAvatar(app: apps[i], size: size, radius: radius),
                   if (i > 0)
                     Positioned.fill(
                       child: DecoratedBox(
@@ -276,8 +276,8 @@ class _AppStackIcons extends StatelessWidget {
   }
 }
 
-class _AppAvatar extends StatelessWidget {
-  const _AppAvatar({required this.app, required this.size, this.radius = 10});
+class AppAvatar extends StatelessWidget {
+  const AppAvatar({required this.app, required this.size, this.radius = 10});
 
   final HubApp app;
   final double size;
