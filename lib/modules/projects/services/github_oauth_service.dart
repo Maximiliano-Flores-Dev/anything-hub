@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class GitHubOAuthService {
-  static const String clientId = 'YOUR_GITHUB_OAUTH_CLIENT_ID';
+  static const String clientId = 'Ov23lickWax2VDYeE86d';
   static const String redirectUri = 'anythings-hub://oauth/callback';
   static const String authEndpoint =
       'https://github.com/login/oauth/authorize';
@@ -23,8 +23,7 @@ class GitHubOAuthService {
   static const String _keyExpires = 'gh_expires_at';
   static const String _keyVerifier = 'gh_code_verifier';
 
-  static bool get isConfigured =>
-      clientId.isNotEmpty && clientId != 'YOUR_GITHUB_OAUTH_CLIENT_ID';
+  static bool get isConfigured => clientId.isNotEmpty;
 
   static String _generateCodeVerifier({int length = 64}) {
     const charset =
