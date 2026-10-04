@@ -1,20 +1,33 @@
-# Restaurar lib/main.dart integrado
+# Restaurar lib/main.dart (modulo proyectos)
 
-El archivo completo está fragmentado en base64+gzip por límites de la API.
+El archivo monolítico `lib/main.dart` (~145 KB) no pudo subirse completo por limites de la API de commits. **Todo el modulo de proyectos si esta en el repo.**
 
-## Opción A (recomendada): desde el commit bueno
+## Pasos (2 minutos)
 
 ```bash
-git fetch origin
+git pull origin main
+
+# 1) Recuperar main.dart completo del historial
 git checkout 708596b3b42c1d02f47a61677eef76187860e2ef -- lib/main.dart
+
+# 2) Aplicar la integracion (4 cambios pequenos)
+# Abre docs/MAIN_DART_INTEGRATION.md y aplica:
+#   - imports del modulo
+#   - OAuthDeepLinkHandler.init() en main()
+#   - metodo _openProjectsModule()
+#   - onTap de la card index 1 -> _openProjectsModule()
 ```
 
-Luego aplica los 4 cambios de `docs/MAIN_DART_INTEGRATION.md` (imports, OAuthDeepLinkHandler.init, _openProjectsModule, onTap i==1).
+## Ya esta en el repo
 
-## Opción B: reconstruir desde partes base64
+| Componente | Estado |
+|---|---|
+| `lib/modules/projects/**` | OK (modelo, servicios, UI, tests) |
+| `pubspec.yaml` | OK (path, uuid, path_provider, secure_storage, crypto, http, app_links) |
+| `AndroidManifest.xml` | OK (deep-link OAuth + queries Termux/editores) |
+| `MainActivity.kt` | OK (listInstalledPackages, launchAppWithPath, termuxRunCommand) |
+| `lib/main.dart` | Restaurar con los pasos de arriba |
 
-```bash
-cat docs/main_b64_part0.txt docs/main_b64_part1.txt docs/main_b64_part2.txt docs/main_b64_part3.txt | base64 -d | gzip -d > lib/main.dart
-```
+## OAuth Client ID
 
-Esto deja `lib/main.dart` con la integración completa del módulo de proyectos.
+Cada usuario configura su propia GitHub OAuth App. No se comparte una sola cuenta. Pon tu Client ID en `github_oauth_service.dart`.
