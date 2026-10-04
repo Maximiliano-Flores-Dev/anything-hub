@@ -8,6 +8,9 @@ import 'package:flutter/physics.dart';
 import '../../core/hub_colors.dart';
 import '../../core/models.dart';
 
+part 'collapsible_sidebar_state.dart';
+part 'collapsible_sidebar_tiles.dart';
+
 class CollapsibleSidebar extends StatefulWidget {
   const CollapsibleSidebar({
     super.key,
@@ -24,13 +27,4 @@ class CollapsibleSidebar extends StatefulWidget {
 
   @override
   State<CollapsibleSidebar> createState() => _CollapsibleSidebarState();
-}
-
-// NOTE: Full implementation is being uploaded.
-// Temporary stub so the path exists. Replace with full file in next commit.
-class _CollapsibleSidebarState extends State<CollapsibleSidebar> {
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox(width: 64);
-  }
 }
