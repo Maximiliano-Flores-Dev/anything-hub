@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Red (OAuth GitHub, vscode.dev) -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- Permiso necesario para UsageStats -->
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
@@ -33,6 +36,16 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Deep link OAuth 2.0 + PKCE (Hito 3.2) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="anythings-hub"
+                    android:host="oauth"
+                    android:pathPrefix="/callback"/>
+            </intent-filter>
         </activity>
 
         <meta-data
@@ -64,6 +77,15 @@
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:mimeType="*/*" />
+        </intent>
+        <!-- Editores y Termux (Hito 3.1 / 3.3) -->
+        <package android:name="com.foxdebug.acode" />
+        <package android:name="com.markor" />
+        <package android:name="com.termux" />
+        <package android:name="com.termux.api" />
+        <package android:name="com.aor.droidedit" />
+        <intent>
+            <action android:name="com.termux.RUN_COMMAND" />
         </intent>
     </queries>
 </manifest>
