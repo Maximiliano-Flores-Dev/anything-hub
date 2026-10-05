@@ -335,7 +335,7 @@ class MainActivity : FlutterActivity() {
                             try {
                                 val src = File(path)
                                 val dest = File(src.parentFile, newName)
-                                runOnUiThread { result.success(src.renameTo(dest))
+                                runOnUiThread { result.success(src.renameTo(dest)) }
                             } catch (e: Exception) {
                                 runOnUiThread { result.error("RENAME", e.message, null) }
                             }
