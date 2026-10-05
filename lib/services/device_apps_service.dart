@@ -44,6 +44,14 @@ class DeviceAppsService {
           }) ??
           false;
 
+  /// Devuelve el payload del último APK recibido (VIEW/SEND) o null si no hay.
+  /// Tras leerlo se limpia en nativo.
+  static Future<Map<String, dynamic>?> consumePendingIncomingApk() async {
+    final raw = await _call<Map<dynamic, dynamic>>('consumePendingIncomingApk');
+    if (raw == null) return null;
+    return raw.map((k, v) => MapEntry(k.toString(), v));
+  }
+
   static Future<String?> loadState() => _call<String>('loadState');
 
   static Future<void> saveState(String json) async {
