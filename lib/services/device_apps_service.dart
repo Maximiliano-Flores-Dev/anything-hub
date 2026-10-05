@@ -32,6 +32,18 @@ class DeviceAppsService {
   static Future<bool> launch(String packageName) async =>
       await _call<bool>('launchApp', {'package': packageName}) ?? false;
 
+  static Future<bool> openAppSettings(String packageName) async =>
+      await _call<bool>('openAppSettings', {'package': packageName}) ?? false;
+
+  static Future<bool> requestUninstall(String packageName) async =>
+      await _call<bool>('requestUninstall', {'package': packageName}) ?? false;
+
+  static Future<bool> installApkFromCache(String cacheRelativePath) async =>
+      await _call<bool>('installApkFromCache', {
+            'cacheRelativePath': cacheRelativePath,
+          }) ??
+          false;
+
   static Future<String?> loadState() => _call<String>('loadState');
 
   static Future<void> saveState(String json) async {
