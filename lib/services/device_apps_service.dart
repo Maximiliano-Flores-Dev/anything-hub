@@ -44,6 +44,16 @@ class DeviceAppsService {
           }) ??
           false;
 
+  /// Metadatos reales del APK en caché (PackageManager.getPackageArchiveInfo).
+  /// Keys: packageName, appLabel, versionName, versionCode, permissions, fileName, sizeBytes.
+  static Future<Map<String, dynamic>?> inspectApk(String cacheRelativePath) async {
+    final raw = await _call<Map<dynamic, dynamic>>('inspectApk', {
+      'cacheRelativePath': cacheRelativePath,
+    });
+    if (raw == null) return null;
+    return raw.map((k, v) => MapEntry(k.toString(), v));
+  }
+
   /// Devuelve el payload del último APK recibido (VIEW/SEND) o null si no hay.
   /// Tras leerlo se limpia en nativo.
   static Future<Map<String, dynamic>?> consumePendingIncomingApk() async {
