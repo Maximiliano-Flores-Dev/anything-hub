@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/hub_colors.dart';
 import '../../../ui/widgets/gradient_pill_button.dart';
+import '../../../services/device_apps_service.dart';
 import '../models/app_models.dart';
 import '../services/apk_risk_scorer.dart';
 import '../widgets/hub_panel.dart';
@@ -152,23 +153,56 @@ class ApkIncomingSheet extends StatelessWidget {
     );
   }
 
-  void _analyze(BuildContext context) {
+  Future<void> _analyze(BuildContext context) async {
+    // Mostrar progreso breve mientras el nativo parsea el manifiesto.
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: HubColors.pomelo),
+      ),
+    );
+
+    Map<String, dynamic>? meta;
+    try {
+      meta = await DeviceAppsService.inspectApk(cacheRelativePath);
+    } catch (_) {
+      meta = null;
+    }
+
+    if (!context.mounted) return;
+    Navigator.of(context).pop(); // cierra el loader
+
+    final packageName = (meta?['packageName'] as String?)?.trim();
+    final appLabel = (meta?['appLabel'] as String?)?.trim();
+    final rawPerms = (meta?['permissions'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        <String>[];
+
+    final displayName = (appLabel != null && appLabel.isNotEmpty)
+        ? appLabel
+        : fileName;
+    final displayPackage = (packageName != null && packageName.isNotEmpty)
+        ? packageName
+        : 'com.desconocido.apk';
+
     final report = ApkRiskScorer.score(
-      fileName: fileName,
-      packageName: 'com.desconocido.apk',
-      rawPermissions: const [
-        'android.permission.INTERNET',
-        'android.permission.BIND_ACCESSIBILITY_SERVICE',
-      ],
+      fileName: displayName,
+      packageName: displayPackage,
+      rawPermissions: rawPerms,
       detectedPackages: const [],
       sha256: null,
     );
 
+    if (!context.mounted) return;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => RevisarApkScreen(
           report: report,
-          onInstallOverride: () {},
+          onInstallOverride: () {
+            DeviceAppsService.installApkFromCache(cacheRelativePath);
+          },
         ),
       ),
     );
