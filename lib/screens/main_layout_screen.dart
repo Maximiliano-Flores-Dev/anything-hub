@@ -15,6 +15,7 @@ import '../ui/sidebar/collapsible_sidebar.dart';
 import '../ui/widgets/card_arts.dart';
 import '../ui/widgets/dashboard_card.dart';
 import '../ui/widgets/gradient_pill_button.dart';
+import '../modules/apps/ui/mis_aplicaciones_screen.dart';
 import 'file_explorer_screen.dart';
 import 'web_links_screen.dart';
 
@@ -25,9 +26,6 @@ class _CardData {
   final Widget art;
 }
 
-// ============================================================================
-// PANTALLA PRINCIPAL
-// ============================================================================
 class MainLayoutScreen extends StatefulWidget {
   const MainLayoutScreen({super.key});
 
@@ -39,13 +37,13 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     with WidgetsBindingObserver {
   int _tab = 0;
   bool _deviceScanned = false;
-  bool _consent = false; // El usuario aceptó que la app lea las apps instaladas
+  bool _consent = false;
   bool _scanning = false;
-  bool _awaitingUsageAccess = false; // Esperando que vuelva de Ajustes del sistema
-  bool _usagePromptDismissed = false; // Rechazó el acceso de uso en esta sesión
-  String _selfPackage = ''; // Lo entrega Android: nunca queda hardcodeado
+  bool _awaitingUsageAccess = false;
+  bool _usagePromptDismissed = false;
+  String _selfPackage = '';
 
-  final Map<String, HubApp> _catalog = {}; // packageName → app real
+  final Map<String, HubApp> _catalog = {};
   List<AppGroup> _appGroups = [];
   final WebLinkRepository _webLinks = WebLinkRepository();
 
@@ -72,7 +70,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     super.dispose();
   }
 
-  // Al volver desde Ajustes → "Acceso a datos de uso", reescaneamos solos.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && _awaitingUsageAccess) {
@@ -87,7 +84,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     if (_consent) await _requestDeviceAppsAndScan(userInitiated: false);
   }
 
-  // ---------------------------------------------------------------- Persistencia
   Future<void> _loadState() async {
     final raw = await DeviceAppsService.loadState();
     if (raw == null) return;
@@ -123,9 +119,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     return DeviceAppsService.saveState(json);
   }
 
-  // ------------------------------------------------------------------- Grupos
-  // Única fuente de verdad: catálogo real + membresías manuales → grupos.
-  // Una app asignada a un grupo personalizado sale de su categoría automática.
   void _rebuildGroups() {
     final customs = _appGroups.where((g) => g.isCustom).toList();
     final claimed = <String>{for (final g in customs) ...g.packages};
@@ -149,7 +142,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     _appGroups = [...autoGroups, ...customs];
   }
 
-  // ------------------------------------------------------------------ Permisos
   Future<bool> _confirmDialog({
     required String title,
     required String body,
@@ -192,8 +184,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     );
   }
 
-  // Flujo: 1) consentimiento propio  2) acceso de uso (permiso especial de
-  // Android, se concede en Ajustes)  3) lectura de apps  4) clasificación.
   Future<void> _requestDeviceAppsAndScan({bool userInitiated = true}) async {
     if (_scanning) return;
     _scanning = true;
@@ -236,7 +226,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
 
       _catalog.clear();
       for (final d in found) {
-        if (d.packageName == _selfPackage) continue; // Se ignora a sí misma
+        if (d.packageName == _selfPackage) continue;
         _catalog[d.packageName] = HubApp(
           d.name,
           background: HubColors.panel,
@@ -276,7 +266,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     );
   }
 
-  /// Hito 1: Activación condicional del módulo de proyectos (opt-in).
   Future<void> _openProjectsModule() async {
     await ProjectActivationService.incrementAttempts();
     final activated = await ProjectActivationService.isActivated();
@@ -290,7 +279,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
 
     final shouldShow = await ProjectActivationService.shouldShowAdvisement();
     if (!shouldShow) {
-      // Usuario marcó "no volver a mostrar" y aún no activó → no hacer nada.
       SystemLogger.log('Projects module: advisement dismissed permanently');
       return;
     }
@@ -302,7 +290,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       builder: (ctx) => ProjectAdvisementModal(
         onAccepted: () async {
           Navigator.of(ctx).pop();
-          // Crear estructura solo después de aceptación explícita
           try {
             await ProjectFsService.ensureStructure();
           } catch (e) {
@@ -483,7 +470,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
                   group.packages
                     ..clear()
                     ..addAll(selected);
-                  _rebuildGroups(); // Re-ordena por uso y saca las apps de su categoría automática
+                  _rebuildGroups();
                 });
                 _saveState();
                 Navigator.pop(ctx);
@@ -598,13 +585,17 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
                 art: c.art,
                 onTap: () {
                   if (i == 0) {
-                    _requestDeviceAppsAndScan();
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const MisAplicacionesScreen(),
+                      ),
+                    );
                   } else if (i == 1) {
-                    _openProjectsModule(); // "Carpetas del Proyecto"
+                    _openProjectsModule();
                   } else if (i == 2) {
-                    _openWebLinks(); // "Webs Rápidas"
+                    _openWebLinks();
                   } else if (i == 4) {
-                    _openFileExplorer(); // "Gestión de Archivos"
+                    _openFileExplorer();
                   } else {
                     SystemLogger.log('Card → ${c.title}');
                   }
@@ -635,10 +626,6 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     );
   }
 }
-
-// ============================================================================
-// BOTÓN CON DEGRADADO
-// ============================================================================
 
 class _BottomNav extends StatelessWidget {
   const _BottomNav({
@@ -697,12 +684,3 @@ class _BottomNav extends StatelessWidget {
     );
   }
 }
-
-// ============================================================================
-// WEBS RÁPIDAS: GESTOR DE ENLACES MINIMALISTA
-// ============================================================================
-
-/// Una web guardada. [imagePath] es opcional:
-///  - null / vacío → avatar automático (favicon de Google, derivado del dominio)
-///  - ruta local   → imagen personalizada del dispositivo
-///  - URL http(s)  → imagen remota personalizada
