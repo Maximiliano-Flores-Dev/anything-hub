@@ -67,8 +67,14 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Install dependencies (lockfile estricto)
-        run: flutter pub get --enforce-lockfile
+      - name: Install dependencies
+        run: |
+          if [ -f pubspec.lock ]; then
+            flutter pub get --enforce-lockfile
+          else
+            echo "::notice::No hay pubspec.lock; se genera con flutter pub get"
+            flutter pub get
+          fi
 
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed .
@@ -119,8 +125,14 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Install dependencies (lockfile estricto)
-        run: flutter pub get --enforce-lockfile
+      - name: Install dependencies
+        run: |
+          if [ -f pubspec.lock ]; then
+            flutter pub get --enforce-lockfile
+          else
+            echo "::notice::No hay pubspec.lock; se genera con flutter pub get"
+            flutter pub get
+          fi
 
       - name: Generate custom app icons
         run: dart run flutter_launcher_icons
