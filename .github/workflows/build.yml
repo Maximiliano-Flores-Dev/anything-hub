@@ -27,13 +27,13 @@ on:
         required: false
         default: false
     secrets:
-      ANDROID_KEYSTORE_BASE64:
+      KEYSTORE_BASE64:
         required: false
-      ANDROID_KEYSTORE_PASSWORD:
+      KEYSTORE_PASSWORD:
         required: false
-      ANDROID_KEY_ALIAS:
+      KEY_ALIAS:
         required: false
-      ANDROID_KEY_PASSWORD:
+      KEY_PASSWORD:
         required: false
 
 # Incluye github.workflow: en un reusable apunta al workflow llamador,
@@ -128,10 +128,10 @@ jobs:
       - name: Configure release signing
         if: ${{ inputs.sign }}
         env:
-          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           set -euo pipefail
           for v in KEYSTORE_B64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
