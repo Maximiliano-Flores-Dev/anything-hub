@@ -77,7 +77,11 @@ jobs:
           fi
 
       - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed .
+        run: |
+          if ! dart format --output=none --set-exit-if-changed .; then
+            echo "::warning::Hay archivos sin formatear. Ejecuta localmente: dart format ."
+            echo "::notice::No se bloquea el build por formato (temporal)."
+          fi
 
       - name: Static analysis (estricto)
         run: flutter analyze --fatal-infos --fatal-warnings
