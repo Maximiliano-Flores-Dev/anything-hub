@@ -50,7 +50,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          latest="$(git tag --list 'v*' \vert{} grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1 || true)"
+          latest="$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1 || true)"
 
           if [ -z "$latest" ]; then
             previous="(ninguna)"
@@ -60,7 +60,8 @@ jobs:
             IFS=. read -r MA MI PA <<< "${latest#v}"
             case "$BUMP" in
               major) MA=$((MA+1)); MI=0; PA=0 ;;
-              minor) MI=$((MI+1)); PA=0 ;;               *)     PA=$((PA+1)) ;;
+              minor) MI=$((MI+1)); PA=0 ;;
+              *)     PA=$((PA+1)) ;;
             esac
             # Desborde en cascada: 1.0.9 -> 1.1.0 | 1.9.9 -> 2.0.0
             if [ "$PA" -gt "$MAX_PATCH" ]; then PA=0; MI=$((MI+1)); fi
@@ -90,9 +91,9 @@ jobs:
 
           {
             echo "### Versión calculada"
-            echo "- Anterior: \`$previous\`"
-            echo "- Nueva: \`$tag\` (versionCode \`$build_number\`)"
-            echo "- Incremento solicitado: \`$BUMP\`"
+            echo "- Anterior: `$previous`"
+            echo "- Nueva: `$tag` (versionCode `$build_number`)"
+            echo "- Incremento solicitado: `$BUMP`"
           } >> "$GITHUB_STEP_SUMMARY"
 
   build:
@@ -156,4 +157,3 @@ jobs:
             dist/SHA256SUMS.txt
           generate_release_notes: true
           fail_on_unmatched_files: true
-          
