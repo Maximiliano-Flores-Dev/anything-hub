@@ -50,7 +50,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          latest="$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1 || true)"
+          latest="$(git tag --list 'v*' \vert{} grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1 || true)"
 
           if [ -z "$latest" ]; then
             previous="(ninguna)"
@@ -60,8 +60,7 @@ jobs:
             IFS=. read -r MA MI PA <<< "${latest#v}"
             case "$BUMP" in
               major) MA=$((MA+1)); MI=0; PA=0 ;;
-              minor) MI=$((MI+1)); PA=0 ;;
-              *)     PA=$((PA+1)) ;;
+              minor) MI=$((MI+1)); PA=0 ;;               *)     PA=$((PA+1)) ;;
             esac
             # Desborde en cascada: 1.0.9 -> 1.1.0 | 1.9.9 -> 2.0.0
             if [ "$PA" -gt "$MAX_PATCH" ]; then PA=0; MI=$((MI+1)); fi
@@ -106,10 +105,10 @@ jobs:
       build-number: ${{ needs.version.outputs.build_number }}
       sign: true
     secrets:
-      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
   publish:
     name: Publish GitHub Release
@@ -157,3 +156,4 @@ jobs:
             dist/SHA256SUMS.txt
           generate_release_notes: true
           fail_on_unmatched_files: true
+          
