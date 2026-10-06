@@ -1,0 +1,159 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Tipo de incremento
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      dry-run:
+        description: Solo calcular la versión, sin compilar ni publicar
+        type: boolean
+        default: false
+
+# Serializado: dos releases simultáneos calcularían la misma versión
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    name: Calculate next version
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.next.outputs.version }}
+      tag: ${{ steps.next.outputs.tag }}
+      build_number: ${{ steps.next.outputs.build_number }}
+      previous: ${{ steps.next.outputs.previous }}
+    steps:
+      - name: Checkout repository (historial y tags completos)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Compute next version
+        id: next
+        env:
+          BUMP: ${{ inputs.bump }}
+          MAX_PATCH: '9'
+          MAX_MINOR: '9'
+          MAX_MAJOR: '99'
+        run: |
+          set -euo pipefail
+
+          latest="$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1 || true)"
+
+          if [ -z "$latest" ]; then
+            previous="(ninguna)"
+            MA=1; MI=0; PA=0
+          else
+            previous="$latest"
+            IFS=. read -r MA MI PA <<< "${latest#v}"
+            case "$BUMP" in
+              major) MA=$((MA+1)); MI=0; PA=0 ;;
+              minor) MI=$((MI+1)); PA=0 ;;
+              *)     PA=$((PA+1)) ;;
+            esac
+            # Desborde en cascada: 1.0.9 -> 1.1.0 | 1.9.9 -> 2.0.0
+            if [ "$PA" -gt "$MAX_PATCH" ]; then PA=0; MI=$((MI+1)); fi
+            if [ "$MI" -gt "$MAX_MINOR" ]; then MI=0; MA=$((MA+1)); fi
+          fi
+
+          if [ "$MA" -gt "$MAX_MAJOR" ]; then
+            echo "::error::Se alcanzó el límite de versión ($MAX_MAJOR.$MAX_MINOR.$MAX_PATCH)."
+            exit 1
+          fi
+
+          version="$MA.$MI.$PA"
+          tag="v$version"
+          build_number=$((MA*10000 + MI*100 + PA))
+
+          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            echo "::error::El tag $tag ya existe."
+            exit 1
+          fi
+
+          {
+            echo "version=$version"
+            echo "tag=$tag"
+            echo "build_number=$build_number"
+            echo "previous=$previous"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### Versión calculada"
+            echo "- Anterior: \`$previous\`"
+            echo "- Nueva: \`$tag\` (versionCode \`$build_number\`)"
+            echo "- Incremento solicitado: \`$BUMP\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  build:
+    name: Build
+    needs: version
+    if: ${{ !inputs.dry-run }}
+    uses: ./.github/workflows/build.yml
+    with:
+      build-name: ${{ needs.version.outputs.version }}
+      build-number: ${{ needs.version.outputs.build_number }}
+      sign: true
+    secrets:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+  publish:
+    name: Publish GitHub Release
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: release   # permite exigir aprobación manual en Settings > Environments
+    permissions:
+      contents: write      # crear tag y release
+      id-token: write      # attestation
+      attestations: write
+    steps:
+      - name: Download APK artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: app-release-abis
+          path: dist
+
+      - name: Rename artifacts and generate checksums
+        env:
+          TAG: ${{ needs.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          cd dist
+          for f in app-*-release.apk; do
+            abi="${f#app-}"; abi="${abi%-release.apk}"
+            mv "$f" "anything-hub-${TAG}-${abi}.apk"
+          done
+          sha256sum *.apk > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/*.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: Anything Hub ${{ needs.version.outputs.tag }}
+          files: |
+            dist/*.apk
+            dist/SHA256SUMS.txt
+          generate_release_notes: true
+          fail_on_unmatched_files: true
