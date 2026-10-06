@@ -1,0 +1,190 @@
+name: Build
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      build-name:
+        description: Versión semántica (X.Y.Z) a inyectar en el APK
+        type: string
+        required: false
+        default: ''
+      build-number:
+        description: versionCode de Android
+        type: string
+        required: false
+        default: ''
+      sign:
+        description: Firmar con el keystore de release (obligatorio para publicar)
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      ANDROID_KEYSTORE_BASE64:
+        required: false
+      ANDROID_KEYSTORE_PASSWORD:
+        required: false
+      ANDROID_KEY_ALIAS:
+        required: false
+      ANDROID_KEY_PASSWORD:
+        required: false
+
+# Incluye github.workflow: en un reusable apunta al workflow llamador,
+# así un release no cancela el CI de la misma rama (ni al revés).
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_SUPPRESS_ANALYTICS: 'true'
+  DART_SUPPRESS_ANALYTICS: 'true'
+  CI: 'true'
+
+jobs:
+  quality:
+    name: Quality gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies (lockfile estricto)
+        run: flutter pub get --enforce-lockfile
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Static analysis (estricto)
+        run: flutter analyze --fatal-infos --fatal-warnings
+
+      - name: Run tests
+        run: |
+          if [ -d test ] && [ -n "$(find test -name '*_test.dart' -print -quit)" ]; then
+            flutter test --no-pub
+          else
+            echo "::notice::No hay tests en /test, se omite este paso"
+          fi
+
+  build-apk:
+    name: Build split APKs (release)
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate Android project
+        env:
+          SIGN: ${{ inputs.sign }}
+        run: |
+          if [ ! -d android ]; then
+            if [ "$SIGN" = "true" ]; then
+              echo "::error::Los releases requieren la carpeta android/ commiteada (firma y reproducibilidad)."
+              exit 1
+            fi
+            flutter create . --project-name anything_hub --org com.anything.hub --platforms=android
+          fi
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies (lockfile estricto)
+        run: flutter pub get --enforce-lockfile
+
+      - name: Generate custom app icons
+        run: dart run flutter_launcher_icons
+
+      - name: Configure release signing
+        if: ${{ inputs.sign }}
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for v in KEYSTORE_B64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Falta el secret asociado a $v"
+              exit 1
+            fi
+          done
+          umask 077
+          echo "$KEYSTORE_B64" | base64 -d > android/app/release.jks
+          {
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyPassword=$KEY_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "storeFile=release.jks"
+          } > android/key.properties
+
+      - name: Build split APKs (release)
+        env:
+          BUILD_NAME: ${{ inputs.build-name }}
+          BUILD_NUMBER: ${{ inputs.build-number }}
+        run: |
+          set -euo pipefail
+          args=(--release --split-per-abi --no-pub)
+          if [ -n "$BUILD_NAME" ];   then args+=(--build-name="$BUILD_NAME"); fi
+          if [ -n "$BUILD_NUMBER" ]; then args+=(--build-number="$BUILD_NUMBER"); fi
+          flutter build apk "${args[@]}"
+
+      - name: Verify APK signatures
+        env:
+          SIGN: ${{ inputs.sign }}
+        run: |
+          set -euo pipefail
+          APKSIGNER="$(ls -d "$ANDROID_SDK_ROOT"/build-tools/*/apksigner | sort -V | tail -n1)"
+          shopt -s nullglob
+          apks=(build/app/outputs/flutter-apk/*.apk)
+          [ "${#apks[@]}" -gt 0 ] || { echo "::error::No se generó ningún APK"; exit 1; }
+          for apk in "${apks[@]}"; do
+            "$APKSIGNER" verify --verbose "$apk"
+            if [ "$SIGN" = "true" ] && "$APKSIGNER" verify --print-certs "$apk" | grep -qi "Android Debug"; then
+              echo "::error::$apk está firmado con la clave DEBUG. Se aborta."
+              exit 1
+            fi
+          done
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-abis
+          path: build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Cleanup signing material
+        if: ${{ always() && inputs.sign }}
+        run: rm -f android/app/release.jks android/key.properties
