@@ -16,6 +16,9 @@
 
     <!-- Instalar APKs desde el hub (Hito 2/3) -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <!-- Termux RUN_COMMAND (módulo de proyectos) -->
+    <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
 
     <application
         android:label="Anythings Hub"
