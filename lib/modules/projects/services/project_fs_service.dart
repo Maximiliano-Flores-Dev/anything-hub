@@ -12,12 +12,11 @@ class ProjectFsService {
   static const String configDir = 'config';
   static const String logsDir = 'logs';
   static const String projectsDir = 'projects';
+  static const String pluginsDir = 'plugins';
 
   /// Preferencia: carpeta pública Documents para que editores (Acode, Markor)
   /// y el explorador del sistema puedan ver `.anythinghub` / `project.md`.
-  /// Requiere MANAGE_EXTERNAL_STORAGE (ya declarado en el manifest).
   static Future<Directory> getRootDirectory() async {
-    // 1) Documents públicos del usuario (visible en exploradores y editores)
     final publicDocs = Directory('/storage/emulated/0/Documents');
     try {
       if (await publicDocs.exists()) {
@@ -25,7 +24,6 @@ class ProjectFsService {
       }
     } catch (_) {}
 
-    // 2) Almacenamiento externo de la app (aún limitado, pero mejor que el sandbox interno)
     try {
       final ext = await getExternalStorageDirectory();
       if (ext != null) {
@@ -33,7 +31,6 @@ class ProjectFsService {
       }
     } catch (_) {}
 
-    // 3) Fallback sandbox (solo si no hay almacenamiento externo)
     final base = await getApplicationDocumentsDirectory();
     return Directory(p.join(base.path, rootDirName));
   }
@@ -43,11 +40,15 @@ class ProjectFsService {
     if (!await root.exists()) {
       await root.create(recursive: true);
     }
-    for (final sub in [cacheDir, configDir, logsDir, projectsDir]) {
+    for (final sub in [cacheDir, configDir, logsDir, projectsDir, pluginsDir]) {
       final d = Directory(p.join(root.path, sub));
       if (!await d.exists()) {
         await d.create(recursive: true);
       }
+    }
+    final icons = Directory(p.join(root.path, cacheDir, 'icons'));
+    if (!await icons.exists()) {
+      await icons.create(recursive: true);
     }
 
     final editorsFile = File(p.join(root.path, configDir, 'editors.json'));

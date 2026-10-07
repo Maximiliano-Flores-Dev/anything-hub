@@ -12,7 +12,7 @@ class DeviceAppsService {
     try {
       return await _ch.invokeMethod<T>(method, args);
     } on MissingPluginException {
-      return null; // Plataforma sin implementación nativa (iOS, web, escritorio)
+      return null;
     } on PlatformException catch (e) {
       SystemLogger.log('Canal nativo "$method" falló: ${e.message}');
       return null;
@@ -45,7 +45,7 @@ class DeviceAppsService {
           false;
 
   /// Metadatos reales del APK en caché (PackageManager.getPackageArchiveInfo).
-  /// Keys: packageName, appLabel, versionName, versionCode, permissions, fileName, sizeBytes.
+  /// Keys: packageName, appLabel, versionName, versionCode, permissions, fileName, sizeBytes, icon.
   static Future<Map<String, dynamic>?> inspectApk(String cacheRelativePath) async {
     final raw = await _call<Map<dynamic, dynamic>>('inspectApk', {
       'cacheRelativePath': cacheRelativePath,
@@ -54,8 +54,15 @@ class DeviceAppsService {
     return raw.map((k, v) => MapEntry(k.toString(), v));
   }
 
-  /// Devuelve el payload del último APK recibido (VIEW/SEND) o null si no hay.
-  /// Tras leerlo se limpia en nativo.
+  /// Metadatos + icono de un APK en ruta absoluta (solo lectura).
+  static Future<Map<String, dynamic>?> inspectApkPath(String absolutePath) async {
+    final raw = await _call<Map<dynamic, dynamic>>('inspectApkPath', {
+      'path': absolutePath,
+    });
+    if (raw == null) return null;
+    return raw.map((k, v) => MapEntry(k.toString(), v));
+  }
+
   static Future<Map<String, dynamic>?> consumePendingIncomingApk() async {
     final raw = await _call<Map<dynamic, dynamic>>('consumePendingIncomingApk');
     if (raw == null) return null;
@@ -68,7 +75,6 @@ class DeviceAppsService {
     await _call<Object?>('saveState', {'json': json});
   }
 
-  /// Devuelve null si el escaneo no es posible en esta plataforma.
   static Future<List<DeviceAppInfo>?> listApps({int days = 14}) async {
     final raw = await _call<List<dynamic>>('listApps', {'days': days});
     if (raw == null) return null;
@@ -84,7 +90,6 @@ class DeviceAppsService {
   }
 }
 
-/// Decide a qué categoría automática pertenece una app real.
 String classifyApp(DeviceAppInfo app) {
   final haystack = '${app.packageName} ${app.name}'.toLowerCase();
   if (kAiKeywords.any(haystack.contains)) return 'ai';
