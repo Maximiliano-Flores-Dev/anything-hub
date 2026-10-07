@@ -1,6 +1,8 @@
 package com.example.anything_hub
 
+import android.Manifest
 import android.app.ActivityManager
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -8,19 +10,21 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 /**
- * Best-effort performance controls without root.
- * - Memory snapshot
- * - Focus via NotificationManager interruption filter
- * - Trim only non-system, non-critical user packages via killBackgroundProcesses
+ * Focus uses ACCESS_NOTIFICATION_POLICY (No molestar),
+ * not the same as POST_NOTIFICATIONS (mostrar notificaciones propias).
  */
 object PerformanceBridge {
     private const val PREFS = "hub_performance"
     private const val KEY_MODE = "active_mode"
     private const val KEY_PREV_FILTER = "prev_interruption_filter"
+    private const val CHANNEL_ID = "hub_performance"
+    private const val REQ_POST_NOTIFICATIONS = 4401
 
     private val HARD_WHITELIST = setOf(
         "android",
@@ -38,7 +42,17 @@ object PerformanceBridge {
         when (call.method) {
             "getMemoryInfo" -> result.success(memoryInfo(activity))
             "hasNotificationPolicyAccess" -> result.success(hasPolicyAccess(activity))
+            "hasPostNotifications" -> result.success(hasPostNotifications(activity))
+            "requestPostNotifications" -> {
+                requestPostNotifications(activity)
+                result.success(null)
+            }
+            "ensureNotificationChannel" -> {
+                ensureNotificationChannel(activity)
+                result.success(null)
+            }
             "openNotificationPolicySettings" -> {
+                ensureNotificationChannel(activity)
                 openPolicySettings(activity)
                 result.success(null)
             }
@@ -85,6 +99,39 @@ object PerformanceBridge {
         return nm.isNotificationPolicyAccessGranted
     }
 
+    private fun hasPostNotifications(ctx: Context): Boolean {
+        if (Build.VERSION.SDK_INT < 33) return true
+        return ContextCompat.checkSelfPermission(
+            ctx, Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPostNotifications(activity: MainActivity) {
+        if (Build.VERSION.SDK_INT < 33) return
+        if (hasPostNotifications(activity)) return
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+            REQ_POST_NOTIFICATIONS
+        )
+    }
+
+    private fun ensureNotificationChannel(ctx: Context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (nm.getNotificationChannel(CHANNEL_ID) != null) return
+        val ch = NotificationChannel(
+            CHANNEL_ID,
+            "Rendimiento / Focus",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Avisos del modo Focus y rendimiento"
+            setShowBadge(false)
+        }
+        nm.createNotificationChannel(ch)
+    }
+
+    /** Lista de apps con acceso a No molestar — NO la pantalla de notificaciones de la app. */
     private fun openPolicySettings(activity: MainActivity) {
         try {
             val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -95,6 +142,12 @@ object PerformanceBridge {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             activity.startActivity(intent)
         } catch (_: Exception) {
+            try {
+                activity.startActivity(
+                    Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+            } catch (_: Exception) {
+            }
         }
     }
 
@@ -126,23 +179,17 @@ object PerformanceBridge {
         val pm = ctx.packageManager
         val self = ctx.packageName
         val candidates = mutableListOf<String>()
-
         val limit = when (level) {
             "performance" -> 18
             "focus" -> 12
             else -> 8
         }
-
         try {
             @Suppress("DEPRECATION")
             val running = am.runningAppProcesses ?: emptyList()
             for (proc in running) {
-                if (proc.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                    continue
-                }
-                if (proc.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
-                    continue
-                }
+                if (proc.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) continue
+                if (proc.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE) continue
                 val pkgs = proc.pkgList ?: continue
                 for (pkg in pkgs) {
                     if (pkg == self) continue
@@ -150,8 +197,7 @@ object PerformanceBridge {
                     if (pkg.startsWith("com.android.") || pkg.startsWith("android.")) continue
                     try {
                         val ai = pm.getApplicationInfo(pkg, 0)
-                        val isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) != 0
-                        if (isSystem) continue
+                        if ((ai.flags and ApplicationInfo.FLAG_SYSTEM) != 0) continue
                         if (proc.importance >= ActivityManager.RunningAppProcessInfo.IMPORTANCE_CACHED ||
                             proc.importance >= ActivityManager.RunningAppProcessInfo.IMPORTANCE_SERVICE
                         ) {
@@ -163,7 +209,6 @@ object PerformanceBridge {
             }
         } catch (_: Exception) {
         }
-
         val target = candidates.take(limit)
         var killed = 0
         for (pkg in target) {
@@ -173,13 +218,11 @@ object PerformanceBridge {
             } catch (_: Exception) {
             }
         }
-
         val note = if (target.isEmpty()) {
-            "No habia procesos de usuario en segundo plano elegibles (o el SO restringe la limpieza)."
+            "No habia procesos de usuario elegibles (o el SO restringe la limpieza)."
         } else {
-            "Solo apps de usuario no criticas en background. El SO puede limitar killBackgroundProcesses."
+            "Solo apps de usuario no criticas en background."
         }
-
         return mapOf(
             "attempted" to target.size,
             "killed" to killed,
