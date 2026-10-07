@@ -50,10 +50,10 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
 
   static const List<_CardData> _cards = [
     _CardData('Mis Aplicaciones', 'Gestiona, descarga y abre tus apps en un solo lugar', AppsArt()),
-    _CardData('Carpetas del Proyecto', 'Acceso rápido a tus proyectos', SheetsArt()),
-    _CardData('Webs Rápidas', 'Tus sitios favoritos, al instante', WebArt()),
+    _CardData('Carpetas del Proyecto', 'Acceso r\u00e1pido a tus proyectos', SheetsArt()),
+    _CardData('Webs R\u00e1pidas', 'Tus sitios favoritos, al instante', WebArt()),
     _CardData('Favoritos', 'Todo lo que te importa', FavoritesArt()),
-    _CardData('Gestión de Archivos', 'Explora, organiza y accede rápido', FilesArt()),
+    _CardData('Gesti\u00f3n de Archivos', 'Explora, organiza y accede r\u00e1pido', FilesArt()),
     _CardData('Modos de Rendimiento', 'Ajusta el rendimiento de tu dispositivo', PerformanceArt()),
   ];
 
@@ -208,7 +208,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
         if (!userInitiated) return;
         final accepted = await _confirmDialog(
           title: 'Permiso de Acceso a Apps',
-          body: 'Anythings Hub necesita consultar las aplicaciones instaladas en tu dispositivo para clasificarlas por categorías. Todo se procesa en el dispositivo y no se envía a ningún servidor. La aplicación se ignora a sí misma.',
+          body: 'Anythings Hub necesita consultar las aplicaciones instaladas en tu dispositivo para clasificarlas por categor\u00edas. Todo se procesa en el dispositivo y no se env\u00eda a ning\u00fan servidor. La aplicaci\u00f3n se ignora a s\u00ed misma.',
           confirmLabel: 'Permitir',
           cancelLabel: 'Cancelar',
         );
@@ -221,7 +221,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       if (!usageOk && userInitiated && !_usagePromptDismissed) {
         final goToSettings = await _confirmDialog(
           title: 'Acceso a datos de uso',
-          body: 'Para ordenar tus apps por uso frecuente, Android requiere que actives "Acceso a datos de uso" para Anythings Hub en Ajustes. Te llevaré allí; al volver, el orden se actualiza solo. Sin este permiso se ordenan alfabéticamente.',
+          body: 'Para ordenar tus apps por uso frecuente, Android requiere que actives "Acceso a datos de uso" para Anythings Hub en Ajustes. Te llevar\u00e9 all\u00ed; al volver, el orden se actualiza solo. Sin este permiso se ordenan alfab\u00e9ticamente.',
           confirmLabel: 'Abrir Ajustes',
         );
         if (!mounted) return;
@@ -236,7 +236,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       final found = await DeviceAppsService.listApps();
       if (!mounted) return;
       if (found == null) {
-        if (userInitiated) _toast('El escaneo de apps solo está disponible en Android.');
+        if (userInitiated) _toast('El escaneo de apps solo est\u00e1 disponible en Android.');
         return;
       }
 
@@ -264,7 +264,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       SystemLogger.log('Escaneo completado: ${_catalog.length} apps (propia ignorada: $_selfPackage).');
       _toast(usageOk
           ? 'Apps sincronizadas y ordenadas por uso.'
-          : 'Apps sincronizadas (sin acceso de uso: orden alfabético).');
+          : 'Apps sincronizadas (sin acceso de uso: orden alfab\u00e9tico).');
     } finally {
       _scanning = false;
     }
@@ -296,6 +296,35 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     final shouldShow = await ProjectActivationService.shouldShowAdvisement();
     if (!shouldShow) {
       SystemLogger.log('Projects module: advisement dismissed permanently');
+      if (!mounted) return;
+      final reopen = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: HubColors.panel,
+          title: const Text('M\u00f3dulo de proyectos',
+              style: TextStyle(color: HubColors.textoPrincipal)),
+          content: const Text(
+            'Hab\u00edas elegido no volver a mostrar el aviso. \u00bfQuieres reactivar el m\u00f3dulo de proyectos?',
+            style: TextStyle(color: HubColors.textoSecundario),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Reactivar'),
+            ),
+          ],
+        ),
+      );
+      if (reopen == true) {
+        await ProjectActivationService.clearAdvisementDismissal();
+        // fall through to show advisement again by recursion
+        if (!mounted) return;
+        await _openProjectsModule();
+      }
       return;
     }
 
@@ -327,7 +356,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
   }
 
   void _onFabAction(RadialAction action) {
-    SystemLogger.log('FAB → ${action.id}');
+    SystemLogger.log('FAB \u2192 ${action.id}');
     if (action.id == 'folder') {
       _showCreateGroupDialog();
     } else if (action.id == 'add_app') {
@@ -339,7 +368,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
         SnackBar(
           behavior: SnackBarBehavior.floating,
           backgroundColor: HubColors.panel,
-          content: Text('${action.label}: acción ejecutada', style: const TextStyle(color: HubColors.textoPrincipal)),
+          content: Text('${action.label}: acci\u00f3n ejecutada', style: const TextStyle(color: HubColors.textoPrincipal)),
         ),
       );
     }
@@ -523,7 +552,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
                   _BottomNav(
                     selected: _tab,
                     onSelected: (i) {
-                      SystemLogger.log('Footer → tab $i');
+                      SystemLogger.log('Footer \u2192 tab $i');
                       setState(() => _tab = i);
                     },
                   ),
@@ -537,6 +566,25 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
   }
 
   Widget _buildContent() {
+    // Footer tabs: 0 dashboard \u00b7 1 apps \u00b7 2 explorar \u00b7 3 perfil (placeholder)
+    if (_tab == 1) {
+      return const MisAplicacionesScreen();
+    }
+    if (_tab == 2) {
+      return const FileExplorerScreen();
+    }
+    if (_tab == 3) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'Perfil y ajustes pr\u00f3ximamente',
+            style: TextStyle(color: HubColors.textoSecundario, fontSize: 15),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
       child: Column(
@@ -578,7 +626,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
           ),
           const SizedBox(height: 5),
           const Text(
-            'Sincronización inteligente de apps',
+            'Sincronizaci\u00f3n inteligente de apps',
             style: TextStyle(color: HubColors.textoAcento, fontSize: 13),
           ),
           const SizedBox(height: 14),
@@ -613,7 +661,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
                   } else if (i == 4) {
                     _openFileExplorer();
                   } else {
-                    SystemLogger.log('Card → ${c.title}');
+                    SystemLogger.log('Card \u2192 ${c.title}');
                   }
                 },
               );
@@ -633,7 +681,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
           const SizedBox(height: 10),
           const Center(
             child: Text(
-              'Orden automático por frecuencia de uso activo',
+              'Orden autom\u00e1tico por frecuencia de uso activo',
               style: TextStyle(color: HubColors.textoSecundario, fontSize: 11.5),
             ),
           ),
@@ -662,33 +710,36 @@ class _BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 58,
       decoration: const BoxDecoration(
-        color: HubColors.fondoPrincipal,
-        border: Border(top: BorderSide(color: HubColors.lineaFooter, width: 0.8)),
+        color: HubColors.panel,
+        border: Border(top: BorderSide(color: HubColors.linea)),
       ),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(_items.length, (i) {
-          final active = selected == i;
-          final item = _items[i];
-          return Expanded(
-            child: InkWell(
-              onTap: () => onSelected(i),
+          final (activeIcon, idleIcon, label) = _items[i];
+          final isSel = selected == i;
+          return InkWell(
+            onTap: () => onSelected(i),
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    active ? item.$1 : item.$2,
+                    isSel ? activeIcon : idleIcon,
+                    color: isSel ? HubColors.pomelo : HubColors.textoSecundario,
                     size: 24,
-                    color: active ? HubColors.pomelo : HubColors.pomeloSuave,
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    item.$3,
+                    label,
                     style: TextStyle(
+                      color: isSel ? HubColors.pomelo : HubColors.textoSecundario,
                       fontSize: 10,
-                      color: active ? HubColors.pomelo : HubColors.pomeloSuave,
-                      fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+                      fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
                     ),
                   ),
                 ],
