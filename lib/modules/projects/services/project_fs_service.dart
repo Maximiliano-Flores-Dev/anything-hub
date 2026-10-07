@@ -13,7 +13,27 @@ class ProjectFsService {
   static const String logsDir = 'logs';
   static const String projectsDir = 'projects';
 
+  /// Preferencia: carpeta pública Documents para que editores (Acode, Markor)
+  /// y el explorador del sistema puedan ver `.anythinghub` / `project.md`.
+  /// Requiere MANAGE_EXTERNAL_STORAGE (ya declarado en el manifest).
   static Future<Directory> getRootDirectory() async {
+    // 1) Documents públicos del usuario (visible en exploradores y editores)
+    final publicDocs = Directory('/storage/emulated/0/Documents');
+    try {
+      if (await publicDocs.exists()) {
+        return Directory(p.join(publicDocs.path, rootDirName));
+      }
+    } catch (_) {}
+
+    // 2) Almacenamiento externo de la app (aún limitado, pero mejor que el sandbox interno)
+    try {
+      final ext = await getExternalStorageDirectory();
+      if (ext != null) {
+        return Directory(p.join(ext.path, rootDirName));
+      }
+    } catch (_) {}
+
+    // 3) Fallback sandbox (solo si no hay almacenamiento externo)
     final base = await getApplicationDocumentsDirectory();
     return Directory(p.join(base.path, rootDirName));
   }
