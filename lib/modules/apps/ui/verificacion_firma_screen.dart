@@ -36,13 +36,18 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
     setState(() => _loading = true);
     await Future<void>.delayed(const Duration(milliseconds: 600));
 
+    // Fail-closed: sin oráculo real no afirmamos que el certificado coincide.
+    // Cuando exista un servicio de verificación, sustituir este bloque.
+    final hasCert = widget.certSha256 != null && widget.certSha256!.isNotEmpty;
     final result = SignatureCheckResult(
-      status: SignatureStatus.cacheHit,
+      status: hasCert ? SignatureStatus.unverified : SignatureStatus.error,
       packageName: widget.packageName,
       versionLabel: widget.versionLabel,
       certSha256: widget.certSha256,
-      cacheAgeDays: 5,
-      message: 'Verificación con datos almacenados',
+      cacheAgeDays: null,
+      message: hasCert
+          ? 'Oráculo de firmas aún no conectado. No se puede confirmar autenticidad.'
+          : 'Sin huella de certificado. Verificación imposible.',
     );
 
     if (!mounted) return;
@@ -184,6 +189,33 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                           ? 'Verificación exitosa (caché)'
                           : 'Verificación exitosa',
                       style: const TextStyle(color: Color(0xFF3DDC84), fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    if (r.status == SignatureStatus.unverified || r.status == SignatureStatus.error) {
+      widgets.add(
+        HubPanel(
+          child: Row(
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Color(0xFFE53935)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Firma no verificada',
+                      style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      r.message ?? 'No se pudo confirmar autenticidad',
+                      style: const TextStyle(color: Color(0xFFE53935), fontSize: 12),
                     ),
                   ],
                 ),
