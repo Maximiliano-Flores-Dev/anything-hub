@@ -2,7 +2,6 @@ import 'package:flutter/services.dart';
 
 import '../core/logger.dart';
 
-/// Modos de rendimiento del núcleo (sin modo juego).
 enum PerfMode {
   balanced,
   eco,
@@ -114,10 +113,6 @@ class TrimResult {
       );
 }
 
-/// Canal nativo de rendimiento. Best-effort en Android sin root:
-/// - Memoria vía ActivityManager
-/// - Focus vía política de notificaciones (INTERRUPTION_FILTER)
-/// - Limpieza de segundo plano solo de apps de usuario no críticas
 class PerformanceService {
   static const _ch = MethodChannel('anythings.hub/performance');
 
@@ -138,19 +133,33 @@ class PerformanceService {
     return MemorySnapshot.fromMap(raw);
   }
 
+  /// Acceso a No molestar (Focus). No es POST_NOTIFICATIONS.
   static Future<bool> hasNotificationPolicyAccess() async =>
       await _call<bool>('hasNotificationPolicyAccess') ?? false;
 
+  /// Android 13+: permiso para mostrar notificaciones propias.
+  static Future<bool> hasPostNotifications() async =>
+      await _call<bool>('hasPostNotifications') ?? true;
+
+  static Future<void> requestPostNotifications() async {
+    await _call<Object?>('requestPostNotifications');
+  }
+
+  static Future<void> ensureNotificationChannel() async {
+    await _call<Object?>('ensureNotificationChannel');
+  }
+
+  /// Abre Ajustes → lista "Acceso a No molestar".
   static Future<void> openNotificationPolicySettings() async {
+    await ensureNotificationChannel();
     await _call<Object?>('openNotificationPolicySettings');
   }
 
   static Future<bool> applyFocusNotifications({required bool enable}) async =>
       await _call<bool>('setFocusNotifications', {'enable': enable}) ?? false;
 
-  /// Cierra procesos en segundo plano *innecesarios* (apps de usuario, no sistema).
   static Future<TrimResult?> trimUnnecessaryBackground({
-    required String aggressiveness, // 'eco' | 'performance' | 'focus'
+    required String aggressiveness,
   }) async {
     final raw = await _call<Map>('trimUnnecessaryBackground', {
       'aggressiveness': aggressiveness,
