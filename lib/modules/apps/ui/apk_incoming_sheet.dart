@@ -92,14 +92,14 @@ class ApkIncomingSheet extends StatelessWidget {
                       'Aplicación que comparte',
                       callerPackage == null || callerPackage!.isEmpty
                           ? 'Desconocido'
-                          : '$callerPackage${callerVerified ? ' ✓' : ''}',
+                          : '$callerPackage${callerVerified ? ' \u2713' : ''}',
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
               const Text(
-                '¿Qué deseas hacer?',
+                '\u00bfQu\u00e9 deseas hacer?',
                 style: TextStyle(
                   color: HubColors.textoPrincipal,
                   fontWeight: FontWeight.w700,
@@ -108,7 +108,7 @@ class ApkIncomingSheet extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               const Text(
-                'Elige cómo quieres manejar este APK.',
+                'Elige c\u00f3mo quieres manejar este APK.',
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
               const SizedBox(height: 16),
@@ -180,19 +180,22 @@ class ApkIncomingSheet extends StatelessWidget {
             .toList() ??
         <String>[];
 
+    final parseFailed = packageName == null || packageName.isEmpty;
     final displayName = (appLabel != null && appLabel.isNotEmpty)
         ? appLabel
         : fileName;
-    final displayPackage = (packageName != null && packageName.isNotEmpty)
-        ? packageName
-        : 'com.desconocido.apk';
+    final displayPackage = parseFailed ? 'com.desconocido.apk' : packageName!;
 
+    // Fail-closed: APK ilegible \u2192 no presentar como "riesgo bajo"
     final report = ApkRiskScorer.score(
       fileName: displayName,
       packageName: displayPackage,
-      rawPermissions: rawPerms,
+      rawPermissions: parseFailed
+          ? const ['android.permission.PARSE_FAILED']
+          : rawPerms,
       detectedPackages: const [],
       sha256: null,
+      parseFailed: parseFailed,
     );
 
     if (!context.mounted) return;
