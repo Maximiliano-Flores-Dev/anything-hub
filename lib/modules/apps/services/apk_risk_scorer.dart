@@ -44,7 +44,28 @@ class ApkRiskScorer {
     required List<String> rawPermissions,
     required List<String> detectedPackages,
     String? sha256,
+    bool parseFailed = false,
   }) {
+    // Fail-closed: manifiesto ilegible → riesgo alto, nunca "bajo"
+    if (parseFailed) {
+      return ApkRiskReport(
+        score: 95,
+        level: ApkRiskReport.levelFromScore(95),
+        permissions: const [
+          ApkPermission(
+            name: 'PARSE_FAILED',
+            description:
+                'No se pudo leer el manifiesto del APK. Tratar como no confiable.',
+            critical: true,
+          ),
+        ],
+        trackingSdks: const [],
+        fileName: fileName,
+        packageName: packageName,
+        sha256: sha256,
+      );
+    }
+
     var score = 0;
     final permissions = <ApkPermission>[];
 
