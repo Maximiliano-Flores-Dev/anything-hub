@@ -71,7 +71,7 @@ class MainActivity : FlutterActivity() {
         if (action != Intent.ACTION_VIEW && action != Intent.ACTION_SEND) return
 
         val caller = callingPackage
-        val uri: Uri? = when (action) {
+        val incomingUri: Uri = when (action) {
             Intent.ACTION_VIEW -> intent.data
             Intent.ACTION_SEND -> if (Build.VERSION.SDK_INT >= 33) {
                 intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
@@ -82,8 +82,8 @@ class MainActivity : FlutterActivity() {
             else -> null
         } ?: return
 
-        val mime = intent.type ?: contentResolver.getType(uri) ?: ""
-        val pathHint = uri.toString().lowercase()
+        val mime = intent.type ?: contentResolver.getType(incomingUri) ?: ""
+        val pathHint = incomingUri.toString().lowercase()
         val looksLikeApk = mime.contains("package-archive") ||
             mime == "application/octet-stream" ||
             pathHint.endsWith(".apk")
@@ -93,7 +93,7 @@ class MainActivity : FlutterActivity() {
             try {
                 val dest = File(cacheDir, "incoming_apk/${System.currentTimeMillis()}.apk")
                 dest.parentFile?.mkdirs()
-                contentResolver.openInputStream(uri)?.use { input ->
+                contentResolver.openInputStream(incomingUri)?.use { input ->
                     FileOutputStream(dest).use { output -> input.copyTo(output) }
                 }
                 if (!dest.exists() || dest.length() == 0L) return@execute

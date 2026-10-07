@@ -6,6 +6,7 @@ import '../models/app_models.dart';
 import '../services/apps_local_store.dart';
 import '../widgets/app_icon_cell.dart';
 import 'app_gestion_screen.dart';
+import 'puerto_software_screen.dart';
 
 /// Grilla compacta de apps instaladas.
 /// Tap → AppGestionScreen. Sin botones grandes en cada celda.
@@ -127,6 +128,15 @@ class _MisAplicacionesScreenState extends State<MisAplicacionesScreen> {
           ),
         ),
         actions: [
+          IconButton(
+            tooltip: 'Puerto de Software',
+            icon: const Icon(Icons.anchor, color: HubColors.textoSecundario),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PuertoSoftwareScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.search, color: HubColors.textoSecundario),
             onPressed: () {
