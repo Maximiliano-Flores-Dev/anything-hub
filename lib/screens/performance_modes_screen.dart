@@ -29,6 +29,11 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
 
   Future<void> _refresh() async {
     setState(() => _loading = true);
+    await PerformanceService.ensureNotificationChannel();
+    final post = await PerformanceService.hasPostNotifications();
+    if (!post) {
+      await PerformanceService.requestPostNotifications();
+    }
     final mem = await PerformanceService.memoryInfo();
     final active = await PerformanceService.getActiveMode();
     final policy = await PerformanceService.hasNotificationPolicyAccess();
@@ -50,10 +55,13 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: HubColors.panel,
-          title: const Text('Permiso de notificaciones',
+          title: const Text('Acceso a No molestar (Focus)',
               style: TextStyle(color: HubColors.textoPrincipal)),
           content: const Text(
-            'Focus necesita acceso a la politica de notificaciones para silenciar el sonido de apps de terceros (siguen visibles).',
+            'Focus no usa el permiso normal de notificaciones.\n\n'
+            'En Ajustes busca la lista "Acceso a No molestar" o "Acceso a la política de notificaciones" '
+            'y activa el interruptor de Anythings Hub.\n\n'
+            'No abras "Notificaciones de la app": ahí Android dice que la app no las solicita.',
             style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
           ),
           actions: [
@@ -162,7 +170,7 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
                 if (!_policyAccess) ...[
                   const SizedBox(height: 20),
                   GradientPillButton(
-                    label: 'Conceder politica de notificaciones (Focus)',
+                    label: 'Abrir acceso a No molestar (Focus)',
                     icon: Icons.notifications_off_outlined,
                     onPressed: () => PerformanceService.openNotificationPolicySettings(),
                   ),
