@@ -1,1 +1,78 @@
-SEE_B1_4
+{
+  "version": 1,
+  "updated": "2026-10-07",
+  "description": "Catálogo oficial de plugins de Anythings Hub. Solo metadatos JSON; la app no ejecuta código remoto.",
+  "plugins": [
+    {
+      "id": "file-filters-extra",
+      "name": "Filtros extra de archivos",
+      "version": "1.0.0",
+      "description": "Añade presets de filtro (documentos legales, dumps log) al explorador. Solo configuración local.",
+      "author": "Anythings Hub",
+      "category": "files",
+      "tags": ["files", "filters"],
+      "homepage": "https://github.com/Maximiliano-Flores-Dev/anything-hub/tree/main/plugins",
+      "minHubVersion": "1.0.0",
+      "permissions": [],
+      "extendsFeature": "",
+      "capabilities": [],
+      "configSchema": {
+        "presets": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    {
+      "id": "apk-risk-labels-es",
+      "name": "Etiquetas de riesgo APK (ES)",
+      "version": "1.0.0",
+      "description": "Textos y descripciones en español para permisos frecuentes en el análisis de APK (solo strings).",
+      "author": "Anythings Hub",
+      "category": "apps",
+      "tags": ["apk", "i18n"],
+      "homepage": "https://github.com/Maximiliano-Flores-Dev/anything-hub/tree/main/plugins",
+      "minHubVersion": "1.0.0",
+      "permissions": [],
+      "extendsFeature": "",
+      "capabilities": [],
+      "configSchema": {}
+    },
+    {
+      "id": "projects-templates-basic",
+      "name": "Plantillas básicas de proyectos",
+      "version": "1.0.0",
+      "description": "Manifiestos de plantilla (Flutter, Node, Python) para rellenar project.md. No ejecuta comandos.",
+      "author": "Anythings Hub",
+      "category": "projects",
+      "tags": ["projects", "templates"],
+      "homepage": "https://github.com/Maximiliano-Flores-Dev/anything-hub/tree/main/plugins",
+      "minHubVersion": "1.0.0",
+      "permissions": [],
+      "extendsFeature": "",
+      "capabilities": [],
+      "configSchema": {
+        "templates": { "type": "array" }
+      }
+    },
+    {
+      "id": "perf-game-overlay-fps",
+      "name": "Overlay FPS / modo juegos",
+      "version": "1.0.0",
+      "description": "Plugin opcional que amplía Modos de rendimiento: declara overlay sobre otras apps y un modo juegos con contador de FPS. Solo metadatos; la app no incluye el modo juego en el núcleo ni ejecuta código remoto.",
+      "author": "Anythings Hub",
+      "category": "performance",
+      "tags": ["performance", "overlay", "fps", "games"],
+      "homepage": "https://github.com/Maximiliano-Flores-Dev/anything-hub/tree/main/plugins",
+      "minHubVersion": "1.0.0",
+      "permissions": ["SYSTEM_ALERT_WINDOW", "PACKAGE_USAGE_STATS"],
+      "extendsFeature": "performance-modes",
+      "capabilities": ["overlay", "fps-counter", "game-mode"],
+      "configSchema": {
+        "showFps": { "type": "boolean", "default": true },
+        "overlayOpacity": { "type": "number", "default": 0.85 },
+        "position": { "type": "string", "enum": ["top-left", "top-right", "bottom-left", "bottom-right"] }
+      }
+    }
+  ]
+}
