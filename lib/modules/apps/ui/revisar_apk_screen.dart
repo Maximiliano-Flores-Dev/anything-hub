@@ -13,10 +13,12 @@ class RevisarApkScreen extends StatelessWidget {
     super.key,
     required this.report,
     this.onInstallOverride,
+    this.advisoryNote,
   });
 
   final ApkRiskReport report;
   final VoidCallback? onInstallOverride;
+  final String? advisoryNote;
 
   Color get _levelColor {
     switch (report.level) {
@@ -59,6 +61,15 @@ class RevisarApkScreen extends StatelessWidget {
           Text(report.fileName, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
           const SizedBox(height: 2),
           Text(report.packageName, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+          if (advisoryNote != null && advisoryNote!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            HubPanel(
+              child: Text(
+                advisoryNote!,
+                style: const TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+              ),
+            ),
+          ],
           const SizedBox(height: 24),
           HubPanel(
             child: Column(

@@ -59,6 +59,8 @@ class MainActivity : FlutterActivity() {
                     result.error("PERF", e.message, null)
                 }
             }
+
+        PuertoPipeBridge.register(flutterEngine.dartExecutor.binaryMessenger, this)
     }
 
     /**

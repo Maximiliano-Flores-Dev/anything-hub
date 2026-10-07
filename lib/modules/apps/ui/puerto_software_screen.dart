@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/hub_colors.dart';
+import '../services/puerto_pipe_service.dart';
+import 'puerto_limbo_screen.dart';
 
 enum PuertoTrust {
   official,
@@ -21,6 +22,8 @@ class PuertoEntry {
     required this.publisher,
     this.packageName,
     this.sha256,
+    this.apkUrl,
+    this.githubRepo,
   });
 
   final String name;
@@ -30,6 +33,8 @@ class PuertoEntry {
   final String publisher;
   final String? packageName;
   final String? sha256;
+  final String? apkUrl;
+  final String? githubRepo;
 }
 
 /// Catálogo curado. No hospedamos APK: solo enlaces a origen oficial,
@@ -97,6 +102,7 @@ const kPuertoCatalog = <PuertoEntry>[
     trust: PuertoTrust.fdroid,
     publisher: 'F-Droid',
     packageName: 'org.fdroid.fdroid',
+    apkUrl: 'https://f-droid.org/F-Droid.apk',
   ),
   PuertoEntry(
     name: 'NewPipe',
@@ -105,6 +111,7 @@ const kPuertoCatalog = <PuertoEntry>[
     trust: PuertoTrust.fdroid,
     publisher: 'Team NewPipe',
     packageName: 'org.schabi.newpipe',
+    githubRepo: 'TeamNewPipe/NewPipe',
   ),
   PuertoEntry(
     name: 'AntennaPod',
@@ -121,6 +128,7 @@ const kPuertoCatalog = <PuertoEntry>[
     trust: PuertoTrust.github,
     publisher: 'beemdevelopment',
     packageName: 'com.beemdevelopment.aegis',
+    githubRepo: 'beemdevelopment/Aegis',
   ),
   PuertoEntry(
     name: 'KeePassDX',
@@ -129,6 +137,7 @@ const kPuertoCatalog = <PuertoEntry>[
     trust: PuertoTrust.github,
     publisher: 'Kunzisoft',
     packageName: 'com.kunzisoft.keepass.free',
+    githubRepo: 'Kunzisoft/KeePassDX',
   ),
   PuertoEntry(
     name: 'Obtainium',
@@ -137,6 +146,7 @@ const kPuertoCatalog = <PuertoEntry>[
     trust: PuertoTrust.trustedCatalog,
     publisher: 'ImranR98',
     packageName: 'dev.imranr.obtainium.fdroid',
+    githubRepo: 'ImranR98/Obtainium',
   ),
   PuertoEntry(
     name: 'HappyMod',
@@ -179,6 +189,13 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
             fontWeight: FontWeight.w700,
           ),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Clave VirusTotal',
+            icon: const Icon(Icons.key, color: HubColors.textoSecundario),
+            onPressed: _askVirusTotalKey,
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -186,8 +203,7 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Text(
-              'Solo orígenes oficiales, F-Droid, GitHub del proyecto o catálogos conocidos. '
-              'No hay mods ni herramientas ofensivas. Toda APK que vuelva al Hub pasa por análisis de permisos.',
+              'El APK entra por un tubo (chunks de 8 KB) a un limbo en caché. Ahí se calcula SHA-256, se lee el manifiesto y, si hay clave, se consulta VirusTotal. Tú decides si instalas.',
               style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
             ),
           ),
@@ -326,42 +342,99 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
     );
   }
 
+  Future<void> _askVirusTotalKey() async {
+    final current = await PuertoPipeService.virusTotalKey();
+    if (!mounted) return;
+    final ctrl = TextEditingController(text: current ?? '');
+    final saved = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: HubColors.panel,
+        title: const Text('VirusTotal', style: TextStyle(color: HubColors.textoPrincipal)),
+        content: TextField(
+          controller: ctrl,
+          obscureText: true,
+          style: const TextStyle(color: HubColors.textoPrincipal),
+          decoration: const InputDecoration(
+            hintText: 'API key (solo en el dispositivo)',
+            hintStyle: TextStyle(color: HubColors.textoSecundario),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, ctrl.text), child: const Text('Guardar')),
+        ],
+      ),
+    );
+    if (saved != null) await PuertoPipeService.saveVirusTotalKey(saved);
+  }
+
   Future<void> _open(PuertoEntry e) async {
+    if (e.trust == PuertoTrust.gray || (e.apkUrl == null && e.githubRepo == null)) {
+      final canPipe = e.apkUrl != null || e.githubRepo != null;
+      if (!canPipe) {
+        final ok = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: HubColors.panel,
+            title: const Text('Sin artefacto directo', style: TextStyle(color: HubColors.textoPrincipal)),
+            content: Text(
+              e.trust == PuertoTrust.gray
+                  ? 'No canalizamos este catálogo: no hay un APK firmado único que podamos hashear. Si descargas fuera, ábrelo con el Hub para el análisis.'
+                  : 'Esta ficha aún no tiene URL directa de APK. Abre la página oficial y, si bajas el archivo, compártelo con el Hub.',
+              style: const TextStyle(color: HubColors.textoSecundario),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cerrar')),
+              TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Abrir página')),
+            ],
+          ),
+        );
+        if (ok == true) {
+          await launchUrl(Uri.parse(e.url), mode: LaunchMode.externalApplication);
+        }
+        return;
+      }
+    }
+
     if (e.trust == PuertoTrust.gray) {
       final ok = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: HubColors.panel,
-          title: const Text(
-            'Zona gris',
-            style: TextStyle(color: HubColors.textoPrincipal),
-          ),
+          title: const Text('Zona gris', style: TextStyle(color: HubColors.textoPrincipal)),
           content: const Text(
-            'Este sitio no es el autor de las apps que ofrece. No podemos saber si el APK hace lo que dice o si fue alterado. '
-            'Si lo descargas, ábrelo con Anythings Hub y revisa permisos y firma antes de instalar. Tú eres responsable de lo que ejecutas.',
+            'El tubo igual va a hashear y analizar, pero el origen no es el autor. El resultado es una recomendación, no una autorización.',
             style: TextStyle(color: HubColors.textoSecundario),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Abrir bajo mi responsabilidad'),
-            ),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+            TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Seguir')),
           ],
         ),
       );
       if (ok != true) return;
     }
-    final uri = Uri.parse(e.url);
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!launched && mounted) {
-      await Clipboard.setData(ClipboardData(text: e.url));
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo abrir. Enlace copiado.')),
-      );
+
+    var apkUrl = e.apkUrl;
+    if (apkUrl == null && e.githubRepo != null) {
+      apkUrl = await PuertoPipeService.latestGithubApk(e.githubRepo!);
     }
+    if (!mounted) return;
+    if (apkUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se encontró un APK https en el release.')),
+      );
+      return;
+    }
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PuertoLimboScreen(
+          name: e.name,
+          apkUrl: apkUrl!,
+          gray: e.trust == PuertoTrust.gray,
+        ),
+      ),
+    );
   }
 }
