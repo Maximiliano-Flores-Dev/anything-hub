@@ -5,6 +5,7 @@ import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
@@ -235,6 +236,23 @@ class MainActivity : FlutterActivity() {
                             }
                         }
                     }
+                    "inspectApk" -> {
+                        val relative = call.argument<String>("cacheRelativePath")
+                        if (relative.isNullOrEmpty()) {
+                            result.error("PATH", "cacheRelativePath requerido", null)
+                        } else {
+                            worker.execute {
+                                try {
+                                    val data = inspectApkFromCache(relative)
+                                    runOnUiThread { result.success(data) }
+                                } catch (e: Exception) {
+                                    runOnUiThread {
+                                        result.error("INSPECT", e.message, null)
+                                    }
+                                }
+                            }
+                        }
+                    }
                     "consumePendingIncomingApk" -> {
                         val pending = pendingIncomingApk
                         pendingIncomingApk = null
@@ -413,7 +431,7 @@ class MainActivity : FlutterActivity() {
                                 putExtra(Intent.EXTRA_STREAM, uri)
                                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             }
-                            startActivity(Intent.createChooser(intent, "Compartir"))
+                            startActivity(Intent.createChooser(intent, "Compartir").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                             result.success(true)
                         } catch (e: Exception) {
                             result.error("SHARE", e.message, null)
@@ -424,22 +442,68 @@ class MainActivity : FlutterActivity() {
             }
     }
 
+
+    /**
+     * Lee metadatos reales del APK en caché vía PackageManager.getPackageArchiveInfo.
+     * Devuelve packageName, appLabel, versionName, versionCode y lista de permisos.
+     */
+    private fun inspectApkFromCache(relative: String): Map<String, Any?> {
+        val file = File(cacheDir, relative)
+        if (!file.exists() || !file.isFile) {
+            throw IllegalArgumentException("APK no encontrado: $relative")
+        }
+        val path = file.absolutePath
+        @Suppress("DEPRECATION")
+        val flags = PackageManager.GET_PERMISSIONS
+        val pi = packageManager.getPackageArchiveInfo(path, flags)
+            ?: throw IllegalStateException("No se pudo parsear el APK")
+
+        val ai = pi.applicationInfo
+        if (ai != null) {
+            ai.sourceDir = path
+            ai.publicSourceDir = path
+        }
+
+        val label = if (ai != null) {
+            try {
+                packageManager.getApplicationLabel(ai).toString()
+            } catch (_: Exception) {
+                pi.packageName ?: file.name
+            }
+        } else {
+            pi.packageName ?: file.name
+        }
+
+        val perms = pi.requestedPermissions?.toList() ?: emptyList()
+
+        return mapOf(
+            "packageName" to (pi.packageName ?: ""),
+            "appLabel" to label,
+            "versionName" to (pi.versionName ?: ""),
+            "versionCode" to if (Build.VERSION.SDK_INT >= 28) {
+                pi.longVersionCode
+            } else {
+                @Suppress("DEPRECATION")
+                pi.versionCode.toLong()
+            },
+            "permissions" to perms,
+            "fileName" to file.name,
+            "sizeBytes" to file.length(),
+        )
+    }
+
     private fun prefs() = getSharedPreferences("anythings_hub", Context.MODE_PRIVATE)
 
     private fun hasUsageAccess(): Boolean {
         val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
         val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             appOps.unsafeCheckOpNoThrow(
-                AppOpsManager.OPSTR_GET_USAGE_STATS,
-                Process.myUid(),
-                packageName
+                AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), packageName
             )
         } else {
             @Suppress("DEPRECATION")
             appOps.checkOpNoThrow(
-                AppOpsManager.OPSTR_GET_USAGE_STATS,
-                Process.myUid(),
-                packageName
+                AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), packageName
             )
         }
         return mode == AppOpsManager.MODE_ALLOWED
@@ -453,52 +517,20 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun getStorageRoots(): List<Map<String, Any?>> {
-        val roots = mutableListOf<Map<String, Any?>>()
+    private fun getStorageRoots(): List<Map<String, String>> {
+        val roots = ArrayList<Map<String, String>>()
         val primary = Environment.getExternalStorageDirectory()
         if (primary != null && primary.exists()) {
-            roots.add(
-                mapOf(
-                    "path" to primary.absolutePath,
-                    "label" to "Almacenamiento interno",
-                    "isPrimary" to true,
-                )
-            )
-        }
-        // SD / volúmenes secundarios
-        val dirs = getExternalFilesDirs(null)
-        for (d in dirs) {
-            if (d == null) continue
-            var root = d
-            // subir hasta el root del volumen
-            while (root.parentFile != null && root.parentFile!!.canRead()) {
-                val parent = root.parentFile!!
-                if (parent.absolutePath == "/" || parent.absolutePath == "/storage") break
-                root = parent
-            }
-            val path = root.absolutePath
-            if (roots.none { it["path"] == path }) {
-                roots.add(
-                    mapOf(
-                        "path" to path,
-                        "label" to root.name.ifEmpty { path },
-                        "isPrimary" to false,
-                    )
-                )
-            }
+            roots.add(mapOf("path" to primary.absolutePath, "label" to "Almacenamiento interno"))
         }
         return roots
     }
 
-    private fun storageInfo(path: String): Map<String, Any?> {
+    private fun storageInfo(path: String): Map<String, Any> {
         val stat = StatFs(path)
         val total = stat.totalBytes
         val free = stat.availableBytes
-        return mapOf(
-            "totalBytes" to total,
-            "freeBytes" to free,
-            "usedBytes" to (total - free),
-        )
+        return mapOf("total" to total, "free" to free, "used" to (total - free))
     }
 
     private fun listDir(path: String, showHidden: Boolean): List<Map<String, Any?>> {
@@ -521,28 +553,32 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun deleteRecursive(f: File): Boolean {
-        var ok = true
         if (f.isDirectory) {
-            f.listFiles()?.forEach { child ->
+            val children = f.listFiles() ?: return f.delete()
+            var ok = true
+            for (child in children) {
                 if (!deleteRecursive(child)) ok = false
             }
+            if (!ok) return false
         }
-        if (!f.delete()) ok = false
-        return ok
+        return f.delete()
     }
 
     private fun copyRecursive(src: File, dest: File): Boolean {
         return try {
+            val srcCanon = src.canonicalFile
+            val destCanon = dest.canonicalFile
             // Same file / same path would truncate and destroy data
-            if (src.canonicalPath == dest.canonicalPath) return true
+            if (srcCanon.absolutePath == destCanon.absolutePath) return false
             // Pasting a folder into itself (or a descendant) causes infinite nesting
-            if (src.isDirectory && dest.canonicalPath.startsWith(src.canonicalPath + File.separator)) {
+            if (srcCanon.isDirectory && destCanon.absolutePath.startsWith(srcCanon.absolutePath + "/")) {
                 return false
             }
             if (src.isDirectory) {
                 if (!dest.exists() && !dest.mkdirs()) return false
+                val children = src.listFiles() ?: return true
                 var ok = true
-                src.listFiles()?.forEach { child ->
+                for (child in children) {
                     if (!copyRecursive(child, File(dest, child.name))) ok = false
                 }
                 ok
@@ -560,110 +596,130 @@ class MainActivity : FlutterActivity() {
 
     private fun listApps(days: Int): List<Map<String, Any?>> {
         val pm = packageManager
-        val packages = pm.getInstalledApplications(0)
+        val launcher = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+        @Suppress("DEPRECATION")
+        val resolved = pm.queryIntentActivities(launcher, 0)
         val usageMap = mutableMapOf<String, Long>()
-        if (hasUsageAccess()) {
-            try {
-                val usm = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-                val end = System.currentTimeMillis()
-                val start = end - days * 24L * 60 * 60 * 1000
-                val stats = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end)
-                stats?.forEach { s ->
-                    usageMap[s.packageName] = (usageMap[s.packageName] ?: 0L) + s.totalTimeInForeground
-                }
-            } catch (_: Exception) {}
+        try {
+            val usm = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+            val end = System.currentTimeMillis()
+            val start = end - days * 24L * 60 * 60 * 1000
+            val stats = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end)
+            stats?.forEach { s ->
+                usageMap[s.packageName] = (usageMap[s.packageName] ?: 0L) + s.totalTimeInForeground
+            }
+        } catch (_: Exception) {
         }
-        return packages.mapNotNull { ai ->
-            try {
-                val label = pm.getApplicationLabel(ai).toString()
-                val iconBytes = drawableToBytes(pm.getApplicationIcon(ai))
-                val mins = ((usageMap[ai.packageName] ?: 0L) / 60000L).toInt()
-                mapOf(
-                    "name" to label,
-                    "packageName" to ai.packageName,
-                    "icon" to iconBytes,
-                    "usageMinutes" to mins,
-                    "category" to categoryOf(ai),
-                    "isSystem" to ((ai.flags and ApplicationInfo.FLAG_SYSTEM) != 0),
-                )
+        val result = ArrayList<Map<String, Any?>>()
+        for (ri in resolved) {
+            val pkg = ri.activityInfo.packageName
+            val ai = try { pm.getApplicationInfo(pkg, 0) } catch (_: Exception) { continue }
+            val name = pm.getApplicationLabel(ai).toString()
+            val icon = try {
+                iconBytes(pm.getApplicationIcon(ai))
             } catch (_: Exception) {
                 null
             }
+            result.add(
+                mapOf(
+                    "package" to pkg,
+                    "name" to name,
+                    "category" to categoryOf(ai),
+                    "usageMs" to (usageMap[pkg] ?: 0L),
+                    "icon" to icon,
+                )
+            )
         }
+        return result
     }
 
     private fun categoryOf(ai: ApplicationInfo): String {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return when (ai.category) {
-                ApplicationInfo.CATEGORY_GAME -> "games"
-                ApplicationInfo.CATEGORY_AUDIO -> "media"
-                ApplicationInfo.CATEGORY_VIDEO -> "media"
+                ApplicationInfo.CATEGORY_GAME -> "game"
+                ApplicationInfo.CATEGORY_AUDIO,
+                ApplicationInfo.CATEGORY_VIDEO,
                 ApplicationInfo.CATEGORY_IMAGE -> "media"
                 ApplicationInfo.CATEGORY_SOCIAL -> "social"
                 ApplicationInfo.CATEGORY_NEWS -> "news"
                 ApplicationInfo.CATEGORY_MAPS -> "maps"
                 ApplicationInfo.CATEGORY_PRODUCTIVITY -> "productivity"
-                else -> "other"
+                else -> "undefined"
             }
         }
-        return "other"
+        return "undefined"
     }
 
-    private fun drawableToBytes(drawable: Drawable): ByteArray {
-        val w = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 96
-        val h = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 96
-        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+    private fun iconBytes(drawable: Drawable, size: Int = 96): ByteArray {
+        val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bmp)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.setBounds(0, 0, size, size)
         drawable.draw(canvas)
         val stream = ByteArrayOutputStream()
-        bmp.compress(Bitmap.CompressFormat.PNG, 90, stream)
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        bmp.recycle()
         return stream.toByteArray()
     }
 
     private fun listInstalledPackages(): List<String> {
-        return packageManager.getInstalledApplications(0).map { it.packageName }
+        val pm = packageManager
+        val launcher = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+        @Suppress("DEPRECATION")
+        val resolved = pm.queryIntentActivities(launcher, 0)
+        return resolved.map { it.activityInfo.packageName }.distinct()
     }
 
     private fun launchAppWithPath(pkg: String, path: String?): Boolean {
-        return try {
+        val pm = packageManager
+        if (!path.isNullOrEmpty()) {
+            val file = File(path)
             // Editors expect a file; if given a project folder, open project.md
-            var targetPath = path
-            if (!path.isNullOrEmpty()) {
-                val file = File(path)
-                if (file.isDirectory) {
+            val target = when {
+                file.exists() && file.isFile -> file
+                file.exists() && file.isDirectory -> {
                     val md = File(file, "project.md")
-                    if (md.exists() && md.isFile) {
-                        targetPath = md.absolutePath
-                    }
+                    if (md.exists() && md.isFile) md else null
                 }
+                else -> null
             }
-            if (!targetPath.isNullOrEmpty()) {
-                val file = File(targetPath)
-                if (file.exists() && file.isFile) {
+            if (target != null) {
+                try {
                     val uri = FileProvider.getUriForFile(
-                        this, "$packageName.fileprovider", file
+                        this,
+                        "$packageName.fileprovider",
+                        target
                     )
-                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                    val viewIntent = Intent(Intent.ACTION_VIEW).apply {
                         setDataAndType(uri, "text/markdown")
                         setPackage(pkg)
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
-                    startActivity(intent)
-                    return true
+                    if (viewIntent.resolveActivity(pm) != null) {
+                        startActivity(viewIntent)
+                        return true
+                    }
+                    // Fallback: generic type if editor does not declare markdown
+                    val fallback = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(uri, "*/*")
+                        setPackage(pkg)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    if (fallback.resolveActivity(pm) != null) {
+                        startActivity(fallback)
+                        return true
+                    }
+                } catch (_: Exception) {
                 }
             }
-            val launch = packageManager.getLaunchIntentForPackage(pkg)
-            if (launch != null) {
-                startActivity(launch)
-                true
-            } else {
-                false
-            }
-        } catch (e: Exception) {
-            false
         }
+        val launch = pm.getLaunchIntentForPackage(pkg)
+        if (launch != null) {
+            startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            return true
+        }
+        return false
     }
 
     private fun termuxRunCommand(command: String, workdir: String, background: Boolean): Boolean {
