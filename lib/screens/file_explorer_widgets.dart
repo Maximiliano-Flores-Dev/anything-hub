@@ -1,7 +1,15 @@
-part of 'file_explorer_screen.dart';
+import 'dart:io';
+import 'dart:typed_data';
 
-class _FileThumb extends StatefulWidget {
-  const _FileThumb({
+import 'package:flutter/material.dart';
+
+import '../core/hub_colors.dart';
+import '../services/device_files_service.dart';
+import '../services/device_apps_service.dart';
+import '../services/file_preview_service.dart';
+
+class FileThumb extends StatefulWidget {
+  const FileThumb({
     required this.entry,
     required this.fallbackIcon,
     required this.fallbackColor,
@@ -14,10 +22,10 @@ class _FileThumb extends StatefulWidget {
   final double size;
 
   @override
-  State<_FileThumb> createState() => _FileThumbState();
+  State<FileThumb> createState() => _FileThumbState();
 }
 
-class _FileThumbState extends State<_FileThumb> {
+class _FileThumbState extends State<FileThumb> {
   ImageProvider? _provider;
 
   @override
@@ -27,7 +35,7 @@ class _FileThumbState extends State<_FileThumb> {
   }
 
   @override
-  void didUpdateWidget(covariant _FileThumb oldWidget) {
+  void didUpdateWidget(covariant FileThumb oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.entry.path != widget.entry.path) {
       _provider = null;
@@ -41,8 +49,7 @@ class _FileThumbState extends State<_FileThumb> {
     final ext = e.extension.toLowerCase();
     if (FilePreviewService.isImage(ext)) {
       final f = File(e.path);
-      if (await f.exists()) {
-        if (!mounted) return;
+      if (await f.exists() && mounted) {
         setState(() => _provider = FileImage(f));
       }
       return;
@@ -50,8 +57,7 @@ class _FileThumbState extends State<_FileThumb> {
     if (FilePreviewService.isApk(ext)) {
       final key = FilePreviewService.apkCacheKey(e.path, e.size);
       final cached = await FilePreviewService.cachedIcon(key);
-      if (cached != null) {
-        if (!mounted) return;
+      if (cached != null && mounted) {
         setState(() => _provider = FileImage(cached));
         return;
       }
@@ -59,8 +65,7 @@ class _FileThumbState extends State<_FileThumb> {
       final icon = meta?['icon'];
       if (icon is Uint8List && icon.isNotEmpty) {
         await FilePreviewService.cacheIconBytes(key, icon);
-        if (!mounted) return;
-        setState(() => _provider = MemoryImage(icon));
+        if (mounted) setState(() => _provider = MemoryImage(icon));
       }
     }
   }
@@ -91,15 +96,15 @@ class _FileThumbState extends State<_FileThumb> {
   }
 }
 
-class _FileDetailsDialog extends StatefulWidget {
-  const _FileDetailsDialog({required this.entry});
+class FileDetailsDialog extends StatefulWidget {
+  const FileDetailsDialog({required this.entry});
   final FileEntry entry;
 
   @override
-  State<_FileDetailsDialog> createState() => _FileDetailsDialogState();
+  State<FileDetailsDialog> createState() => _FileDetailsDialogState();
 }
 
-class _FileDetailsDialogState extends State<_FileDetailsDialog> {
+class _FileDetailsDialogState extends State<FileDetailsDialog> {
   bool _loading = true;
   String? _md5;
   String? _sha1;
