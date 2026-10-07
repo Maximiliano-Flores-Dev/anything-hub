@@ -1,16 +1,7 @@
-import 'dart:io';
-import 'dart:typed_data';
+part of 'file_explorer_screen.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import '../core/hub_colors.dart';
-import '../services/device_files_service.dart';
-import '../services/device_apps_service.dart';
-import '../services/file_preview_service.dart';
-
-class FileThumb extends StatefulWidget {
-  const FileThumb({
+class _FileThumb extends StatefulWidget {
+  const _FileThumb({
     required this.entry,
     required this.fallbackIcon,
     required this.fallbackColor,
@@ -23,10 +14,10 @@ class FileThumb extends StatefulWidget {
   final double size;
 
   @override
-  State<FileThumb> createState() => _FileThumbState();
+  State<_FileThumb> createState() => _FileThumbState();
 }
 
-class _FileThumbState extends State<FileThumb> {
+class _FileThumbState extends State<_FileThumb> {
   ImageProvider? _provider;
 
   @override
@@ -36,7 +27,7 @@ class _FileThumbState extends State<FileThumb> {
   }
 
   @override
-  void didUpdateWidget(covariant FileThumb oldWidget) {
+  void didUpdateWidget(covariant _FileThumb oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.entry.path != widget.entry.path) {
       _provider = null;
@@ -100,15 +91,15 @@ class _FileThumbState extends State<FileThumb> {
   }
 }
 
-class FileDetailsDialog extends StatefulWidget {
-  const FileDetailsDialog({required this.entry});
+class _FileDetailsDialog extends StatefulWidget {
+  const _FileDetailsDialog({required this.entry});
   final FileEntry entry;
 
   @override
-  State<FileDetailsDialog> createState() => _FileDetailsDialogState();
+  State<_FileDetailsDialog> createState() => _FileDetailsDialogState();
 }
 
-class _FileDetailsDialogState extends State<FileDetailsDialog> {
+class _FileDetailsDialogState extends State<_FileDetailsDialog> {
   bool _loading = true;
   String? _md5;
   String? _sha1;
@@ -168,7 +159,8 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _row('Tipo',
+              _row(
+                  'Tipo',
                   e.isDirectory
                       ? 'Carpeta'
                       : (e.extension.isEmpty
@@ -176,7 +168,7 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
                           : e.extension.toUpperCase())),
               _row('Ruta', e.path),
               if (!e.isDirectory) _row('Tamaño', e.sizeLabel),
-              if (e.modified != null) _row('Modificado', _fmt(e.modified!)),
+              if (e.modifiedMs > 0) _row('Modificado', _fmt(e.modified)),
               if (_loading)
                 const Padding(
                   padding: EdgeInsets.all(12),
