@@ -45,6 +45,10 @@ class ApkRiskScorer {
     required List<String> detectedPackages,
     String? sha256,
     bool parseFailed = false,
+    String versionLabel = '—',
+    List<String> signingCertSha256 = const [],
+    List<String> installedCertSha256 = const [],
+    bool isPackageInstalled = false,
   }) {
     // Fail-closed: manifiesto ilegible → riesgo alto, nunca "bajo"
     if (parseFailed) {
@@ -63,6 +67,10 @@ class ApkRiskScorer {
         fileName: fileName,
         packageName: packageName,
         sha256: sha256,
+        versionLabel: versionLabel,
+        signingCertSha256: signingCertSha256,
+        installedCertSha256: installedCertSha256,
+        isPackageInstalled: isPackageInstalled,
       );
     }
 
@@ -97,6 +105,10 @@ class ApkRiskScorer {
       fileName: fileName,
       packageName: packageName,
       sha256: sha256,
+      versionLabel: versionLabel,
+      signingCertSha256: signingCertSha256,
+      installedCertSha256: installedCertSha256,
+      isPackageInstalled: isPackageInstalled,
     );
   }
 
