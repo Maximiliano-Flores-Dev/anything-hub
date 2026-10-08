@@ -41,11 +41,11 @@ extension PerfModeX on PerfMode {
       case PerfMode.balanced:
         return 'Sin cambios agresivos. El sistema gestiona procesos con normalidad.';
       case PerfMode.eco:
-        return 'Prioriza batería: cierra procesos en segundo plano innecesarios de apps de usuario.';
+        return 'Prioriza bater\u00eda: cierra procesos en segundo plano innecesarios de apps de usuario.';
       case PerfMode.focus:
         return 'Silencia notificaciones de terceros (siguen visibles, sin sonido) y limpia procesos innecesarios para concentrarte en una tarea.';
       case PerfMode.performance:
-        return 'Libera memoria cerrando solo procesos en segundo plano innecesarios de apps no críticas.';
+        return 'Libera memoria cerrando solo procesos en segundo plano innecesarios de apps no cr\u00edticas.';
     }
   }
 
@@ -118,6 +118,7 @@ class PerformanceService {
 
   static Future<T?> _call<T>(String method, [Map<String, dynamic>? args]) async {
     try {
+      SystemLogger.channel('performance', method);
       return await _ch.invokeMethod<T>(method, args);
     } on MissingPluginException {
       return null;
@@ -133,11 +134,9 @@ class PerformanceService {
     return MemorySnapshot.fromMap(raw);
   }
 
-  /// Acceso a No molestar (Focus). No es POST_NOTIFICATIONS.
   static Future<bool> hasNotificationPolicyAccess() async =>
       await _call<bool>('hasNotificationPolicyAccess') ?? false;
 
-  /// Android 13+: permiso para mostrar notificaciones propias.
   static Future<bool> hasPostNotifications() async =>
       await _call<bool>('hasPostNotifications') ?? true;
 
@@ -149,7 +148,6 @@ class PerformanceService {
     await _call<Object?>('ensureNotificationChannel');
   }
 
-  /// Abre Ajustes → lista "Acceso a No molestar".
   static Future<void> openNotificationPolicySettings() async {
     await ensureNotificationChannel();
     await _call<Object?>('openNotificationPolicySettings');
