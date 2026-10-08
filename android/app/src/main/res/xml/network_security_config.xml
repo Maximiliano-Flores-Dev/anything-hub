@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network Security Config — Anythings Hub
+  - Cleartext (HTTP) deshabilitado en toda la app.
+  - Solo HTTPS para GitHub, favicons, PuertoPipe y catálogo de plugins.
+  - Sin trust de certificados de usuario (evita MITM con CA instalada por el usuario
+    en perfiles de trabajo / debug, salvo en debug builds vía manifest debug).
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
