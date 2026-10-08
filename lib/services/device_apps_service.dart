@@ -10,6 +10,7 @@ class DeviceAppsService {
 
   static Future<T?> _call<T>(String method, [dynamic args]) async {
     try {
+      SystemLogger.channel('device_apps', method);
       return await _ch.invokeMethod<T>(method, args);
     } on MissingPluginException {
       return null;
@@ -45,7 +46,6 @@ class DeviceAppsService {
           false;
 
   /// Metadatos reales del APK en caché (PackageManager.getPackageArchiveInfo).
-  /// Keys: packageName, appLabel, versionName, versionCode, permissions, fileName, sizeBytes, icon.
   static Future<Map<String, dynamic>?> inspectApk(String cacheRelativePath) async {
     final raw = await _call<Map<dynamic, dynamic>>('inspectApk', {
       'cacheRelativePath': cacheRelativePath,
@@ -54,7 +54,6 @@ class DeviceAppsService {
     return raw.map((k, v) => MapEntry(k.toString(), v));
   }
 
-  /// Metadatos + icono de un APK en ruta absoluta (solo lectura).
   static Future<Map<String, dynamic>?> inspectApkPath(String absolutePath) async {
     final raw = await _call<Map<dynamic, dynamic>>('inspectApkPath', {
       'path': absolutePath,

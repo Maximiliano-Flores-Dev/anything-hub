@@ -94,6 +94,7 @@ class DeviceFilesService {
 
   static Future<T?> _call<T>(String method, [dynamic args]) async {
     try {
+      SystemLogger.channel('device_files', method);
       return await _ch.invokeMethod<T>(method, args);
     } on MissingPluginException {
       return null;
@@ -163,4 +164,39 @@ class DeviceFilesService {
 
   static Future<bool> shareFile(String path) async =>
       await _call<bool>('shareFile', {'path': path}) ?? false;
+}
+
+/// Límites de operaciones masivas (Code Hardening).
+class FileOpGuard {
+  static const int maxBatchItems = 100;
+  static const int maxOpsPerMinute = 200;
+
+  static final List<DateTime> _window = [];
+
+  static String? checkBatch(int count, {String op = 'operación'}) {
+    if (count <= 0) return 'Nada que procesar';
+    if (count > maxBatchItems) {
+      return 'Máximo $maxBatchItems elementos por $op. '
+          'Seleccionaste $count.';
+    }
+    _prune();
+    if (_window.length + count > maxOpsPerMinute) {
+      return 'Demasiadas operaciones en poco tiempo '
+          '(máx $maxOpsPerMinute/min). Espera un momento.';
+    }
+    return null;
+  }
+
+  static void record(int count) {
+    final now = DateTime.now();
+    for (var i = 0; i < count; i++) {
+      _window.add(now);
+    }
+    _prune();
+  }
+
+  static void _prune() {
+    final cutoff = DateTime.now().subtract(const Duration(minutes: 1));
+    _window.removeWhere((t) => t.isBefore(cutoff));
+  }
 }

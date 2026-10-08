@@ -1,4 +1,4 @@
-package com.example.anything_hub
+package com.anything.hub
 
 import android.content.Context
 import android.content.Intent
@@ -8,12 +8,22 @@ import android.content.Intent
  */
 object TermuxHelper {
 
+    /** Límite duro de longitud de comando (mitiga abuse / DoS vía channel). */
+    private const val MAX_COMMAND_CHARS = 8_192
+    private const val MAX_WORKDIR_CHARS = 1_024
+
     fun runCommand(
         context: Context,
         command: String,
         workdir: String,
         background: Boolean,
     ): Boolean {
+        if (command.isBlank()) return false
+        if (command.length > MAX_COMMAND_CHARS) return false
+        if (command.contains('\u0000')) return false
+        if (workdir.length > MAX_WORKDIR_CHARS) return false
+        if (workdir.contains('\u0000')) return false
+
         return try {
             val intent = Intent().apply {
                 setClassName("com.termux", "com.termux.app.RunCommandService")

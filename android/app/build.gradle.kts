@@ -15,7 +15,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.anything_hub"
+    // Alineado con applicationId — sin com.example (bandera de plantilla)
+    namespace = "com.anything.hub"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -43,10 +44,37 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (keystorePropertiesFile.exists()) {
-                signingConfigs.getByName("release")
+            // Ofuscación + tree-shaking de recursos (Code Hardening)
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+
+            // Fail-closed en builds locales: sin keystore → error.
+            // En CI (GITHUB_ACTIONS/CI) se permite debug solo para compilar PRs;
+            // el workflow de release siempre inyecta key.properties antes de firmar.
+            val hasKeystore = keystorePropertiesFile.exists() &&
+                !(keystoreProperties["keyAlias"] as String?).isNullOrBlank() &&
+                !(keystoreProperties["storeFile"] as String?).isNullOrBlank()
+            val isCi = System.getenv("CI") == "true" ||
+                System.getenv("GITHUB_ACTIONS") == "true"
+
+            if (hasKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            } else if (isCi) {
+                logger.warn(
+                    "WARNING: release sin key.properties en CI — firmando con debug. " +
+                        "No publicar este APK."
+                )
+                signingConfig = signingConfigs.getByName("debug")
             } else {
-                signingConfigs.getByName("debug")
+                throw GradleException(
+                    "Release build requiere android/key.properties (keystore). " +
+                        "No se permite fallback a debug en builds locales. " +
+                        "Crea key.properties o compila con --debug."
+                )
             }
         }
     }

@@ -4,9 +4,12 @@ import '../core/hub_colors.dart';
 import '../modules/plugins/plugin_models.dart';
 import '../modules/plugins/plugin_service.dart';
 import '../modules/projects/services/project_fs_service.dart';
+import '../services/device_apps_service.dart';
+import '../services/device_files_service.dart';
+import '../services/performance_service.dart';
 import '../ui/widgets/gradient_pill_button.dart';
 
-/// Configuraciones + gestión de plugins locales (catálogo GitHub → `.anythinghub/plugins/`).
+/// Configuraciones + gestión de plugins locales + auditoría de permisos.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -23,6 +26,12 @@ class _SettingsScreenState extends State<SettingsScreen>
   bool _loadingInstalled = false;
   String? _hubPath;
   String? _error;
+
+  bool _permStorage = false;
+  bool _permUsage = false;
+  bool _permFocus = false;
+  bool _permPostNotif = true;
+  bool _loadingPerms = false;
 
   @override
   void initState() {
@@ -43,7 +52,25 @@ class _SettingsScreenState extends State<SettingsScreen>
       final root = await ProjectFsService.getRootDirectory();
       if (mounted) setState(() => _hubPath = root.path);
     } catch (_) {}
-    await Future.wait([_loadInstalled(), _loadCatalog()]);
+    await Future.wait([_loadInstalled(), _loadCatalog(), _refreshPermissions()]);
+  }
+
+  Future<void> _refreshPermissions() async {
+    if (mounted) setState(() => _loadingPerms = true);
+    final results = await Future.wait([
+      DeviceFilesService.hasPermission(),
+      DeviceAppsService.hasUsageAccess(),
+      PerformanceService.hasNotificationPolicyAccess(),
+      PerformanceService.hasPostNotifications(),
+    ]);
+    if (!mounted) return;
+    setState(() {
+      _permStorage = results[0];
+      _permUsage = results[1];
+      _permFocus = results[2];
+      _permPostNotif = results[3];
+      _loadingPerms = false;
+    });
   }
 
   Future<void> _loadInstalled() async {
@@ -156,6 +183,57 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
+  Widget _permRow(
+    String title,
+    String subtitle,
+    bool granted,
+    VoidCallback onOpen,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          granted ? Icons.check_circle : Icons.cancel_outlined,
+          size: 22,
+          color: granted ? const Color(0xFF3DDC84) : const Color(0xFFE53935),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title,
+                  style: const TextStyle(
+                      color: HubColors.textoPrincipal,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13)),
+              const SizedBox(height: 2),
+              Text(subtitle,
+                  style: const TextStyle(
+                      color: HubColors.textoSecundario, fontSize: 12)),
+              const SizedBox(height: 2),
+              Text(
+                granted ? 'Concedido' : 'No concedido — toca para gestionar',
+                style: TextStyle(
+                  color: granted
+                      ? const Color(0xFF3DDC84)
+                      : HubColors.pomelo,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          tooltip: 'Abrir ajustes del sistema',
+          onPressed: onOpen,
+          icon: const Icon(Icons.open_in_new, size: 18, color: HubColors.textoAcento),
+        ),
+      ],
+    );
+  }
+
   Widget _buildGeneral() {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
@@ -191,9 +269,84 @@ class _SettingsScreenState extends State<SettingsScreen>
           child: const Text(
             'Los plugins se instalan solo como metadatos JSON en el dispositivo. '
             'Anythings Hub no ejecuta código remoto ni carga Dex/so dinámicos. '
-            'El File Manager sigue siendo de solo visualización para APKs e imágenes.',
+            'Sin telemetría. Local-first.',
             style: TextStyle(color: HubColors.textoSecundario, fontSize: 13, height: 1.35),
           ),
+        ),
+        const SizedBox(height: 20),
+        _sectionTitle('Permisos del sistema'),
+        _card(
+          child: _loadingPerms
+              ? const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: HubColors.pomelo,
+                      ),
+                    ),
+                  ),
+                )
+              : Column(
+                  children: [
+                    _permRow(
+                      'Almacenamiento (todos los archivos)',
+                      'Explorador de archivos',
+                      _permStorage,
+                      () async {
+                        await DeviceFilesService.openPermissionSettings();
+                        await Future<void>.delayed(const Duration(seconds: 1));
+                        await _refreshPermissions();
+                      },
+                    ),
+                    const Divider(color: HubColors.linea, height: 20),
+                    _permRow(
+                      'Acceso a datos de uso',
+                      'Ordenar apps por uso frecuente',
+                      _permUsage,
+                      () async {
+                        await DeviceAppsService.openUsageAccessSettings();
+                        await Future<void>.delayed(const Duration(seconds: 1));
+                        await _refreshPermissions();
+                      },
+                    ),
+                    const Divider(color: HubColors.linea, height: 20),
+                    _permRow(
+                      'No molestar / Focus',
+                      'Silenciar notificaciones de terceros',
+                      _permFocus,
+                      () async {
+                        await PerformanceService.openNotificationPolicySettings();
+                        await Future<void>.delayed(const Duration(seconds: 1));
+                        await _refreshPermissions();
+                      },
+                    ),
+                    const Divider(color: HubColors.linea, height: 20),
+                    _permRow(
+                      'Notificaciones propias',
+                      'Avisos del modo rendimiento (Android 13+)',
+                      _permPostNotif,
+                      () async {
+                        await PerformanceService.requestPostNotifications();
+                        await Future<void>.delayed(const Duration(milliseconds: 800));
+                        await _refreshPermissions();
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: _refreshPermissions,
+                        icon: const Icon(Icons.refresh, size: 18, color: HubColors.textoAcento),
+                        label: const Text('Actualizar',
+                            style: TextStyle(color: HubColors.textoAcento)),
+                      ),
+                    ),
+                  ],
+                ),
         ),
         const SizedBox(height: 20),
         _sectionTitle('Acerca de'),

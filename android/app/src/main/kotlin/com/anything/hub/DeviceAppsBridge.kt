@@ -1,4 +1,4 @@
-package com.example.anything_hub
+package com.anything.hub
 
 import android.app.AppOpsManager
 import android.app.usage.UsageStatsManager
@@ -142,8 +142,9 @@ object DeviceAppsBridge {
                 } else {
                     activity.worker.execute {
                         try {
-                            val file = File(activity.cacheDir, relative)
-                            if (!file.exists()) {
+                            // PathSecurity: solo incoming_apk/ o puerto_limbo/, sin traversal
+                            val file = PathSecurity.resolveCacheApk(activity, relative)
+                            if (!file.exists() || !file.isFile) {
                                 activity.runOnUiThread {
                                     result.error("NOT_FOUND", "APK no encontrado en caché", null)
                                 }

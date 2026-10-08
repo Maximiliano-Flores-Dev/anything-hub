@@ -1,4 +1,4 @@
-package com.example.anything_hub
+package com.anything.hub
 
 import android.Manifest
 import android.app.ActivityManager
@@ -117,7 +117,6 @@ object PerformanceBridge {
         )
     }
 
-    /** Canal propio para que el SO reconozca la app como productora de notificaciones. */
     private fun ensureNotificationChannel(ctx: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -133,10 +132,6 @@ object PerformanceBridge {
         nm.createNotificationChannel(ch)
     }
 
-    /**
-     * Abre la lista de apps con acceso a política de No molestar.
-     * NO es la pantalla de "notificaciones de la app" (esa dice "no solicita").
-     */
     private fun openPolicySettings(activity: MainActivity) {
         try {
             val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

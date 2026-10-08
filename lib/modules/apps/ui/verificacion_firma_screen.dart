@@ -3,20 +3,27 @@ import 'package:flutter/material.dart';
 import '../../../core/hub_colors.dart';
 import '../../../ui/widgets/gradient_pill_button.dart';
 import '../models/app_models.dart';
+import '../services/signature_oracle_service.dart';
 import '../widgets/hub_panel.dart';
 
-/// Oráculo de firmas + soporte offline (TTL) + fail-closed con override.
+/// Oráculo de firmas local + pins offline (TTL) + fail-closed con override.
 class VerificacionFirmaScreen extends StatefulWidget {
   const VerificacionFirmaScreen({
     super.key,
     required this.packageName,
     required this.versionLabel,
     this.certSha256,
+    this.signingCertSha256 = const [],
+    this.installedCertSha256 = const [],
+    this.isPackageInstalled = false,
   });
 
   final String packageName;
   final String versionLabel;
   final String? certSha256;
+  final List<String> signingCertSha256;
+  final List<String> installedCertSha256;
+  final bool isPackageInstalled;
 
   @override
   State<VerificacionFirmaScreen> createState() => _VerificacionFirmaScreenState();
@@ -34,20 +41,19 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
 
   Future<void> _runCheck() async {
     setState(() => _loading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 600));
 
-    // Fail-closed: sin oráculo real no afirmamos que el certificado coincide.
-    // Cuando exista un servicio de verificación, sustituir este bloque.
-    final hasCert = widget.certSha256 != null && widget.certSha256!.isNotEmpty;
-    final result = SignatureCheckResult(
-      status: hasCert ? SignatureStatus.unverified : SignatureStatus.error,
+    final certs = widget.signingCertSha256.isNotEmpty
+        ? widget.signingCertSha256
+        : (widget.certSha256 != null && widget.certSha256!.isNotEmpty
+            ? [widget.certSha256!]
+            : <String>[]);
+
+    final result = await SignatureOracleService.verify(
       packageName: widget.packageName,
       versionLabel: widget.versionLabel,
-      certSha256: widget.certSha256,
-      cacheAgeDays: null,
-      message: hasCert
-          ? 'Oráculo de firmas aún no conectado. No se puede confirmar autenticidad.'
-          : 'Sin huella de certificado. Verificación imposible.',
+      apkCertSha256: certs,
+      installedCertSha256: widget.installedCertSha256,
+      isPackageInstalled: widget.isPackageInstalled,
     );
 
     if (!mounted) return;
@@ -116,7 +122,7 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                       const SizedBox(width: 10),
                       const Expanded(
                         child: Text(
-                          'Certificate Pinning',
+                          'Oráculo local',
                           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -126,10 +132,16 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                           color: HubColors.textoAcento.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Text(
-                          'FIJADO',
+                        child: Text(
+                          _result?.status == SignatureStatus.verified ||
+                                  _result?.status == SignatureStatus.cacheHit
+                              ? 'OK'
+                              : 'FAIL-CLOSED',
                           style: TextStyle(
-                            color: HubColors.textoAcento,
+                            color: _result?.status == SignatureStatus.verified ||
+                                    _result?.status == SignatureStatus.cacheHit
+                                ? const Color(0xFF3DDC84)
+                                : const Color(0xFFE53935),
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
                           ),
@@ -138,6 +150,34 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                     ],
                   ),
                 ),
+                if (_result?.status == SignatureStatus.verified ||
+                    _result?.status == SignatureStatus.cacheHit) ...[
+                  const SizedBox(height: 16),
+                  GradientPillButton(
+                    label: 'Fijar certificado (pin local)',
+                    icon: Icons.push_pin_outlined,
+                    onPressed: () async {
+                      final cert = _result?.certSha256;
+                      if (cert == null || cert.isEmpty) return;
+                      await SignatureOracleService.pinPackage(
+                        widget.packageName,
+                        cert,
+                      );
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Pin local guardado (TTL 90 días)'),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  GradientPillButton(
+                    label: 'Continuar',
+                    icon: Icons.check,
+                    onPressed: () => Navigator.of(context).pop(true),
+                  ),
+                ],
                 if (_result?.status == SignatureStatus.unverified ||
                     _result?.status == SignatureStatus.error) ...[
                   const SizedBox(height: 16),

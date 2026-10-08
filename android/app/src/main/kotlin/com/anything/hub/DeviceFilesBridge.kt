@@ -1,4 +1,4 @@
-package com.example.anything_hub
+package com.anything.hub
 
 import android.content.Intent
 import android.net.Uri
@@ -16,6 +16,7 @@ import java.io.FileOutputStream
 
 /**
  * Canal anythings.hub/device_files: listado, CRUD, open/share, roots/storage.
+ * Paths validados con PathSecurity (null-byte / rename seguro).
  */
 object DeviceFilesBridge {
 
@@ -53,7 +54,12 @@ object DeviceFilesBridge {
             }
 
             "getStorageInfo" -> {
-                val path = call.argument<String>("path") ?: ""
+                val path = try {
+                    PathSecurity.requireValidPath(call.argument<String>("path") ?: "")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
                 activity.worker.execute {
                     try {
                         val info = storageInfo(path)
@@ -67,7 +73,12 @@ object DeviceFilesBridge {
             }
 
             "listDirectory" -> {
-                val path = call.argument<String>("path") ?: ""
+                val path = try {
+                    PathSecurity.requireValidPath(call.argument<String>("path") ?: "")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
                 val showHidden = call.argument<Boolean>("showHidden") ?: false
                 activity.worker.execute {
                     try {
@@ -82,7 +93,12 @@ object DeviceFilesBridge {
             }
 
             "createDirectory" -> {
-                val path = call.argument<String>("path") ?: ""
+                val path = try {
+                    PathSecurity.requireValidPath(call.argument<String>("path") ?: "")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
                 activity.worker.execute {
                     try {
                         activity.runOnUiThread { result.success(File(path).mkdirs()) }
@@ -95,7 +111,12 @@ object DeviceFilesBridge {
             }
 
             "createFile" -> {
-                val path = call.argument<String>("path") ?: ""
+                val path = try {
+                    PathSecurity.requireValidPath(call.argument<String>("path") ?: "")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
                 activity.worker.execute {
                     try {
                         val f = File(path)
@@ -110,7 +131,12 @@ object DeviceFilesBridge {
             }
 
             "delete" -> {
-                val path = call.argument<String>("path") ?: ""
+                val path = try {
+                    PathSecurity.requireValidPath(call.argument<String>("path") ?: "")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
                 activity.worker.execute {
                     try {
                         activity.runOnUiThread {
@@ -125,8 +151,18 @@ object DeviceFilesBridge {
             }
 
             "rename" -> {
-                val path = call.argument<String>("path") ?: ""
-                val newName = call.argument<String>("newName") ?: ""
+                val path = try {
+                    PathSecurity.requireValidPath(call.argument<String>("path") ?: "")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
+                val newName = try {
+                    PathSecurity.requireSafeFileName(call.argument<String>("newName") ?: "")
+                } catch (e: Exception) {
+                    result.error("NAME", e.message, null)
+                    return
+                }
                 activity.worker.execute {
                     try {
                         val src = File(path)
@@ -141,8 +177,18 @@ object DeviceFilesBridge {
             }
 
             "copy" -> {
-                val src = call.argument<String>("src") ?: ""
-                val dest = call.argument<String>("dest") ?: ""
+                val src = try {
+                    PathSecurity.requireValidPath(call.argument<String>("src") ?: "", "src")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
+                val dest = try {
+                    PathSecurity.requireValidPath(call.argument<String>("dest") ?: "", "dest")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
                 activity.worker.execute {
                     try {
                         activity.runOnUiThread {
@@ -157,8 +203,18 @@ object DeviceFilesBridge {
             }
 
             "move" -> {
-                val src = call.argument<String>("src") ?: ""
-                val dest = call.argument<String>("dest") ?: ""
+                val src = try {
+                    PathSecurity.requireValidPath(call.argument<String>("src") ?: "", "src")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
+                val dest = try {
+                    PathSecurity.requireValidPath(call.argument<String>("dest") ?: "", "dest")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
                 activity.worker.execute {
                     try {
                         val s = File(src)
@@ -177,7 +233,12 @@ object DeviceFilesBridge {
             }
 
             "openFile" -> {
-                val path = call.argument<String>("path") ?: ""
+                val path = try {
+                    PathSecurity.requireValidPath(call.argument<String>("path") ?: "")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
                 try {
                     val file = File(path)
                     if (!file.exists() || !file.isFile) {
@@ -205,7 +266,12 @@ object DeviceFilesBridge {
             }
 
             "shareFile" -> {
-                val path = call.argument<String>("path") ?: ""
+                val path = try {
+                    PathSecurity.requireValidPath(call.argument<String>("path") ?: "")
+                } catch (e: Exception) {
+                    result.error("PATH", e.message, null)
+                    return
+                }
                 try {
                     val file = File(path)
                     if (!file.exists() || !file.isFile) {
@@ -303,9 +369,7 @@ object DeviceFilesBridge {
         return try {
             val srcCanon = src.canonicalFile
             val destCanon = dest.canonicalFile
-            // Same path would truncate and destroy data
             if (srcCanon.absolutePath == destCanon.absolutePath) return false
-            // Pasting a folder into itself (or a descendant) causes infinite nesting
             if (srcCanon.isDirectory &&
                 destCanon.absolutePath.startsWith(srcCanon.absolutePath + "/")
             ) {

@@ -1,4 +1,4 @@
-package com.example.anything_hub
+package com.anything.hub
 
 import android.os.Handler
 import android.os.Looper
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Tubo de descarga: el APK entra por chunks a cacheDir/puerto_limbo.
- * No se ofrece instalar hasta que el archivo esté completo y con SHA-256.
+ * Solo HTTPS, límite de tamaño, cabecera ZIP, SHA-256.
  */
 object PuertoPipeBridge : EventChannel.StreamHandler {
     private val main = Handler(Looper.getMainLooper())
@@ -27,6 +27,8 @@ object PuertoPipeBridge : EventChannel.StreamHandler {
             handle(activity, call, result)
         }
         EventChannel(messenger, "anythings.hub/puerto_events").setStreamHandler(this)
+        // Limpieza best-effort de limbo/incoming al registrar
+        activity.worker.execute { PathSecurity.cleanupStaleApkCache(activity) }
     }
 
     override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
@@ -44,6 +46,20 @@ object PuertoPipeBridge : EventChannel.StreamHandler {
                 val url = call.argument<String>("url")
                 if (url.isNullOrBlank() || !(url.startsWith("https://"))) {
                     result.error("URL", "Solo https", null)
+                    return
+                }
+                try {
+                    val parsed = URL(url)
+                    if (parsed.userInfo != null) {
+                        result.error("URL", "URL con credenciales no permitida", null)
+                        return
+                    }
+                    if (parsed.host.isNullOrBlank()) {
+                        result.error("URL", "Host inválido", null)
+                        return
+                    }
+                } catch (e: Exception) {
+                    result.error("URL", e.message, null)
                     return
                 }
                 cancel.set(false)
@@ -78,6 +94,11 @@ object PuertoPipeBridge : EventChannel.StreamHandler {
             val code = conn.responseCode
             if (code !in 200..299) throw IllegalStateException("HTTP $code")
             val total = conn.contentLengthLong
+            if (total > PathSecurity.MAX_APK_DOWNLOAD_BYTES) {
+                throw IllegalStateException(
+                    "APK demasiado grande (máx ${PathSecurity.MAX_APK_DOWNLOAD_BYTES} bytes)"
+                )
+            }
             val dir = File(activity.cacheDir, "puerto_limbo")
             dir.mkdirs()
             val dest = File(dir, "${System.currentTimeMillis()}.apk")
@@ -87,12 +108,19 @@ object PuertoPipeBridge : EventChannel.StreamHandler {
                 FileOutputStream(dest).use { output ->
                     val buf = ByteArray(8192)
                     while (true) {
-                        if (cancel.get()) throw IllegalStateException("Descarga cancelada")
+                        if (cancel.get()) {
+                            dest.delete()
+                            throw IllegalStateException("Descarga cancelada")
+                        }
                         val n = input.read(buf)
                         if (n < 0) break
                         output.write(buf, 0, n)
                         digest.update(buf, 0, n)
                         readTotal += n
+                        if (readTotal > PathSecurity.MAX_APK_DOWNLOAD_BYTES) {
+                            dest.delete()
+                            throw IllegalStateException("APK demasiado grande durante descarga")
+                        }
                         val progress = mapOf(
                             "phase" to "downloading",
                             "bytes" to readTotal,
@@ -102,7 +130,10 @@ object PuertoPipeBridge : EventChannel.StreamHandler {
                     }
                 }
             }
-            if (readTotal < 4L) throw IllegalStateException("Archivo vacío")
+            if (readTotal < 4L) {
+                dest.delete()
+                throw IllegalStateException("Archivo vacío")
+            }
             val head = ByteArray(4)
             dest.inputStream().use { it.read(head) }
             val isZip = head[0] == 0x50.toByte() && head[1] == 0x4B.toByte()

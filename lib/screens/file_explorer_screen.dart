@@ -226,6 +226,11 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
 
   Future<void> _deleteEntries(List<FileEntry> entries) async {
     if (entries.isEmpty) return;
+    final limitMsg = FileOpGuard.checkBatch(entries.length, op: 'eliminación');
+    if (limitMsg != null) {
+      _toast(limitMsg);
+      return;
+    }
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -246,6 +251,7 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
     for (final e in entries) {
       if (await DeviceFilesService.deleteEntry(e.path)) okCount++;
     }
+    FileOpGuard.record(entries.length);
     _toast(okCount == entries.length ? 'Eliminado' : 'Eliminados $okCount de ${entries.length}');
     setState(() { _selected.clear(); _selectionMode = false; });
     await _navigateTo(_currentPath);
@@ -254,6 +260,11 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
   void _copySelected({required bool cut}) {
     final entries = _entries.where((e) => _selected.contains(e.path)).toList();
     if (entries.isEmpty) return;
+    final limitMsg = FileOpGuard.checkBatch(entries.length, op: cut ? 'corte' : 'copia');
+    if (limitMsg != null) {
+      _toast(limitMsg);
+      return;
+    }
     setState(() {
       _clipboard = _ClipboardItem(entries, cut ? _ClipMode.cut : _ClipMode.copy);
       _selectionMode = false;
@@ -265,6 +276,11 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
   Future<void> _paste() async {
     final clip = _clipboard;
     if (clip == null || clip.entries.isEmpty) return;
+    final limitMsg = FileOpGuard.checkBatch(clip.entries.length, op: 'pegado');
+    if (limitMsg != null) {
+      _toast(limitMsg);
+      return;
+    }
     var okCount = 0;
     for (final e in clip.entries) {
       final dest = '$_currentPath/${e.name}';
@@ -273,6 +289,7 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
           : await DeviceFilesService.copyEntry(e.path, dest);
       if (ok) okCount++;
     }
+    FileOpGuard.record(clip.entries.length);
     if (clip.mode == _ClipMode.cut) setState(() => _clipboard = null);
     _toast('Pegados $okCount de ${clip.entries.length}');
     await _navigateTo(_currentPath);
@@ -472,195 +489,216 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
           style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 16),
         ),
         iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
-        leading: _selectionMode
-            ? IconButton(icon: const Icon(Icons.close), onPressed: () => setState(() { _selectionMode = false; _selected.clear(); }))
-            : (_currentPath.split('/').where((p) => p.isNotEmpty).length > 1
-                ? IconButton(icon: const Icon(Icons.arrow_back_rounded), onPressed: () {
-                    final parent = _currentPath.substring(0, _currentPath.lastIndexOf('/'));
-                    if (parent.isNotEmpty) _navigateTo(parent);
-                  })
-                : null),
         actions: [
           if (_selectionMode) ...[
-            IconButton(icon: const Icon(Icons.copy_rounded), tooltip: 'Copiar', onPressed: () => _copySelected(cut: false)),
-            IconButton(icon: const Icon(Icons.cut_rounded), tooltip: 'Cortar', onPressed: () => _copySelected(cut: true)),
-            IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent), tooltip: 'Eliminar', onPressed: () {
-              final entries = _entries.where((e) => _selected.contains(e.path)).toList();
-              _deleteEntries(entries);
-            }),
+            IconButton(icon: const Icon(Icons.copy_rounded), onPressed: () => _copySelected(cut: false), tooltip: 'Copiar'),
+            IconButton(icon: const Icon(Icons.cut_rounded), onPressed: () => _copySelected(cut: true), tooltip: 'Cortar'),
+            IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent), onPressed: () => _deleteEntries(_entries.where((e) => _selected.contains(e.path)).toList()), tooltip: 'Eliminar'),
+            IconButton(icon: const Icon(Icons.close), onPressed: () => setState(() { _selectionMode = false; _selected.clear(); }), tooltip: 'Cancelar'),
           ] else ...[
-            if (_clipboard != null) IconButton(icon: const Icon(Icons.content_paste_rounded), tooltip: 'Pegar', onPressed: _paste),
-            IconButton(
-              icon: Icon(_favorites.contains(_currentPath) ? Icons.star_rounded : Icons.star_outline_rounded, color: _favorites.contains(_currentPath) ? HubColors.amarillo : null),
-              tooltip: 'Favorito', onPressed: _toggleFavorite,
-            ),
-            IconButton(icon: const Icon(Icons.star_half_rounded), tooltip: 'Ver favoritos', onPressed: _showFavorites),
-            IconButton(
-              icon: Icon(_view == _ViewMode.list ? Icons.grid_view_rounded : Icons.view_list_rounded),
-              tooltip: 'Vista',
-              onPressed: () => setState(() { _view = _view == _ViewMode.list ? _ViewMode.grid : _ViewMode.list; }),
-            ),
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
-              color: HubColors.panel,
-              onSelected: (v) {
-                switch (v) {
-                  case 'create': _showCreateMenu(); break;
-                  case 'sort': _showSortMenu(); break;
-                  case 'hidden': setState(() => _showHidden = !_showHidden); _navigateTo(_currentPath); break;
-                  case 'goto': _goToPath(); break;
-                  case 'refresh': _navigateTo(_currentPath); break;
-                }
-              },
-              itemBuilder: (_) => [
-                const PopupMenuItem(value: 'create', child: Text('Crear', style: TextStyle(color: HubColors.textoPrincipal))),
-                const PopupMenuItem(value: 'sort', child: Text('Ordenar', style: TextStyle(color: HubColors.textoPrincipal))),
-                PopupMenuItem(value: 'hidden', child: Text(_showHidden ? 'Ocultar ocultos' : 'Mostrar ocultos', style: const TextStyle(color: HubColors.textoPrincipal))),
-                const PopupMenuItem(value: 'goto', child: Text('Ir a ruta', style: TextStyle(color: HubColors.textoPrincipal))),
-                const PopupMenuItem(value: 'refresh', child: Text('Actualizar', style: TextStyle(color: HubColors.textoPrincipal))),
-              ],
-            ),
-          ],
-        ],
-      ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator(color: HubColors.pomelo))
-          : Column(
-              children: [
-                _buildBreadcrumb(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  child: TextField(
-                    controller: _searchCtrl,
-                    focusNode: _searchFocus,
-                    style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
-                    decoration: InputDecoration(
-                      hintText: 'Buscar…',
-                      hintStyle: const TextStyle(color: HubColors.textoSecundario),
-                      prefixIcon: const Icon(Icons.search, color: HubColors.textoSecundario, size: 20),
-                      suffixIcon: _searchQuery.isNotEmpty ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () => _searchCtrl.clear()) : null,
-                      filled: true,
-                      fillColor: HubColors.panel,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    ),
-                  ),
-                ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
+            if (_clipboard != null)
+              IconButton(icon: const Icon(Icons.paste_rounded), onPressed: _paste, tooltip: 'Pegar'),
+            IconButton(icon: Icon(_favorites.contains(_currentPath) ? Icons.star_rounded : Icons.star_outline_rounded, color: _favorites.contains(_currentPath) ? HubColors.amarillo : null), onPressed: _toggleFavorite, tooltip: 'Favorito'),
+            IconButton(icon: const Icon(Icons.more_vert), onPressed: () {
+              showModalBottomSheet<void>(
+                context: context,
+                backgroundColor: HubColors.panel,
+                builder: (ctx) => SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      for (final f in FileFilter.values)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: FilterChip(
-                            label: Text(_filterLabel(f), style: TextStyle(fontSize: 12, color: _filter == f ? HubColors.fondoPrincipal : HubColors.textoPrincipal)),
-                            selected: _filter == f,
-                            onSelected: (_) => setState(() { _filter = f; _applyFilterAndSort(); }),
-                            selectedColor: HubColors.pomelo,
-                            backgroundColor: HubColors.panel,
-                            showCheckmark: false,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                        ),
+                      ListTile(leading: const Icon(Icons.sort, color: HubColors.textoAcento), title: const Text('Ordenar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showSortMenu(); }),
+                      ListTile(leading: Icon(_view == _ViewMode.list ? Icons.grid_view_rounded : Icons.view_list_rounded, color: HubColors.textoAcento), title: Text(_view == _ViewMode.list ? 'Vista cuadrícula' : 'Vista lista', style: const TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() => _view = _view == _ViewMode.list ? _ViewMode.grid : _ViewMode.list); }),
+                      ListTile(leading: Icon(_showHidden ? Icons.visibility_off : Icons.visibility, color: HubColors.textoAcento), title: Text(_showHidden ? 'Ocultar ocultos' : 'Mostrar ocultos', style: const TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() => _showHidden = !_showHidden); _navigateTo(_currentPath); }),
+                      ListTile(leading: const Icon(Icons.star_rounded, color: HubColors.amarillo), title: const Text('Favoritos', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showFavorites(); }),
+                      ListTile(leading: const Icon(Icons.drive_file_move_outline, color: HubColors.textoAcento), title: const Text('Ir a ruta', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _goToPath(); }),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
-                if (_storageInfo != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Row(
-                      children: [
-                        Expanded(child: LinearProgressIndicator(value: _storageInfo!.usedRatio.clamp(0.0, 1.0), backgroundColor: HubColors.linea, color: HubColors.pomelo, minHeight: 4)),
-                        const SizedBox(width: 8),
-                        Text('${_storageInfo!.usedLabel} / ${_storageInfo!.totalLabel}', style: const TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
-                      ],
-                    ),
-                  ),
-                Expanded(
-                  child: _filtered.isEmpty
-                      ? const Center(child: Text('Vacío', style: TextStyle(color: HubColors.textoSecundario)))
-                      : _view == _ViewMode.grid
-                          ? GridView.builder(
-                              padding: const EdgeInsets.all(12),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.85),
-                              itemCount: _filtered.length,
-                              itemBuilder: (ctx, i) {
-                                final e = _filtered[i];
-                                final sel = _selected.contains(e.path);
-                                return InkWell(
-                                  onTap: () {
-                                    if (_selectionMode) {
-                                      setState(() { if (sel) { _selected.remove(e.path); if (_selected.isEmpty) _selectionMode = false; } else { _selected.add(e.path); } });
-                                    } else if (e.isDirectory) { _navigateTo(e.path); }
-                                    else { _showDetails(e); }
-                                  },
-                                  onLongPress: () => setState(() { _selectionMode = true; _selected.add(e.path); }),
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: sel ? HubColors.pomelo.withOpacity(0.15) : HubColors.panel,
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: sel ? Border.all(color: HubColors.pomelo, width: 1.5) : null,
-                                    ),
-                                    padding: const EdgeInsets.all(8),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        FileThumb(entry: e, fallbackIcon: _iconFor(e), fallbackColor: _iconColor(e), size: 48),
-                                        const SizedBox(height: 6),
-                                        Text(e.name, maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 12)),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            )
-                          : ListView.builder(
-                              itemCount: _filtered.length,
-                              itemBuilder: (ctx, i) {
-                                final e = _filtered[i];
-                                final sel = _selected.contains(e.path);
-                                return ListTile(
-                                  selected: sel,
-                                  selectedTileColor: HubColors.pomelo.withOpacity(0.12),
-                                  leading: FileThumb(entry: e, fallbackIcon: _iconFor(e), fallbackColor: _iconColor(e)),
-                                  title: Text(e.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: HubColors.textoPrincipal)),
-                                  subtitle: Text(e.isDirectory ? '' : e.sizeLabel, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (_selectionMode) Icon(sel ? Icons.check_circle : Icons.circle_outlined, color: sel ? HubColors.pomelo : HubColors.textoSecundario, size: 22),
-                                      if (!_selectionMode && e.isDirectory) const Icon(Icons.chevron_right_rounded, color: HubColors.textoSecundario, size: 20),
-                                      if (!_selectionMode && !e.isDirectory) IconButton(icon: const Icon(Icons.more_vert_rounded, color: HubColors.textoSecundario, size: 18), onPressed: () => _showContextMenu(e), visualDensity: VisualDensity.compact),
-                                    ],
-                                  ),
-                                  onTap: () {
-                                    if (_selectionMode) {
-                                      setState(() { if (sel) { _selected.remove(e.path); if (_selected.isEmpty) _selectionMode = false; } else { _selected.add(e.path); } });
-                                    } else if (e.isDirectory) { _navigateTo(e.path); }
-                                    else { _showDetails(e); }
-                                  },
-                                  onLongPress: () => setState(() { _selectionMode = true; _selected.add(e.path); }),
-                                );
-                              },
-                            ),
-                ),
-              ],
-            ),
+              );
+            }),
+          ],
+        ],
+      ),
       floatingActionButton: _selectionMode ? null : FloatingActionButton(
         backgroundColor: HubColors.pomelo,
-        foregroundColor: HubColors.fondoPrincipal,
         onPressed: _showCreateMenu,
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
+      body: Column(
+        children: [
+          _buildBreadcrumb(),
+          if (_storageInfo != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(
+                      value: _storageInfo!.usedRatio.clamp(0.0, 1.0),
+                      backgroundColor: HubColors.linea,
+                      color: HubColors.pomelo,
+                      minHeight: 4,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text('${_storageInfo!.usedLabel} / ${_storageInfo!.totalLabel}', style: const TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
+                ],
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: TextField(
+              controller: _searchCtrl,
+              focusNode: _searchFocus,
+              style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
+              decoration: InputDecoration(
+                hintText: 'Buscar…',
+                hintStyle: const TextStyle(color: HubColors.textoSecundario),
+                prefixIcon: const Icon(Icons.search, color: HubColors.textoSecundario, size: 20),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () { _searchCtrl.clear(); })
+                    : null,
+                filled: true,
+                fillColor: HubColors.panel,
+                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              ),
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              children: [
+                for (final f in FileFilter.values)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: FilterChip(
+                      label: Text(_filterLabel(f), style: TextStyle(fontSize: 12, color: _filter == f ? Colors.white : HubColors.textoSecundario)),
+                      selected: _filter == f,
+                      onSelected: (_) => setState(() { _filter = f; _applyFilterAndSort(); }),
+                      selectedColor: HubColors.pomelo,
+                      backgroundColor: HubColors.panel,
+                      checkmarkColor: Colors.white,
+                      side: BorderSide.none,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 4),
+          Expanded(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator(color: HubColors.pomelo))
+                : _filtered.isEmpty
+                    ? const Center(child: Text('Vacío', style: TextStyle(color: HubColors.textoSecundario)))
+                    : RefreshIndicator(
+                        color: HubColors.pomelo,
+                        onRefresh: () => _navigateTo(_currentPath),
+                        child: _view == _ViewMode.list ? _buildList() : _buildGrid(),
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildList() {
+    return ListView.builder(
+      itemCount: _filtered.length,
+      itemBuilder: (ctx, i) {
+        final e = _filtered[i];
+        final selected = _selected.contains(e.path);
+        return ListTile(
+          leading: Icon(_iconFor(e), color: _iconColor(e)),
+          title: Text(e.name, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
+          subtitle: Text(e.isDirectory ? 'Carpeta' : e.sizeLabel, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
+          selected: selected,
+          selectedTileColor: HubColors.pomelo.withValues(alpha: 0.12),
+          onTap: () {
+            if (_selectionMode) {
+              setState(() {
+                if (selected) _selected.remove(e.path); else _selected.add(e.path);
+                if (_selected.isEmpty) _selectionMode = false;
+              });
+            } else if (e.isDirectory) {
+              _navigateTo(e.path);
+            } else {
+              DeviceFilesService.openFile(e.path);
+            }
+          },
+          onLongPress: () {
+            if (!_selectionMode) {
+              setState(() { _selectionMode = true; _selected.add(e.path); });
+            } else {
+              _showContextMenu(e);
+            }
+          },
+          trailing: _selectionMode
+              ? Icon(selected ? Icons.check_circle : Icons.circle_outlined, color: selected ? HubColors.pomelo : HubColors.textoSecundario, size: 22)
+              : null,
+        );
+      },
+    );
+  }
+
+  Widget _buildGrid() {
+    return GridView.builder(
+      padding: const EdgeInsets.all(8),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, mainAxisSpacing: 8, crossAxisSpacing: 8, childAspectRatio: 0.85),
+      itemCount: _filtered.length,
+      itemBuilder: (ctx, i) {
+        final e = _filtered[i];
+        final selected = _selected.contains(e.path);
+        return InkWell(
+          onTap: () {
+            if (_selectionMode) {
+              setState(() {
+                if (selected) _selected.remove(e.path); else _selected.add(e.path);
+                if (_selected.isEmpty) _selectionMode = false;
+              });
+            } else if (e.isDirectory) {
+              _navigateTo(e.path);
+            } else {
+              DeviceFilesService.openFile(e.path);
+            }
+          },
+          onLongPress: () {
+            if (!_selectionMode) {
+              setState(() { _selectionMode = true; _selected.add(e.path); });
+            } else {
+              _showContextMenu(e);
+            }
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: selected ? HubColors.pomelo.withValues(alpha: 0.15) : HubColors.panel,
+              borderRadius: BorderRadius.circular(12),
+              border: selected ? Border.all(color: HubColors.pomelo, width: 1.5) : null,
+            ),
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(_iconFor(e), color: _iconColor(e), size: 36),
+                const SizedBox(height: 6),
+                Text(e.name, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 11), maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
   String _filterLabel(FileFilter f) {
     switch (f) {
-      case FileFilter.all: return 'Todos';
+      case FileFilter.all: return 'Todo';
       case FileFilter.folders: return 'Carpetas';
       case FileFilter.images: return 'Imágenes';
       case FileFilter.videos: return 'Videos';

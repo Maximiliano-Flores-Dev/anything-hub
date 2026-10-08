@@ -1,4 +1,4 @@
-package com.example.anything_hub
+package com.anything.hub
 
 import android.content.Intent
 import android.net.Uri
@@ -29,6 +29,7 @@ class MainActivity : FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        worker.execute { PathSecurity.cleanupStaleApkCache(this) }
         handleIncomingApk(intent)
     }
 
@@ -63,10 +64,6 @@ class MainActivity : FlutterActivity() {
         PuertoPipeBridge.register(flutterEngine.dartExecutor.binaryMessenger, this)
     }
 
-    /**
-     * Copia el APK entrante a cacheDir/incoming_apk/ y guarda el payload
-     * para que Flutter lo consuma con consumePendingIncomingApk.
-     */
     private fun handleIncomingApk(intent: Intent?) {
         if (intent == null) return
         val action = intent.action ?: return
@@ -106,7 +103,6 @@ class MainActivity : FlutterActivity() {
                     "callerPackage" to (caller ?: ""),
                 )
             } catch (_: Exception) {
-                // Silencioso: el usuario puede reintentar compartir el APK
             }
         }
     }
