@@ -8,7 +8,7 @@ import '../services/apk_risk_scorer.dart';
 import '../widgets/hub_panel.dart';
 import 'revisar_apk_screen.dart';
 
-/// Bottom sheet / pantalla al recibir un APK vía Compartir o Abrir con.
+/// Bottom sheet / pantalla al recibir un APK v\u00eda Compartir o Abrir con.
 class ApkIncomingSheet extends StatelessWidget {
   const ApkIncomingSheet({
     super.key,
@@ -85,11 +85,11 @@ class ApkIncomingSheet extends StatelessWidget {
                     const SizedBox(height: 16),
                     _row(Icons.insert_drive_file_outlined, 'Nombre del archivo', fileName),
                     const SizedBox(height: 10),
-                    _row(Icons.sd_storage_outlined, 'Tamaño', _sizeLabel),
+                    _row(Icons.sd_storage_outlined, 'Tama\u00f1o', _sizeLabel),
                     const SizedBox(height: 10),
                     _row(
                       Icons.shield_outlined,
-                      'Aplicación que comparte',
+                      'Aplicaci\u00f3n que comparte',
                       callerPackage == null || callerPackage!.isEmpty
                           ? 'Desconocido'
                           : '$callerPackage${callerVerified ? ' \u2713' : ''}',
@@ -124,7 +124,7 @@ class ApkIncomingSheet extends StatelessWidget {
                   side: const BorderSide(color: HubColors.linea),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(radius12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 onPressed: () {
@@ -154,7 +154,6 @@ class ApkIncomingSheet extends StatelessWidget {
   }
 
   Future<void> _analyze(BuildContext context) async {
-    // Mostrar progreso breve mientras el nativo parsea el manifiesto.
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -171,7 +170,7 @@ class ApkIncomingSheet extends StatelessWidget {
     }
 
     if (!context.mounted) return;
-    Navigator.of(context).pop(); // cierra el loader
+    Navigator.of(context).pop();
 
     final packageName = (meta?['packageName'] as String?)?.trim();
     final appLabel = (meta?['appLabel'] as String?)?.trim();
@@ -179,6 +178,21 @@ class ApkIncomingSheet extends StatelessWidget {
             ?.map((e) => e.toString())
             .toList() ??
         <String>[];
+    final versionName = (meta?['versionName'] as String?)?.trim() ?? '';
+    final versionCode = meta?['versionCode'];
+    final versionLabel = [
+      if (versionName.isNotEmpty) versionName,
+      if (versionCode != null) '($versionCode)',
+    ].join(' ').trim();
+    final signingCerts = (meta?['signingCertSha256'] as List?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        <String>[];
+    final installedCerts = (meta?['installedCertSha256'] as List?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        <String>[];
+    final isInstalled = meta?['isPackageInstalled'] == true;
 
     final parseFailed = packageName == null || packageName.isEmpty;
     final displayName = (appLabel != null && appLabel.isNotEmpty)
@@ -186,7 +200,6 @@ class ApkIncomingSheet extends StatelessWidget {
         : fileName;
     final displayPackage = parseFailed ? 'com.desconocido.apk' : packageName!;
 
-    // Fail-closed: APK ilegible \u2192 no presentar como "riesgo bajo"
     final report = ApkRiskScorer.score(
       fileName: displayName,
       packageName: displayPackage,
@@ -196,6 +209,10 @@ class ApkIncomingSheet extends StatelessWidget {
       detectedPackages: const [],
       sha256: null,
       parseFailed: parseFailed,
+      versionLabel: versionLabel.isEmpty ? '\u2014' : versionLabel,
+      signingCertSha256: signingCerts,
+      installedCertSha256: installedCerts,
+      isPackageInstalled: isInstalled,
     );
 
     if (!context.mounted) return;
