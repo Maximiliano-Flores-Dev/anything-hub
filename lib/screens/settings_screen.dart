@@ -288,7 +288,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: HubColors.pomelo,
+                        color: Color(0xFFFF6B35),
                       ),
                     ),
                   ),
@@ -361,7 +361,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   style: TextStyle(
                       color: HubColors.textoPrincipal,
                       fontWeight: FontWeight.w700)),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 'Hub local para apps, archivos y proyectos. Sin telemetría.',
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
@@ -385,7 +385,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           _sectionTitle('Instalados (${_installed.length})'),
           if (_loadingInstalled)
             Padding(
-              padding: EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
               child: Center(
                   child: CircularProgressIndicator(color: HubColors.pomelo)),
             )

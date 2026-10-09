@@ -119,8 +119,8 @@ class _MisAplicacionesScreenState extends State<MisAplicacionesScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
-        title: const Text(
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
+        title: Text(
           'Mis Aplicaciones',
           style: TextStyle(
             color: HubColors.textoPrincipal,
@@ -130,7 +130,7 @@ class _MisAplicacionesScreenState extends State<MisAplicacionesScreen> {
         actions: [
           IconButton(
             tooltip: 'Puerto de Software',
-            icon: const Icon(Icons.anchor, color: HubColors.textoSecundario),
+            icon: Icon(Icons.anchor, color: HubColors.textoSecundario),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const PuertoSoftwareScreen()),
@@ -138,7 +138,7 @@ class _MisAplicacionesScreenState extends State<MisAplicacionesScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.search, color: HubColors.textoSecundario),
+            icon: Icon(Icons.search, color: HubColors.textoSecundario),
             onPressed: () {
               showSearch(
                 context: context,
@@ -162,7 +162,7 @@ class _MisAplicacionesScreenState extends State<MisAplicacionesScreen> {
                   selected: !_favoritesOnly,
                   onTap: () => setState(() => _favoritesOnly = false),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _FilterChip(
                   label: 'Favoritos',
                   selected: _favoritesOnly,
@@ -173,11 +173,11 @@ class _MisAplicacionesScreenState extends State<MisAplicacionesScreen> {
           ),
           Expanded(
             child: _loading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(color: HubColors.pomelo),
                   )
                 : _filtered.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No hay aplicaciones para mostrar',
                           style: TextStyle(color: HubColors.textoSecundario),
@@ -276,14 +276,14 @@ class _AppsSearchDelegate extends SearchDelegate<ManagedApp?> {
   ThemeData appBarTheme(BuildContext context) {
     return Theme.of(context).copyWith(
       scaffoldBackgroundColor: HubColors.fondoPrincipal,
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: HubColors.fondoPrincipal,
         foregroundColor: HubColors.textoPrincipal,
       ),
-      inputDecorationTheme: const InputDecorationTheme(
+      inputDecorationTheme: InputDecorationTheme(
         hintStyle: TextStyle(color: HubColors.textoSecundario),
       ),
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         titleLarge: TextStyle(color: HubColors.textoPrincipal),
       ),
     );
@@ -322,11 +322,11 @@ class _AppsSearchDelegate extends SearchDelegate<ManagedApp?> {
         return ListTile(
           leading: a.icon != null
               ? Image.memory(a.icon!, width: 40, height: 40)
-              : const Icon(Icons.android, color: HubColors.textoSecundario),
-          title: Text(a.name, style: const TextStyle(color: HubColors.textoPrincipal)),
+              : Icon(Icons.android, color: HubColors.textoSecundario),
+          title: Text(a.name, style: TextStyle(color: HubColors.textoPrincipal)),
           subtitle: Text(
             a.packageName,
-            style: const TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+            style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
           ),
           onTap: () {
             close(context, a);

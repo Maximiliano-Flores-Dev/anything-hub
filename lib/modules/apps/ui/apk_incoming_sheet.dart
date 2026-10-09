@@ -8,7 +8,7 @@ import '../services/apk_risk_scorer.dart';
 import '../widgets/hub_panel.dart';
 import 'revisar_apk_screen.dart';
 
-/// Bottom sheet / pantalla al recibir un APK v\u00eda Compartir o Abrir con.
+/// Bottom sheet / pantalla al recibir un APK vía Compartir o Abrir con.
 class ApkIncomingSheet extends StatelessWidget {
   const ApkIncomingSheet({
     super.key,
@@ -43,7 +43,7 @@ class ApkIncomingSheet extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
+              Text(
                 'Anythings Hub',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -52,18 +52,18 @@ class ApkIncomingSheet extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 4),
-              const Text(
+              SizedBox(height: 4),
+              Text(
                 'Todo en un solo lugar',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: 28),
               HubPanel(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
                         Icon(Icons.download_rounded, color: HubColors.pomelo),
                         SizedBox(width: 10),
@@ -77,51 +77,51 @@ class ApkIncomingSheet extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    const Text(
+                    SizedBox(height: 4),
+                    Text(
                       'Archivo APK entrante compartido con Anythings Hub.',
                       style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     _row(Icons.insert_drive_file_outlined, 'Nombre del archivo', fileName),
-                    const SizedBox(height: 10),
-                    _row(Icons.sd_storage_outlined, 'Tama\u00f1o', _sizeLabel),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
+                    _row(Icons.sd_storage_outlined, 'Tamaño', _sizeLabel),
+                    SizedBox(height: 10),
                     _row(
                       Icons.shield_outlined,
-                      'Aplicaci\u00f3n que comparte',
+                      'Aplicación que comparte',
                       callerPackage == null || callerPackage!.isEmpty
                           ? 'Desconocido'
-                          : '$callerPackage${callerVerified ? ' \u2713' : ''}',
+                          : '$callerPackage${callerVerified ? ' ✓' : ''}',
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-              const Text(
-                '\u00bfQu\u00e9 deseas hacer?',
+              SizedBox(height: 24),
+              Text(
+                '¿Qué deseas hacer?',
                 style: TextStyle(
                   color: HubColors.textoPrincipal,
                   fontWeight: FontWeight.w700,
                   fontSize: 15,
                 ),
               ),
-              const SizedBox(height: 4),
-              const Text(
-                'Elige c\u00f3mo quieres manejar este APK.',
+              SizedBox(height: 4),
+              Text(
+                'Elige cómo quieres manejar este APK.',
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               GradientPillButton(
                 label: 'Analizar antes de instalar',
                 icon: Icons.search,
                 onPressed: () => _analyze(context),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: HubColors.textoPrincipal,
-                  side: const BorderSide(color: HubColors.linea),
+                  side: BorderSide(color: HubColors.linea),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -131,10 +131,10 @@ class ApkIncomingSheet extends StatelessWidget {
                   Navigator.of(context).pop({'action': 'save', 'path': cacheRelativePath});
                 },
                 icon: const Icon(Icons.folder_outlined),
-                label: const Text('Solo guardar'),
+                label: Text('Solo guardar'),
               ),
               const Spacer(),
-              const Row(
+              Row(
                 children: [
                   Icon(Icons.verified_user_outlined, size: 16, color: HubColors.textoSecundario),
                   SizedBox(width: 8),
@@ -157,7 +157,7 @@ class ApkIncomingSheet extends StatelessWidget {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(
+      builder: (_) => Center(
         child: CircularProgressIndicator(color: HubColors.pomelo),
       ),
     );
@@ -209,7 +209,7 @@ class ApkIncomingSheet extends StatelessWidget {
       detectedPackages: const [],
       sha256: null,
       parseFailed: parseFailed,
-      versionLabel: versionLabel.isEmpty ? '\u2014' : versionLabel,
+      versionLabel: versionLabel.isEmpty ? '—' : versionLabel,
       signingCertSha256: signingCerts,
       installedCertSha256: installedCerts,
       isPackageInstalled: isInstalled,
@@ -233,13 +233,13 @@ class ApkIncomingSheet extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, size: 18, color: HubColors.textoSecundario),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 12)),
-              Text(value, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
+              Text(label, style: TextStyle(color: HubColors.textoSecundario, fontSize: 12)),
+              Text(value, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
             ],
           ),
         ),
