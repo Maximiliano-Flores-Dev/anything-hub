@@ -49,8 +49,8 @@ class RevisarApkScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
-        title: const Text(
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
+        title: Text(
           'Revisar APK',
           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
         ),
@@ -58,15 +58,15 @@ class RevisarApkScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          Text(report.fileName, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
+          Text(report.fileName, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
           const SizedBox(height: 2),
-          Text(report.packageName, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+          Text(report.packageName, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
           if (advisoryNote != null && advisoryNote!.isNotEmpty) ...[
             const SizedBox(height: 12),
             HubPanel(
               child: Text(
                 advisoryNote!,
-                style: const TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
               ),
             ),
           ],
@@ -74,7 +74,7 @@ class RevisarApkScreen extends StatelessWidget {
           HubPanel(
             child: Column(
               children: [
-                const Text(
+                Text(
                   'NIVEL DE RIESGO',
                   style: TextStyle(
                     color: HubColors.textoSecundario,
@@ -123,13 +123,13 @@ class RevisarApkScreen extends StatelessWidget {
                 Text(
                   'Esta APK tiene un riesgo $_levelLabel seg\u00fan el an\u00e1lisis.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'PERMISOS SOLICITADOS',
             style: TextStyle(
               color: HubColors.textoSecundario,
@@ -158,14 +158,14 @@ class RevisarApkScreen extends StatelessWidget {
                         children: [
                           Text(
                             p.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: HubColors.textoPrincipal,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           Text(
                             p.description,
-                            style: const TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                            style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
                           ),
                         ],
                       ),
@@ -177,7 +177,7 @@ class RevisarApkScreen extends StatelessWidget {
                           color: const Color(0xFFE53935).withOpacity(0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
+                        child: Text(
                           'CR\u00cdTICO',
                           style: TextStyle(
                             color: Color(0xFFE53935),
@@ -211,10 +211,10 @@ class RevisarApkScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Row(
                           children: [
-                            const Icon(Icons.analytics_outlined, size: 18, color: HubColors.textoSecundario),
+                            Icon(Icons.analytics_outlined, size: 18, color: HubColors.textoSecundario),
                             const SizedBox(width: 10),
                             Expanded(
-                              child: Text(s, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 13)),
+                              child: Text(s, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 13)),
                             ),
                           ],
                         ),
@@ -233,8 +233,8 @@ class RevisarApkScreen extends StatelessWidget {
                 ),
               );
             },
-            icon: const Icon(Icons.travel_explore, color: HubColors.textoAcento),
-            label: const Text(
+            icon: Icon(Icons.travel_explore, color: HubColors.textoAcento),
+            label: Text(
               'An\u00e1lisis complementario (opcional)',
               style: TextStyle(color: HubColors.textoAcento),
             ),
@@ -257,8 +257,8 @@ class RevisarApkScreen extends StatelessWidget {
                 ),
               );
             },
-            icon: const Icon(Icons.verified_user_outlined, color: HubColors.textoAcento),
-            label: const Text(
+            icon: Icon(Icons.verified_user_outlined, color: HubColors.textoAcento),
+            label: Text(
               'Verificar firma (or\u00e1culo)',
               style: TextStyle(color: HubColors.textoAcento),
             ),
@@ -304,7 +304,7 @@ class RevisarApkScreen extends StatelessWidget {
           const SizedBox(height: 12),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+            child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
           ),
         ],
       ),

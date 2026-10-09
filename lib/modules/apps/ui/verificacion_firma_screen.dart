@@ -70,18 +70,18 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
-        title: const Text(
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
+        title: Text(
           'Verificación de firma',
           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: HubColors.pomelo))
+          ? Center(child: CircularProgressIndicator(color: HubColors.pomelo))
           : ListView(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
               children: [
-                const Text(
+                Text(
                   'Comprobando la autenticidad de la aplicación',
                   style: TextStyle(color: HubColors.textoSecundario, fontSize: 14),
                 ),
@@ -103,9 +103,9 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                   child: Column(
                     children: [
                       _kv('Paquete', widget.packageName),
-                      const Divider(color: HubColors.linea),
+                      Divider(color: HubColors.linea),
                       _kv('Versión', widget.versionLabel),
-                      const Divider(color: HubColors.linea),
+                      Divider(color: HubColors.linea),
                       _kv(
                         'Certificado (SHA-256)',
                         widget.certSha256 ?? '—',
@@ -118,7 +118,7 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                 HubPanel(
                   child: Row(
                     children: [
-                      const Icon(Icons.lock_outline, color: HubColors.textoAcento, size: 20),
+                      Icon(Icons.lock_outline, color: HubColors.textoAcento, size: 20),
                       const SizedBox(width: 10),
                       const Expanded(
                         child: Text(
@@ -220,7 +220,7 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Certificado coincide con el oráculo',
                       style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
                     ),
@@ -228,7 +228,7 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                       r.status == SignatureStatus.cacheHit
                           ? 'Verificación exitosa (caché)'
                           : 'Verificación exitosa',
-                      style: const TextStyle(color: Color(0xFF3DDC84), fontSize: 12),
+                      style: TextStyle(color: Color(0xFF3DDC84), fontSize: 12),
                     ),
                   ],
                 ),
@@ -249,13 +249,13 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Firma no verificada',
                       style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
                     ),
                     Text(
                       r.message ?? 'No se pudo confirmar autenticidad',
-                      style: const TextStyle(color: Color(0xFFE53935), fontSize: 12),
+                      style: TextStyle(color: Color(0xFFE53935), fontSize: 12),
                     ),
                   ],
                 ),
@@ -271,12 +271,12 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
         HubPanel(
           child: Row(
             children: [
-              const Icon(Icons.wifi_off, color: HubColors.amarillo),
+              Icon(Icons.wifi_off, color: HubColors.amarillo),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   'Sin red, usando caché de ${r.cacheAgeDays} días\n${r.message ?? ''}',
-                  style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                 ),
               ),
             ],
@@ -295,7 +295,7 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
         children: [
           SizedBox(
             width: 120,
-            child: Text(k, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+            child: Text(k, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
           ),
           Expanded(
             child: Text(

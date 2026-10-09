@@ -182,8 +182,8 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
-        title: const Text(
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
+        title: Text(
           'Puerto de Software',
           style: TextStyle(
             color: HubColors.textoPrincipal,
@@ -193,7 +193,7 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
         actions: [
           IconButton(
             tooltip: 'Clave VirusTotal',
-            icon: const Icon(Icons.key, color: HubColors.textoSecundario),
+            icon: Icon(Icons.key, color: HubColors.textoSecundario),
             onPressed: _askVirusTotalKey,
           ),
         ],
@@ -201,7 +201,7 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Text(
               'El APK entra por un tubo (chunks de 8 KB) a un limbo en caché. Ahí se calcula SHA-256, se lee el manifiesto y, si hay clave, se consulta VirusTotal. Tú decides si instalas.',
@@ -274,7 +274,7 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
                   Expanded(
                     child: Text(
                       e.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: HubColors.textoPrincipal,
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
@@ -287,18 +287,18 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
               const SizedBox(height: 4),
               Text(
                 e.publisher,
-                style: const TextStyle(color: HubColors.textoAcento, fontSize: 12),
+                style: TextStyle(color: HubColors.textoAcento, fontSize: 12),
               ),
               const SizedBox(height: 8),
               Text(
                 e.summary,
-                style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
               if (e.packageName != null) ...[
                 const SizedBox(height: 6),
                 Text(
                   e.packageName!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: HubColors.textoSecundario,
                     fontSize: 11,
                     fontFamily: 'monospace',
@@ -351,11 +351,11 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: const Text('VirusTotal', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text('VirusTotal', style: TextStyle(color: HubColors.textoPrincipal)),
         content: TextField(
           controller: ctrl,
           obscureText: true,
-          style: const TextStyle(color: HubColors.textoPrincipal),
+          style: TextStyle(color: HubColors.textoPrincipal),
           decoration: const InputDecoration(
             hintText: 'API key (solo en el dispositivo)',
             hintStyle: TextStyle(color: HubColors.textoSecundario),
@@ -378,12 +378,12 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
           context: context,
           builder: (ctx) => AlertDialog(
             backgroundColor: HubColors.panel,
-            title: const Text('Sin artefacto directo', style: TextStyle(color: HubColors.textoPrincipal)),
+            title: Text('Sin artefacto directo', style: TextStyle(color: HubColors.textoPrincipal)),
             content: Text(
               e.trust == PuertoTrust.gray
                   ? 'No canalizamos este catálogo: no hay un APK firmado único que podamos hashear. Si descargas fuera, ábrelo con el Hub para el análisis.'
                   : 'Esta ficha aún no tiene URL directa de APK. Abre la página oficial y, si bajas el archivo, compártelo con el Hub.',
-              style: const TextStyle(color: HubColors.textoSecundario),
+              style: TextStyle(color: HubColors.textoSecundario),
             ),
             actions: [
               TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cerrar')),
@@ -403,8 +403,8 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: HubColors.panel,
-          title: const Text('Zona gris', style: TextStyle(color: HubColors.textoPrincipal)),
-          content: const Text(
+          title: Text('Zona gris', style: TextStyle(color: HubColors.textoPrincipal)),
+          content: Text(
             'El tubo igual va a hashear y analizar, pero el origen no es el autor. El resultado es una recomendación, no una autorización.',
             style: TextStyle(color: HubColors.textoSecundario),
           ),

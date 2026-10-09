@@ -97,19 +97,19 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: const Text('Desinstalar', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text('Desinstalar', style: TextStyle(color: HubColors.textoPrincipal)),
         content: Text(
           '¿Desinstalar ${widget.app.name}? Esta acción usa el desinstalador del sistema.',
-          style: const TextStyle(color: HubColors.textoSecundario),
+          style: TextStyle(color: HubColors.textoSecundario),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text('Cancelar'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Desinstalar', style: TextStyle(color: HubColors.pomelo)),
+            child: Text('Desinstalar', style: TextStyle(color: HubColors.pomelo)),
           ),
         ],
       ),
@@ -153,7 +153,7 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: HubColors.textoPrincipal),
+            icon: Icon(Icons.arrow_back, color: HubColors.textoPrincipal),
             onPressed: _popWithState,
           ),
         ),
@@ -173,14 +173,14 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                         color: HubColors.panel,
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      child: const Icon(Icons.android, size: 40, color: HubColors.textoSecundario),
+                      child: Icon(Icons.android, size: 40, color: HubColors.textoSecundario),
                     ),
             ),
             const SizedBox(height: 14),
             Text(
               widget.app.name,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 color: HubColors.textoPrincipal,
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -190,7 +190,7 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
             Text(
               widget.app.packageName,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+              style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
             ),
             const SizedBox(height: 8),
             const Row(
@@ -253,7 +253,7 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Tu evaluación privada de esta app',
                     style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
                   ),
@@ -276,19 +276,19 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                     controller: _noteCtrl,
                     maxLength: 120,
                     maxLines: 2,
-                    style: const TextStyle(color: HubColors.textoPrincipal),
+                    style: TextStyle(color: HubColors.textoPrincipal),
                     decoration: InputDecoration(
                       hintText: 'Escribe tu opinión personal…',
-                      hintStyle: const TextStyle(color: HubColors.textoSecundario),
+                      hintStyle: TextStyle(color: HubColors.textoSecundario),
                       filled: true,
                       fillColor: HubColors.fondoPrincipal,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(radius12),
-                        borderSide: const BorderSide(color: HubColors.linea),
+                        borderSide: BorderSide(color: HubColors.linea),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(radius12),
-                        borderSide: const BorderSide(color: HubColors.linea),
+                        borderSide: BorderSide(color: HubColors.linea),
                       ),
                     ),
                   ),
@@ -297,14 +297,14 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: _saveReview,
-                      child: const Text('Guardar reseña', style: TextStyle(color: HubColors.pomelo)),
+                      child: Text('Guardar reseña', style: TextStyle(color: HubColors.pomelo)),
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            const Center(
+            Center(
               child: Text(
                 'Solo en este dispositivo',
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
@@ -348,7 +348,7 @@ class _ActionIcon extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 label,
-                style: const TextStyle(color: HubColors.textoSecundario, fontSize: 10),
+                style: TextStyle(color: HubColors.textoSecundario, fontSize: 10),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -381,7 +381,7 @@ class _SliderRow extends StatelessWidget {
         const SizedBox(width: 8),
         SizedBox(
           width: 88,
-          child: Text(label, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+          child: Text(label, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
         ),
         Expanded(
           child: SliderTheme(
@@ -402,7 +402,7 @@ class _SliderRow extends StatelessWidget {
         ),
         Text(
           value.toStringAsFixed(1),
-          style: const TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
+          style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
         ),
       ],
     );
