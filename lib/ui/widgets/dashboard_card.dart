@@ -41,7 +41,7 @@ class DashboardCard extends StatelessWidget {
                   Expanded(
                     child: Center(child: art),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -55,7 +55,7 @@ class DashboardCard extends StatelessWidget {
                               child: Text(
                                 title,
                                 maxLines: 1,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: HubColors.textoPrincipal,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 13.5,
@@ -63,12 +63,12 @@ class DashboardCard extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            SizedBox(height: 2),
                             Text(
                               subtitle,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: HubColors.textoSecundario,
                                 fontSize: 10.5,
                                 height: 1.25,
@@ -77,7 +77,7 @@ class DashboardCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 4),
                       Icon(
                         Icons.north_east_rounded,
                         size: 14,
