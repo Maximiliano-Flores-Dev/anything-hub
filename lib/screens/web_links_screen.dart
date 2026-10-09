@@ -211,7 +211,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
           behavior: SnackBarBehavior.floating,
           backgroundColor: HubColors.panel,
           action: action,
-          content: Text(message, style: const TextStyle(color: HubColors.textoPrincipal)),
+          content: Text(message, style: TextStyle(color: HubColors.textoPrincipal)),
         ),
       );
   }
@@ -276,7 +276,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'Webs Rápidas',
                       style: TextStyle(
                         color: HubColors.textoPrincipal,
@@ -289,7 +289,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
                       child: IconButton(
                         tooltip: 'Volver',
                         onPressed: () => Navigator.of(context).maybePop(),
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                        icon: Icon(Icons.arrow_back_ios_new_rounded,
                             color: HubColors.textoSecundario, size: 20),
                       ),
                     ),
@@ -298,7 +298,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
                       child: IconButton(
                         tooltip: 'Añadir web',
                         onPressed: () => _addOrEdit(),
-                        icon: const Icon(Icons.add_rounded, color: HubColors.pomelo, size: 28),
+                        icon: Icon(Icons.add_rounded, color: HubColors.pomelo, size: 28),
                       ),
                     ),
                   ],
@@ -321,7 +321,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
   Widget _buildBody() {
     final repo = widget.repository;
     if (!repo.loaded) {
-      return const Center(
+      return Center(
         child: SizedBox(
           width: 22,
           height: 22,
@@ -338,9 +338,9 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.link_rounded, size: 40, color: HubColors.textoSecundario),
+              Icon(Icons.link_rounded, size: 40, color: HubColors.textoSecundario),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Aún no tienes webs guardadas',
                 style: TextStyle(
                   color: HubColors.textoPrincipal,
@@ -349,7 +349,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
                 ),
               ),
               const SizedBox(height: 6),
-              const Text(
+              Text(
                 'Pega un enlace o un [Título](URL) y se abrirá en tu navegador.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
@@ -394,7 +394,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
             },
           ),
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.fromLTRB(24, 4, 24, 12),
           child: Text(
             'Toca el título para abrir · el ícono para editar · mantén pulsado para reordenar',
@@ -444,7 +444,7 @@ class _WebLinkTile extends StatelessWidget {
                 item.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   color: HubColors.textoPrincipal,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
@@ -588,20 +588,20 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
   }
 
   InputDecoration _decoration(String label, String hint, {String? helper, String? error}) {
-    const line = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea));
-    const focus = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo));
-    const warn = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomeloSuave));
+    line = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea));
+    focus = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo));
+    warn = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomeloSuave));
     return InputDecoration(
       labelText: label,
       hintText: hint,
       helperText: helper,
       helperMaxLines: 2,
       errorText: error,
-      labelStyle: const TextStyle(color: HubColors.textoSecundario),
-      floatingLabelStyle: const TextStyle(color: HubColors.pomelo),
+      labelStyle: TextStyle(color: HubColors.textoSecundario),
+      floatingLabelStyle: TextStyle(color: HubColors.pomelo),
       hintStyle: TextStyle(color: HubColors.textoSecundario.withOpacity(0.6), fontSize: 13),
-      helperStyle: const TextStyle(color: HubColors.textoSecundario, fontSize: 11),
-      errorStyle: const TextStyle(color: HubColors.pomeloSuave),
+      helperStyle: TextStyle(color: HubColors.textoSecundario, fontSize: 11),
+      errorStyle: TextStyle(color: HubColors.pomeloSuave),
       enabledBorder: line,
       focusedBorder: focus,
       errorBorder: warn,
@@ -617,7 +617,7 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
         editing ? 'Editar web' : 'Añadir web',
-        style: const TextStyle(color: HubColors.textoPrincipal),
+        style: TextStyle(color: HubColors.textoPrincipal),
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -629,7 +629,7 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
-            style: const TextStyle(color: HubColors.textoPrincipal),
+            style: TextStyle(color: HubColors.textoPrincipal),
             decoration: _decoration(
               'Enlace',
               'youtube.com',
@@ -645,7 +645,7 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
             controller: _titleCtl,
             textCapitalization: TextCapitalization.sentences,
             textInputAction: TextInputAction.done,
-            style: const TextStyle(color: HubColors.textoPrincipal),
+            style: TextStyle(color: HubColors.textoPrincipal),
             decoration: _decoration('Título (opcional)', 'Se toma del enlace si lo dejas vacío'),
             onSubmitted: (_) => _submit(),
           ),
@@ -655,11 +655,11 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
         if (editing)
           TextButton(
             onPressed: () => Navigator.pop(context, const _LinkEditorResult.delete()),
-            child: const Text('Eliminar', style: TextStyle(color: HubColors.pomeloSuave)),
+            child: Text('Eliminar', style: TextStyle(color: HubColors.pomeloSuave)),
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+          child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),

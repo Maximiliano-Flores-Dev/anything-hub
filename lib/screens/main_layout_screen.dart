@@ -211,12 +211,12 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(title, style: const TextStyle(color: HubColors.textoPrincipal)),
-        content: Text(body, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+        title: Text(title, style: TextStyle(color: HubColors.textoPrincipal)),
+        content: Text(body, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(cancelLabel, style: const TextStyle(color: HubColors.textoSecundario)),
+            child: Text(cancelLabel, style: TextStyle(color: HubColors.textoSecundario)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),
@@ -234,7 +234,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       SnackBar(
         behavior: SnackBarBehavior.floating,
         backgroundColor: HubColors.panel,
-        content: Text(message, style: const TextStyle(color: HubColors.textoPrincipal)),
+        content: Text(message, style: TextStyle(color: HubColors.textoPrincipal)),
       ),
     );
   }
@@ -330,8 +330,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: HubColors.panel,
-          title: const Text('Módulo de proyectos', style: TextStyle(color: HubColors.textoPrincipal)),
-          content: const Text(
+          title: Text('Módulo de proyectos', style: TextStyle(color: HubColors.textoPrincipal)),
+          content: Text(
             'Habías elegido no volver a mostrar el aviso. ¿Quieres reactivar el módulo de proyectos?',
             style: TextStyle(color: HubColors.textoSecundario),
           ),
