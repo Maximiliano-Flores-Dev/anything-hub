@@ -198,19 +198,19 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: Text(title, style: const TextStyle(color: HubColors.textoPrincipal)),
+        title: Text(title, style: TextStyle(color: HubColors.textoPrincipal)),
         content: TextField(
           controller: ctrl, autofocus: true,
-          style: const TextStyle(color: HubColors.textoPrincipal),
+          style: TextStyle(color: HubColors.textoPrincipal),
           decoration: InputDecoration(
-            hintText: hint, hintStyle: const TextStyle(color: HubColors.textoSecundario),
-            enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
-            focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
+            hintText: hint, hintStyle: TextStyle(color: HubColors.textoSecundario),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario))),
-          TextButton(onPressed: () => Navigator.pop(ctx, ctrl.text.trim()), child: const Text('Aceptar', style: TextStyle(color: HubColors.pomelo))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario))),
+          TextButton(onPressed: () => Navigator.pop(ctx, ctrl.text.trim()), child: Text('Aceptar', style: TextStyle(color: HubColors.pomelo))),
         ],
       ),
     );
@@ -235,13 +235,13 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: const Text('Eliminar', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text('Eliminar', style: TextStyle(color: HubColors.textoPrincipal)),
         content: Text(
           entries.length == 1 ? '¿Eliminar "${entries.first.name}"?' : '¿Eliminar ${entries.length} elementos?',
-          style: const TextStyle(color: HubColors.textoSecundario),
+          style: TextStyle(color: HubColors.textoSecundario),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario))),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario))),
           TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Eliminar', style: TextStyle(color: Colors.redAccent))),
         ],
       ),
@@ -313,20 +313,20 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
       backgroundColor: HubColors.panel,
       builder: (ctx) {
         if (_favorites.isEmpty) {
-          return const SafeArea(child: Padding(padding: EdgeInsets.all(24), child: Text('Sin favoritos', style: TextStyle(color: HubColors.textoSecundario))));
+          return SafeArea(child: Padding(padding: EdgeInsets.all(24), child: Text('Sin favoritos', style: TextStyle(color: HubColors.textoSecundario))));
         }
         return SafeArea(
           child: ListView(
             shrinkWrap: true,
             children: [
-              const Padding(padding: EdgeInsets.all(16), child: Text('Favoritos', style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700))),
+              Padding(padding: EdgeInsets.all(16), child: Text('Favoritos', style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700))),
               ..._favorites.map((p) => ListTile(
-                leading: const Icon(Icons.star_rounded, color: HubColors.amarillo),
-                title: Text(p.split('/').last.isEmpty ? p : p.split('/').last, style: const TextStyle(color: HubColors.textoPrincipal)),
-                subtitle: Text(p, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
+                leading: Icon(Icons.star_rounded, color: HubColors.amarillo),
+                title: Text(p.split('/').last.isEmpty ? p : p.split('/').last, style: TextStyle(color: HubColors.textoPrincipal)),
+                subtitle: Text(p, style: TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
                 onTap: () { Navigator.pop(ctx); _navigateTo(p); },
                 trailing: IconButton(
-                  icon: const Icon(Icons.close, size: 18, color: HubColors.textoSecundario),
+                  icon: Icon(Icons.close, size: 18, color: HubColors.textoSecundario),
                   onPressed: () { setState(() => _favorites.remove(p)); _saveFavorites(); Navigator.pop(ctx); _showFavorites(); },
                 ),
               )),
@@ -355,12 +355,12 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(leading: const Icon(Icons.info_outline, color: HubColors.textoAcento), title: const Text('Detalles', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showDetails(entry); }),
-            ListTile(leading: const Icon(Icons.drive_file_rename_outline, color: HubColors.textoAcento), title: const Text('Renombrar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _rename(entry); }),
-            ListTile(leading: const Icon(Icons.copy_rounded, color: HubColors.textoAcento), title: const Text('Copiar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() { _selected..clear()..add(entry.path); }); _copySelected(cut: false); }),
-            ListTile(leading: const Icon(Icons.cut_rounded, color: HubColors.textoAcento), title: const Text('Cortar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() { _selected..clear()..add(entry.path); }); _copySelected(cut: true); }),
+            ListTile(leading: Icon(Icons.info_outline, color: HubColors.textoAcento), title: Text('Detalles', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showDetails(entry); }),
+            ListTile(leading: Icon(Icons.drive_file_rename_outline, color: HubColors.textoAcento), title: Text('Renombrar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _rename(entry); }),
+            ListTile(leading: Icon(Icons.copy_rounded, color: HubColors.textoAcento), title: Text('Copiar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() { _selected..clear()..add(entry.path); }); _copySelected(cut: false); }),
+            ListTile(leading: Icon(Icons.cut_rounded, color: HubColors.textoAcento), title: Text('Cortar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() { _selected..clear()..add(entry.path); }); _copySelected(cut: true); }),
             ListTile(leading: const Icon(Icons.delete_outline, color: Colors.redAccent), title: const Text('Eliminar', style: TextStyle(color: Colors.redAccent)), onTap: () { Navigator.pop(ctx); _deleteEntries([entry]); }),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
           ],
         ),
       ),
@@ -375,9 +375,9 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(leading: const Icon(Icons.create_new_folder_rounded, color: HubColors.amarillo), title: const Text('Nueva carpeta', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _createFolder(); }),
-            ListTile(leading: const Icon(Icons.note_add_rounded, color: HubColors.textoAcento), title: const Text('Nuevo archivo', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _createFile(); }),
-            const SizedBox(height: 8),
+            ListTile(leading: Icon(Icons.create_new_folder_rounded, color: HubColors.amarillo), title: Text('Nueva carpeta', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _createFolder(); }),
+            ListTile(leading: Icon(Icons.note_add_rounded, color: HubColors.textoAcento), title: Text('Nuevo archivo', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _createFile(); }),
+            SizedBox(height: 8),
           ],
         ),
       ),
@@ -395,10 +395,10 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
             for (final m in _SortMode.values)
               ListTile(
                 title: Text(_sortLabel(m), style: TextStyle(color: _sort == m ? HubColors.pomelo : HubColors.textoPrincipal)),
-                trailing: _sort == m ? const Icon(Icons.check, color: HubColors.pomelo, size: 18) : null,
+                trailing: _sort == m ? Icon(Icons.check, color: HubColors.pomelo, size: 18) : null,
                 onTap: () { Navigator.pop(ctx); setState(() { _sort = m; _applyFilterAndSort(); }); },
               ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
           ],
         ),
       ),
@@ -443,9 +443,9 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Row(
         children: [
-          InkWell(onTap: () { if (_roots.isNotEmpty) _navigateTo(_roots.first['path']!); }, child: const Icon(Icons.home_rounded, size: 18, color: HubColors.textoAcento)),
+          InkWell(onTap: () { if (_roots.isNotEmpty) _navigateTo(_roots.first['path']!); }, child: Icon(Icons.home_rounded, size: 18, color: HubColors.textoAcento)),
           for (var i = 0; i < parts.length; i++) ...[
-            const Icon(Icons.chevron_right, size: 16, color: HubColors.textoSecundario),
+            Icon(Icons.chevron_right, size: 16, color: HubColors.textoSecundario),
             InkWell(
               onTap: () { final path = '/' + parts.sublist(0, i + 1).join('/'); _navigateTo(path); },
               child: Text(parts[i], style: TextStyle(color: i == parts.length - 1 ? HubColors.textoPrincipal : HubColors.textoAcento, fontSize: 13, fontWeight: i == parts.length - 1 ? FontWeight.w600 : FontWeight.normal)),
@@ -467,10 +467,10 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.folder_off_rounded, size: 64, color: HubColors.textoSecundario),
-                const SizedBox(height: 16),
-                const Text('Se necesita acceso a todos los archivos', textAlign: TextAlign.center, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 16)),
-                const SizedBox(height: 20),
+                Icon(Icons.folder_off_rounded, size: 64, color: HubColors.textoSecundario),
+                SizedBox(height: 16),
+                Text('Se necesita acceso a todos los archivos', textAlign: TextAlign.center, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 16)),
+                SizedBox(height: 20),
                 GradientPillButton(label: 'Conceder acceso a archivos', icon: Icons.folder_open, onPressed: _requestPermission),
               ],
             ),
@@ -486,9 +486,9 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
         elevation: 0,
         title: Text(
           _selectionMode ? '${_selected.length} seleccionados' : (_currentPath.split('/').last.isEmpty ? 'Archivos' : _currentPath.split('/').last),
-          style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 16),
+          style: TextStyle(color: HubColors.textoPrincipal, fontSize: 16),
         ),
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
         actions: [
           if (_selectionMode) ...[
             IconButton(icon: const Icon(Icons.copy_rounded), onPressed: () => _copySelected(cut: false), tooltip: 'Copiar'),
@@ -507,12 +507,12 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      ListTile(leading: const Icon(Icons.sort, color: HubColors.textoAcento), title: const Text('Ordenar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showSortMenu(); }),
-                      ListTile(leading: Icon(_view == _ViewMode.list ? Icons.grid_view_rounded : Icons.view_list_rounded, color: HubColors.textoAcento), title: Text(_view == _ViewMode.list ? 'Vista cuadrícula' : 'Vista lista', style: const TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() => _view = _view == _ViewMode.list ? _ViewMode.grid : _ViewMode.list); }),
-                      ListTile(leading: Icon(_showHidden ? Icons.visibility_off : Icons.visibility, color: HubColors.textoAcento), title: Text(_showHidden ? 'Ocultar ocultos' : 'Mostrar ocultos', style: const TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() => _showHidden = !_showHidden); _navigateTo(_currentPath); }),
-                      ListTile(leading: const Icon(Icons.star_rounded, color: HubColors.amarillo), title: const Text('Favoritos', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showFavorites(); }),
-                      ListTile(leading: const Icon(Icons.drive_file_move_outline, color: HubColors.textoAcento), title: const Text('Ir a ruta', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _goToPath(); }),
-                      const SizedBox(height: 8),
+                      ListTile(leading: Icon(Icons.sort, color: HubColors.textoAcento), title: Text('Ordenar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showSortMenu(); }),
+                      ListTile(leading: Icon(_view == _ViewMode.list ? Icons.grid_view_rounded : Icons.view_list_rounded, color: HubColors.textoAcento), title: Text(_view == _ViewMode.list ? 'Vista cuadrícula' : 'Vista lista', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() => _view = _view == _ViewMode.list ? _ViewMode.grid : _ViewMode.list); }),
+                      ListTile(leading: Icon(_showHidden ? Icons.visibility_off : Icons.visibility, color: HubColors.textoAcento), title: Text(_showHidden ? 'Ocultar ocultos' : 'Mostrar ocultos', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() => _showHidden = !_showHidden); _navigateTo(_currentPath); }),
+                      ListTile(leading: Icon(Icons.star_rounded, color: HubColors.amarillo), title: Text('Favoritos', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showFavorites(); }),
+                      ListTile(leading: Icon(Icons.drive_file_move_outline, color: HubColors.textoAcento), title: Text('Ir a ruta', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _goToPath(); }),
+                      SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -544,8 +544,8 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                       minHeight: 4,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text('${_storageInfo!.usedLabel} / ${_storageInfo!.totalLabel}', style: const TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
+                  SizedBox(height: 2),
+                  Text('${_storageInfo!.usedLabel} / ${_storageInfo!.totalLabel}', style: TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
                 ],
               ),
             ),
@@ -554,11 +554,11 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
             child: TextField(
               controller: _searchCtrl,
               focusNode: _searchFocus,
-              style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
+              style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'Buscar…',
-                hintStyle: const TextStyle(color: HubColors.textoSecundario),
-                prefixIcon: const Icon(Icons.search, color: HubColors.textoSecundario, size: 20),
+                hintStyle: TextStyle(color: HubColors.textoSecundario),
+                prefixIcon: Icon(Icons.search, color: HubColors.textoSecundario, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () { _searchCtrl.clear(); })
                     : null,
@@ -591,12 +591,12 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
               ],
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator(color: HubColors.pomelo))
+                ? Center(child: CircularProgressIndicator(color: HubColors.pomelo))
                 : _filtered.isEmpty
-                    ? const Center(child: Text('Vacío', style: TextStyle(color: HubColors.textoSecundario)))
+                    ? Center(child: Text('Vacío', style: TextStyle(color: HubColors.textoSecundario)))
                     : RefreshIndicator(
                         color: HubColors.pomelo,
                         onRefresh: () => _navigateTo(_currentPath),
@@ -616,10 +616,10 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
         final selected = _selected.contains(e.path);
         return ListTile(
           leading: Icon(_iconFor(e), color: _iconColor(e)),
-          title: Text(e.name, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
-          subtitle: Text(e.isDirectory ? 'Carpeta' : e.sizeLabel, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
+          title: Text(e.name, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
+          subtitle: Text(e.isDirectory ? 'Carpeta' : e.sizeLabel, style: TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
           selected: selected,
-          selectedTileColor: HubColors.pomelo.withValues(alpha: 0.12),
+          selectedTileColor: HubColors.pomelo.withOpacity(0.12),
           onTap: () {
             if (_selectionMode) {
               setState(() {
@@ -677,7 +677,7 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
           },
           child: Container(
             decoration: BoxDecoration(
-              color: selected ? HubColors.pomelo.withValues(alpha: 0.15) : HubColors.panel,
+              color: selected ? HubColors.pomelo.withOpacity(0.15) : HubColors.panel,
               borderRadius: BorderRadius.circular(12),
               border: selected ? Border.all(color: HubColors.pomelo, width: 1.5) : null,
             ),
@@ -686,8 +686,8 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(_iconFor(e), color: _iconColor(e), size: 36),
-                const SizedBox(height: 6),
-                Text(e.name, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 11), maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
+                SizedBox(height: 6),
+                Text(e.name, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 11), maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
               ],
             ),
           ),
