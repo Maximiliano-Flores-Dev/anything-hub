@@ -356,7 +356,7 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
           controller: ctrl,
           obscureText: true,
           style: TextStyle(color: HubColors.textoPrincipal),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: 'API key (solo en el dispositivo)',
             hintStyle: TextStyle(color: HubColors.textoSecundario),
           ),
