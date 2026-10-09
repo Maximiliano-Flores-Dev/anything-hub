@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../core/hub_colors.dart';
+import '../core/macro_customization.dart';
 import '../core/logger.dart';
 import '../core/models.dart';
 import '../modules/projects/services/project_activation_service.dart';
@@ -50,27 +50,70 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
   List<AppGroup> _appGroups = [];
   final WebLinkRepository _webLinks = WebLinkRepository();
 
-  static const List<_CardData> _cards = [
-    _CardData('Mis Aplicaciones', 'Gestiona, descarga y abre tus apps en un solo lugar', AppsArt()),
-    _CardData('Carpetas del Proyecto', 'Acceso rápido a tus proyectos', SheetsArt()),
-    _CardData('Webs Rápidas', 'Tus sitios favoritos, al instante', WebArt()),
-    _CardData('Favoritos', 'Todo lo que te importa', FavoritesArt()),
-    _CardData('Gestión de Archivos', 'Explora, organiza y accede rápido', FilesArt()),
-    _CardData('Modos de Rendimiento', 'Ajusta el rendimiento de tu dispositivo', PerformanceArt()),
-  ];
+  static const Map<String, _CardData> _allCards = {
+    DashboardCardIds.apps: _CardData(
+      'Mis Aplicaciones',
+      'Gestiona, descarga y abre tus apps en un solo lugar',
+      AppsArt(),
+    ),
+    DashboardCardIds.projects: _CardData(
+      'Carpetas del Proyecto',
+      'Acceso rápido a tus proyectos',
+      SheetsArt(),
+    ),
+    DashboardCardIds.webs: _CardData(
+      'Webs Rápidas',
+      'Tus sitios favoritos, al instante',
+      WebArt(),
+    ),
+    DashboardCardIds.favorites: _CardData(
+      'Favoritos',
+      'Todo lo que te importa',
+      FavoritesArt(),
+    ),
+    DashboardCardIds.files: _CardData(
+      'Gestión de Archivos',
+      'Explora, organiza y accede rápido',
+      FilesArt(),
+    ),
+    DashboardCardIds.performance: _CardData(
+      'Modos de Rendimiento',
+      'Ajusta el rendimiento de tu dispositivo',
+      PerformanceArt(),
+    ),
+  };
+
+  List<_CardData> get _visibleCards {
+    final ids = MacroCustomization.instance.activeCardIds;
+    return [
+      for (final id in ids)
+        if (_allCards.containsKey(id)) _allCards[id]!,
+    ];
+  }
+
+  List<String> get _visibleCardIds =>
+      MacroCustomization.instance.activeCardIds
+          .where((id) => _allCards.containsKey(id))
+          .toList();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    MacroCustomization.instance.addListener(_onMacroChanged);
     _bootstrap();
   }
 
   @override
   void dispose() {
+    MacroCustomization.instance.removeListener(_onMacroChanged);
     WidgetsBinding.instance.removeObserver(this);
     _webLinks.dispose();
     super.dispose();
+  }
+
+  void _onMacroChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
@@ -339,21 +382,46 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     }
   }
 
+  void _onCardTap(String cardId) {
+    if (cardId == DashboardCardIds.apps) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const MisAplicacionesScreen()),
+      );
+    } else if (cardId == DashboardCardIds.projects) {
+      _openProjectsModule();
+    } else if (cardId == DashboardCardIds.webs) {
+      _openWebLinks();
+    } else if (cardId == DashboardCardIds.files) {
+      _openFileExplorer();
+    } else if (cardId == DashboardCardIds.performance) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const PerformanceModesScreen(),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
+    final macro = MacroCustomization.instance;
+    final sidebar = macro.sidebarEnabled
+        ? CollapsibleSidebar(
+            screenWidth: screenWidth,
+            appGroups: _appGroups,
+            onActionSelected: _onFabAction,
+            onAppTap: _launchApp,
+          )
+        : null;
+
     return Scaffold(
       backgroundColor: HubColors.fondoPrincipal,
       body: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            CollapsibleSidebar(
-              screenWidth: screenWidth,
-              appGroups: _appGroups,
-              onActionSelected: _onFabAction,
-              onAppTap: _launchApp,
-            ),
+            if (sidebar != null && !macro.leftHandedMode) sidebar,
             Expanded(
               child: Column(
                 children: [
@@ -365,6 +433,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
                 ],
               ),
             ),
+            if (sidebar != null && macro.leftHandedMode) sidebar,
           ],
         ),
       ),
@@ -381,7 +450,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'Bienvenido de\nnuevo',
             style: TextStyle(
               color: HubColors.textoPrincipal,
@@ -391,7 +460,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
             ),
           ),
           const SizedBox(height: 5),
-          const Text(
+          Text(
             'Sincronización inteligente de apps',
             style: TextStyle(color: HubColors.textoAcento, fontSize: 13),
           ),
@@ -400,7 +469,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
             padding: EdgeInsets.zero,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: _cards.length,
+            itemCount: _visibleCards.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 8,
@@ -408,30 +477,13 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
               childAspectRatio: 1.04,
             ),
             itemBuilder: (context, i) {
-              final c = _cards[i];
+              final c = _visibleCards[i];
+              final cardId = _visibleCardIds[i];
               return DashboardCard(
                 title: c.title,
                 subtitle: c.subtitle,
                 art: c.art,
-                onTap: () {
-                  if (i == 0) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(builder: (_) => const MisAplicacionesScreen()),
-                    );
-                  } else if (i == 1) {
-                    _openProjectsModule();
-                  } else if (i == 2) {
-                    _openWebLinks();
-                  } else if (i == 4) {
-                    _openFileExplorer();
-                  } else if (i == 5) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const PerformanceModesScreen(),
-                      ),
-                    );
-                  }
-                },
+                onTap: () => _onCardTap(cardId),
               );
             },
           ),
@@ -467,7 +519,7 @@ class _BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: HubColors.panel,
         border: Border(top: BorderSide(color: HubColors.linea)),
       ),
