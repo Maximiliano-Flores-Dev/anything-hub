@@ -55,9 +55,9 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: HubColors.panel,
-          title: const Text('Acceso a No molestar (Focus)',
+          title: Text('Acceso a No molestar (Focus)',
               style: TextStyle(color: HubColors.textoPrincipal)),
-          content: const Text(
+          content: Text(
             'Focus no usa el permiso normal de notificaciones.\n\n'
             'En Ajustes busca la lista "Acceso a No molestar" o "Acceso a la política de notificaciones" '
             'y activa el interruptor de Anythings Hub.\n\n'
@@ -67,11 +67,11 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Ahora no', style: TextStyle(color: HubColors.textoSecundario)),
+              child: Text('Ahora no', style: TextStyle(color: HubColors.textoSecundario)),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Abrir Ajustes', style: TextStyle(color: HubColors.pomelo)),
+              child: Text('Abrir Ajustes', style: TextStyle(color: HubColors.pomelo)),
             ),
           ],
         ),
@@ -105,7 +105,7 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
       backgroundColor: HubColors.panel,
-      content: Text(note, style: const TextStyle(color: HubColors.textoPrincipal)),
+      content: Text(note, style: TextStyle(color: HubColors.textoPrincipal)),
     ));
   }
 
@@ -116,34 +116,34 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Modos de rendimiento',
+        title: Text('Modos de rendimiento',
             style: TextStyle(color: HubColors.textoPrincipal, fontSize: 17)),
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
         actions: [
           IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _loading ? null : _refresh),
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: HubColors.pomelo))
+          ? Center(child: CircularProgressIndicator(color: HubColors.pomelo))
           : ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
                 _memoryCard(),
-                const SizedBox(height: 16),
-                const Text('Elige un modo',
+                SizedBox(height: 16),
+                Text('Elige un modo',
                     style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700, fontSize: 15)),
-                const SizedBox(height: 4),
-                const Text(
+                SizedBox(height: 4),
+                Text(
                   'Solo se cierran procesos en segundo plano innecesarios de apps de usuario. Nunca apps del sistema ni el proceso en primer plano.',
                   style: TextStyle(color: HubColors.textoSecundario, fontSize: 12, height: 1.35),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 for (final m in PerfMode.values) ...[
                   _modeTile(m),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                 ],
                 if (_gamePluginInstalled) ...[
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -151,7 +151,7 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: HubColors.linea),
                     ),
-                    child: const Row(children: [
+                    child: Row(children: [
                       Icon(Icons.extension_rounded, color: Color(0xFF5B8DEF), size: 22),
                       SizedBox(width: 10),
                       Expanded(
@@ -164,11 +164,11 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
                   ),
                 ],
                 if (_lastNote != null) ...[
-                  const SizedBox(height: 16),
-                  Text(_lastNote!, style: const TextStyle(color: HubColors.textoAcento, fontSize: 12)),
+                  SizedBox(height: 16),
+                  Text(_lastNote!, style: TextStyle(color: HubColors.textoAcento, fontSize: 12)),
                 ],
                 if (!_policyAccess) ...[
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   GradientPillButton(
                     label: 'Abrir acceso a No molestar (Focus)',
                     icon: Icons.notifications_off_outlined,
@@ -194,15 +194,15 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            const Icon(Icons.memory_rounded, color: HubColors.pomelo, size: 20),
-            const SizedBox(width: 8),
-            const Text('Memoria', style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700)),
+            Icon(Icons.memory_rounded, color: HubColors.pomelo, size: 20),
+            SizedBox(width: 8),
+            Text('Memoria', style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700)),
             const Spacer(),
             if (m != null)
               Text('${m.availMb} MB libres / ${m.totalMb} MB',
-                  style: const TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
+                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
           ]),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: LinearProgressIndicator(
@@ -213,7 +213,7 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
             ),
           ),
           if (m?.lowMemory == true) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             const Text('El sistema reporta memoria baja',
                 style: TextStyle(color: Colors.redAccent, fontSize: 11)),
           ],
@@ -261,17 +261,17 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
                 ),
                 child: Icon(icon, color: color, size: 22),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(children: [
                       Text(m.label,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: HubColors.textoPrincipal, fontWeight: FontWeight.w700, fontSize: 14.5)),
                       if (selected) ...[
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
@@ -283,14 +283,14 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
                         ),
                       ],
                     ]),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(m.description,
-                        style: const TextStyle(color: HubColors.textoSecundario, fontSize: 12, height: 1.35)),
+                        style: TextStyle(color: HubColors.textoSecundario, fontSize: 12, height: 1.35)),
                   ],
                 ),
               ),
               if (_applying && selected)
-                const SizedBox(
+                SizedBox(
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(strokeWidth: 2, color: HubColors.pomelo),
