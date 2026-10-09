@@ -61,7 +61,7 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
     await _store.saveReview(widget.app.packageName, review);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text('Reseña guardada en este dispositivo'),
         backgroundColor: HubColors.panel,
       ),
@@ -72,7 +72,7 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
     final ok = await DeviceAppsService.launch(widget.app.packageName);
     if (!ok && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo lanzar la aplicación')),
+        SnackBar(content: Text('No se pudo lanzar la aplicación')),
       );
     }
   }
@@ -85,7 +85,7 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Abre Ajustes del sistema → Apps para configurar'),
         ),
       );
@@ -97,19 +97,19 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: const Text('Desinstalar', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text('Desinstalar', style: TextStyle(color: HubColors.textoPrincipal)),
         content: Text(
           '¿Desinstalar ${widget.app.name}? Esta acción usa el desinstalador del sistema.',
-          style: const TextStyle(color: HubColors.textoSecundario),
+          style: TextStyle(color: HubColors.textoSecundario),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text('Cancelar'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Desinstalar', style: TextStyle(color: HubColors.pomelo)),
+            child: Text('Desinstalar', style: TextStyle(color: HubColors.pomelo)),
           ),
         ],
       ),
@@ -122,7 +122,7 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo iniciar la desinstalación')),
+        SnackBar(content: Text('No se pudo iniciar la desinstalación')),
       );
     }
   }
@@ -153,7 +153,7 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: HubColors.textoPrincipal),
+            icon: Icon(Icons.arrow_back, color: HubColors.textoPrincipal),
             onPressed: _popWithState,
           ),
         ),
@@ -173,27 +173,27 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                         color: HubColors.panel,
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      child: const Icon(Icons.android, size: 40, color: HubColors.textoSecundario),
+                      child: Icon(Icons.android, size: 40, color: HubColors.textoSecundario),
                     ),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Text(
               widget.app.name,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 color: HubColors.textoPrincipal,
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               widget.app.packageName,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+              style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
             ),
-            const SizedBox(height: 8),
-            const Row(
+            SizedBox(height: 8),
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.circle, size: 8, color: Color(0xFF3DDC84)),
@@ -201,7 +201,7 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                 Text('Instalada', style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
@@ -212,19 +212,19 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                     onPressed: _launch,
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _ActionIcon(
                   icon: Icons.settings_outlined,
                   label: 'Ajustes',
                   onTap: _openSettings,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _ActionIcon(
                   icon: Icons.delete_outline,
                   label: 'Desinstalar',
                   onTap: _uninstall,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _ActionIcon(
                   icon: _bookmarked ? Icons.star_rounded : Icons.star_outline_rounded,
                   label: 'Guardar',
@@ -233,12 +233,12 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
             HubPanel(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Icon(Icons.rate_review_outlined, size: 18, color: HubColors.textoSecundario),
                       SizedBox(width: 8),
@@ -252,59 +252,59 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  const Text(
+                  SizedBox(height: 4),
+                  Text(
                     'Tu evaluación privada de esta app',
                     style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   _SliderRow(
                     icon: Icons.speed,
                     label: 'Rendimiento',
                     value: _performance,
                     onChanged: (v) => setState(() => _performance = v),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _SliderRow(
                     icon: Icons.shield_outlined,
                     label: 'Privacidad',
                     value: _privacy,
                     onChanged: (v) => setState(() => _privacy = v),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   TextField(
                     controller: _noteCtrl,
                     maxLength: 120,
                     maxLines: 2,
-                    style: const TextStyle(color: HubColors.textoPrincipal),
+                    style: TextStyle(color: HubColors.textoPrincipal),
                     decoration: InputDecoration(
                       hintText: 'Escribe tu opinión personal…',
-                      hintStyle: const TextStyle(color: HubColors.textoSecundario),
+                      hintStyle: TextStyle(color: HubColors.textoSecundario),
                       filled: true,
                       fillColor: HubColors.fondoPrincipal,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(radius12),
-                        borderSide: const BorderSide(color: HubColors.linea),
+                        borderSide: BorderSide(color: HubColors.linea),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(radius12),
-                        borderSide: const BorderSide(color: HubColors.linea),
+                        borderSide: BorderSide(color: HubColors.linea),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: _saveReview,
-                      child: const Text('Guardar reseña', style: TextStyle(color: HubColors.pomelo)),
+                      child: Text('Guardar reseña', style: TextStyle(color: HubColors.pomelo)),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            const Center(
+            SizedBox(height: 16),
+            Center(
               child: Text(
                 'Solo en este dispositivo',
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
@@ -322,13 +322,13 @@ class _ActionIcon extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
-    this.color = HubColors.textoSecundario,
+    this.color,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -344,11 +344,11 @@ class _ActionIcon extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: color, size: 22),
-              const SizedBox(height: 2),
+              Icon(icon, color: color ?? HubColors.textoSecundario, size: 22),
+              SizedBox(height: 2),
               Text(
                 label,
-                style: const TextStyle(color: HubColors.textoSecundario, fontSize: 10),
+                style: TextStyle(color: HubColors.textoSecundario, fontSize: 10),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -378,10 +378,10 @@ class _SliderRow extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, size: 18, color: HubColors.textoSecundario),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         SizedBox(
           width: 88,
-          child: Text(label, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+          child: Text(label, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
         ),
         Expanded(
           child: SliderTheme(
@@ -402,7 +402,7 @@ class _SliderRow extends StatelessWidget {
         ),
         Text(
           value.toStringAsFixed(1),
-          style: const TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
+          style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
         ),
       ],
     );
