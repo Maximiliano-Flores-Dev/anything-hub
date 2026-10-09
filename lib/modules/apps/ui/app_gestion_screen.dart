@@ -193,11 +193,11 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
               style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
             ),
             const SizedBox(height: 8),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.circle, size: 8, color: Color(0xFF3DDC84)),
-                SizedBox(width: 6),
+                const Icon(Icons.circle, size: 8, color: Color(0xFF3DDC84)),
+                const SizedBox(width: 6),
                 Text('Instalada', style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
               ],
             ),
@@ -238,10 +238,10 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Icon(Icons.rate_review_outlined, size: 18, color: HubColors.textoSecundario),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         'Reseña local',
                         style: TextStyle(

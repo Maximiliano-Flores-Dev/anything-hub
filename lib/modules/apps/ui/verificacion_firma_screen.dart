@@ -120,7 +120,7 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                     children: [
                       Icon(Icons.lock_outline, color: HubColors.textoAcento, size: 20),
                       const SizedBox(width: 10),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Oráculo local',
                           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
@@ -182,10 +182,10 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                     _result?.status == SignatureStatus.error) ...[
                   const SizedBox(height: 16),
                   HubPanel(
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.cancel_outlined, color: Color(0xFFE53935)),
-                        SizedBox(width: 10),
+                        const Icon(Icons.cancel_outlined, color: Color(0xFFE53935)),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             'No se pudo verificar. Puedes forzar bajo tu responsabilidad.',

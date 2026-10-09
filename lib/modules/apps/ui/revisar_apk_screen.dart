@@ -193,7 +193,7 @@ class RevisarApkScreen extends StatelessWidget {
           ),
           if (report.trackingSdks.isNotEmpty) ...[
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'SDKs DE RASTREO DETECTADOS',
               style: TextStyle(
                 color: HubColors.textoSecundario,
@@ -271,7 +271,7 @@ class RevisarApkScreen extends StatelessWidget {
               children: [
                 Icon(Icons.gavel, color: HubColors.pomelo.withOpacity(0.9), size: 22),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
