@@ -90,7 +90,7 @@ class WebArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Icon(Icons.public_rounded, size: 48, color: Color(0xFF5B8DEF));
+    return Icon(Icons.public_rounded, size: 48, color: HubColors.pomelo);
   }
 }
 
@@ -99,7 +99,7 @@ class FavoritesArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Icon(Icons.favorite_rounded, size: 44, color: Color(0xFFE85D75));
+    return Icon(Icons.star_rounded, size: 48, color: HubColors.amarillo);
   }
 }
 
@@ -108,7 +108,7 @@ class FilesArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Icon(Icons.folder_copy_outlined, size: 46, color: Color(0xFFF2B531));
+    return Icon(Icons.folder_open_rounded, size: 48, color: HubColors.textoAcento);
   }
 }
 
@@ -117,32 +117,6 @@ class PerformanceArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 78,
-      height: 52,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _chip('CPU', HubColors.pomelo),
-          const SizedBox(width: 6),
-          _chip('GPU', const Color(0xFF5B8DEF)),
-        ],
-      ),
-    );
-  }
-
-  Widget _chip(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.5)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700),
-      ),
-    );
+    return Icon(Icons.speed_rounded, size: 48, color: HubColors.pomelo);
   }
 }

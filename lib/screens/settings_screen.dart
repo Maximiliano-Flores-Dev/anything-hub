@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/hub_colors.dart';
+import 'macro_customization_tab.dart';
 import '../modules/plugins/plugin_models.dart';
 import '../modules/plugins/plugin_service.dart';
 import '../modules/projects/services/project_fs_service.dart';
@@ -36,7 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 2, vsync: this);
+    _tabs = TabController(length: 3, vsync: this);
     _bootstrap();
   }
 
@@ -111,7 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           ok
               ? 'Plugin «${entry.manifest.name}» instalado en .anythinghub/plugins/'
               : 'No se pudo instalar el plugin',
-          style: const TextStyle(color: HubColors.textoPrincipal),
+          style: TextStyle(color: HubColors.textoPrincipal),
         ),
       ),
     );
@@ -123,16 +124,16 @@ class _SettingsScreenState extends State<SettingsScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: const Text('Desinstalar plugin',
+        title: Text('Desinstalar plugin',
             style: TextStyle(color: HubColors.textoPrincipal)),
         content: Text(
           'Se eliminará «${entry.manifest.name}» de .anythinghub/plugins/. Solo se borran metadatos locales.',
-          style: const TextStyle(color: HubColors.textoSecundario),
+          style: TextStyle(color: HubColors.textoSecundario),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar',
+            child: Text('Cancelar',
                 style: TextStyle(color: HubColors.textoSecundario)),
           ),
           ElevatedButton(
@@ -156,8 +157,8 @@ class _SettingsScreenState extends State<SettingsScreen>
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
-        title: const Text(
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
+        title: Text(
           'Configuración',
           style: TextStyle(
               color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
@@ -169,6 +170,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           unselectedLabelColor: HubColors.textoSecundario,
           tabs: const [
             Tab(text: 'General'),
+            Tab(text: 'Personalización'),
             Tab(text: 'Plugins'),
           ],
         ),
@@ -177,6 +179,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         controller: _tabs,
         children: [
           _buildGeneral(),
+          const MacroCustomizationTab(),
           _buildPlugins(),
         ],
       ),
@@ -203,13 +206,13 @@ class _SettingsScreenState extends State<SettingsScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: HubColors.textoPrincipal,
                       fontWeight: FontWeight.w600,
                       fontSize: 13)),
               const SizedBox(height: 2),
               Text(subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: HubColors.textoSecundario, fontSize: 12)),
               const SizedBox(height: 2),
               Text(
@@ -228,7 +231,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         IconButton(
           tooltip: 'Abrir ajustes del sistema',
           onPressed: onOpen,
-          icon: const Icon(Icons.open_in_new, size: 18, color: HubColors.textoAcento),
+          icon: Icon(Icons.open_in_new, size: 18, color: HubColors.textoAcento),
         ),
       ],
     );
@@ -243,7 +246,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Raíz .anythinghub',
                 style: TextStyle(
                     color: HubColors.textoSecundario, fontSize: 12),
@@ -251,11 +254,11 @@ class _SettingsScreenState extends State<SettingsScreen>
               const SizedBox(height: 4),
               Text(
                 _hubPath ?? '…',
-                style: const TextStyle(
+                style: TextStyle(
                     color: HubColors.textoPrincipal, fontSize: 13),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Subcarpetas: cache/, config/, logs/, projects/, plugins/',
                 style: TextStyle(
                     color: HubColors.textoSecundario, fontSize: 12),
@@ -266,7 +269,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         const SizedBox(height: 20),
         _sectionTitle('Seguridad'),
         _card(
-          child: const Text(
+          child: Text(
             'Los plugins se instalan solo como metadatos JSON en el dispositivo. '
             'Anythings Hub no ejecuta código remoto ni carga Dex/so dinámicos. '
             'Sin telemetría. Local-first.',
@@ -285,7 +288,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: HubColors.pomelo,
+                        color: Color(0xFFFF6B35),
                       ),
                     ),
                   ),
@@ -302,7 +305,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                         await _refreshPermissions();
                       },
                     ),
-                    const Divider(color: HubColors.linea, height: 20),
+                    Divider(color: HubColors.linea, height: 20),
                     _permRow(
                       'Acceso a datos de uso',
                       'Ordenar apps por uso frecuente',
@@ -313,7 +316,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                         await _refreshPermissions();
                       },
                     ),
-                    const Divider(color: HubColors.linea, height: 20),
+                    Divider(color: HubColors.linea, height: 20),
                     _permRow(
                       'No molestar / Focus',
                       'Silenciar notificaciones de terceros',
@@ -324,7 +327,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                         await _refreshPermissions();
                       },
                     ),
-                    const Divider(color: HubColors.linea, height: 20),
+                    Divider(color: HubColors.linea, height: 20),
                     _permRow(
                       'Notificaciones propias',
                       'Avisos del modo rendimiento (Android 13+)',
@@ -340,8 +343,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed: _refreshPermissions,
-                        icon: const Icon(Icons.refresh, size: 18, color: HubColors.textoAcento),
-                        label: const Text('Actualizar',
+                        icon: Icon(Icons.refresh, size: 18, color: HubColors.textoAcento),
+                        label: Text('Actualizar',
                             style: TextStyle(color: HubColors.textoAcento)),
                       ),
                     ),
@@ -351,14 +354,14 @@ class _SettingsScreenState extends State<SettingsScreen>
         const SizedBox(height: 20),
         _sectionTitle('Acerca de'),
         _card(
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Anythings Hub',
                   style: TextStyle(
                       color: HubColors.textoPrincipal,
                       fontWeight: FontWeight.w700)),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 'Hub local para apps, archivos y proyectos. Sin telemetría.',
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
@@ -381,14 +384,14 @@ class _SettingsScreenState extends State<SettingsScreen>
         children: [
           _sectionTitle('Instalados (${_installed.length})'),
           if (_loadingInstalled)
-            const Padding(
-              padding: EdgeInsets.all(24),
+            Padding(
+              padding: const EdgeInsets.all(24),
               child: Center(
                   child: CircularProgressIndicator(color: HubColors.pomelo)),
             )
           else if (_installed.isEmpty)
             _card(
-              child: const Text(
+              child: Text(
                 'Ningún plugin instalado. Explora el catálogo abajo.',
                 style:
                     TextStyle(color: HubColors.textoSecundario, fontSize: 13),
@@ -403,19 +406,19 @@ class _SettingsScreenState extends State<SettingsScreen>
               IconButton(
                 tooltip: 'Actualizar catálogo',
                 onPressed: _loadingCatalog ? null : _loadCatalog,
-                icon: const Icon(Icons.refresh_rounded,
+                icon: Icon(Icons.refresh_rounded,
                     color: HubColors.pomelo),
               ),
             ],
           ),
-          const Text(
+          Text(
             'Fuente: plugins/catalog.json del repositorio oficial. Solo metadatos.',
             style: TextStyle(color: HubColors.textoSecundario, fontSize: 11.5),
           ),
           const SizedBox(height: 8),
           if (_loadingCatalog)
-            const Padding(
-              padding: EdgeInsets.all(24),
+            Padding(
+              padding: const EdgeInsets.all(24),
               child: Center(
                   child: CircularProgressIndicator(color: HubColors.pomelo)),
             )
@@ -425,7 +428,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(_error!,
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: HubColors.textoSecundario, fontSize: 13)),
                   const SizedBox(height: 12),
                   GradientPillButton(
@@ -460,7 +463,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                     color: HubColors.pomelo.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.extension_rounded,
+                  child: Icon(Icons.extension_rounded,
                       color: HubColors.pomelo, size: 22),
                 ),
                 const SizedBox(width: 12),
@@ -469,13 +472,13 @@ class _SettingsScreenState extends State<SettingsScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(m.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: HubColors.textoPrincipal,
                               fontWeight: FontWeight.w700,
                               fontSize: 14.5)),
                       Text(
                         'v${m.version}${m.author.isNotEmpty ? ' · ${m.author}' : ''}',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: HubColors.textoSecundario, fontSize: 11.5),
                       ),
                     ],
@@ -500,14 +503,14 @@ class _SettingsScreenState extends State<SettingsScreen>
             if (m.description.isNotEmpty) ...[
               const SizedBox(height: 10),
               Text(m.description,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: HubColors.textoSecundario, fontSize: 12.5)),
             ],
             if (m.permissions.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
                 'Permisos declarados: ${m.permissions.join(', ')}',
-                style: const TextStyle(
+                style: TextStyle(
                     color: HubColors.textoAcento, fontSize: 11),
               ),
             ],
@@ -547,7 +550,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         padding: const EdgeInsets.only(bottom: 8),
         child: Text(
           t,
-          style: const TextStyle(
+          style: TextStyle(
             color: HubColors.textoPrincipal,
             fontWeight: FontWeight.w700,
             fontSize: 14,
