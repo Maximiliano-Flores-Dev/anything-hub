@@ -19,8 +19,8 @@ class AnalisisComplementarioScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
-        title: const Text(
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
+        title: Text(
           'Análisis complementario',
           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
         ),
@@ -28,16 +28,16 @@ class AnalisisComplementarioScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          const Text(
+          Text(
             'Verifica la integridad y seguridad del APK de forma adicional.',
             style: TextStyle(color: HubColors.textoSecundario, fontSize: 14),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           HubPanel(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.fingerprint, color: HubColors.textoSecundario, size: 20),
                     SizedBox(width: 8),
@@ -50,12 +50,12 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                const Text(
+                SizedBox(height: 4),
+                Text(
                   'Identificador único del APK analizado.',
                   style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
@@ -66,14 +66,14 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                   ),
                   child: SelectableText(
                     '$hash\n(SHA-256)',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: HubColors.textoPrincipal,
                       fontSize: 12,
                       fontFamily: 'monospace',
                     ),
                   ),
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -90,20 +90,20 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                         : () {
                             Clipboard.setData(ClipboardData(text: report.sha256!));
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Hash copiado')),
+                              SnackBar(content: Text('Hash copiado')),
                             );
                           },
                     icon: const Icon(Icons.copy),
-                    label: const Text('Copiar hash'),
+                    label: Text('Copiar hash'),
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
                       foregroundColor: HubColors.textoPrincipal,
-                      side: const BorderSide(color: HubColors.linea),
+                      side: BorderSide(color: HubColors.linea),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(radius12),
@@ -111,24 +111,24 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                     ),
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                        SnackBar(
                           content: Text('Exportar APK: conectar con FileProvider'),
                         ),
                       );
                     },
                     icon: const Icon(Icons.file_upload_outlined),
-                    label: const Text('Exportar APK'),
+                    label: Text('Exportar APK'),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           HubPanel(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.menu_book_outlined, color: HubColors.textoSecundario, size: 20),
                     SizedBox(width: 8),
@@ -141,23 +141,23 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                const Text(
+                SizedBox(height: 12),
+                Text(
                   'Este análisis es opcional y no afecta la instalación. '
                   'Puedes verificar el APK manualmente para mayor confianza:',
                   style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 _step('1', 'Sube el APK a VirusTotal (virustotal.com) para escanearlo en la nube.'),
                 _step('2', 'O escanea el APK con tu antivirus local de confianza.'),
                 _step('3', 'Revisa los resultados y decide si deseas instalarlo.'),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           HubPanel(
             padding: const EdgeInsets.all(12),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.info_outline, color: HubColors.textoAcento, size: 18),
                 SizedBox(width: 10),
@@ -191,16 +191,16 @@ class AnalisisComplementarioScreen extends StatelessWidget {
             ),
             child: Text(
               n,
-              style: const TextStyle(
+              style: TextStyle(
                 color: HubColors.pomelo,
                 fontWeight: FontWeight.w700,
                 fontSize: 12,
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
-            child: Text(text, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+            child: Text(text, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
           ),
         ],
       ),
