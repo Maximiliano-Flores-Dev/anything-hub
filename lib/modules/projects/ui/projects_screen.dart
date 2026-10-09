@@ -61,26 +61,26 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           builder: (ctx, setLocal) {
             return AlertDialog(
               backgroundColor: HubColors.panel,
-              title: const Text('Nuevo proyecto', style: TextStyle(color: HubColors.textoPrincipal)),
+              title: Text('Nuevo proyecto', style: TextStyle(color: HubColors.textoPrincipal)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: nameCtrl,
                     autofocus: true,
-                    style: const TextStyle(color: HubColors.textoPrincipal),
+                    style: TextStyle(color: HubColors.textoPrincipal),
                     decoration: InputDecoration(
                       hintText: 'Nombre del proyecto',
                       hintStyle: TextStyle(color: HubColors.textoSecundario.withOpacity(0.7)),
                       enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
-                      focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
+                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     value: selectedEditor,
                     dropdownColor: HubColors.panel,
-                    style: const TextStyle(color: HubColors.textoPrincipal),
+                    style: TextStyle(color: HubColors.textoPrincipal),
                     items: const [
                       DropdownMenuItem(value: 'acode', child: Text('Acode')),
                       DropdownMenuItem(value: 'markor', child: Text('Markor')),
@@ -96,7 +96,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+                  child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
                 ),
                 TextButton(
                   onPressed: () {
@@ -104,7 +104,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     if (name.isEmpty) return;
                     Navigator.pop(ctx, {'name': name, 'editor': selectedEditor});
                   },
-                  child: const Text('Crear', style: TextStyle(color: HubColors.pomelo)),
+                  child: Text('Crear', style: TextStyle(color: HubColors.pomelo)),
                 ),
               ],
             );
@@ -171,8 +171,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: const Text('Desinstalar módulo', style: TextStyle(color: HubColors.textoPrincipal)),
-        content: const Text(
+        title: Text('Desinstalar módulo', style: TextStyle(color: HubColors.textoPrincipal)),
+        content: Text(
           'Se eliminará completamente .anythinghub/ y todos los proyectos.',
           style: TextStyle(color: HubColors.textoSecundario),
         ),
@@ -191,8 +191,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: const Text('Confirmación final', style: TextStyle(color: HubColors.textoPrincipal)),
-        content: const Text(
+        title: Text('Confirmación final', style: TextStyle(color: HubColors.textoPrincipal)),
+        content: Text(
           '¿Estás seguro? Se borrará todo el módulo de proyectos.',
           style: TextStyle(color: HubColors.textoSecundario),
         ),
@@ -220,8 +220,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       appBar: AppBar(
         backgroundColor: HubColors.fondoSidebar,
         elevation: 0,
-        title: const Text('Proyectos', style: TextStyle(color: HubColors.textoPrincipal)),
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
+        title: Text('Proyectos', style: TextStyle(color: HubColors.textoPrincipal)),
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
         actions: [
           IconButton(
             icon: const Icon(Icons.code_rounded),
@@ -259,7 +259,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   break;
               }
             },
-            itemBuilder: (_) => const [
+            itemBuilder: (_) => [
               PopupMenuItem(
                 value: 'docs',
                 child: Text('Documentación', style: TextStyle(color: HubColors.textoPrincipal)),
@@ -279,9 +279,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         child: const Icon(Icons.add),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: HubColors.pomelo))
+          ? Center(child: CircularProgressIndicator(color: HubColors.pomelo))
           : _error != null
-              ? Center(child: Text(_error!, style: const TextStyle(color: Colors.redAccent)))
+              ? Center(child: Text(_error!, style: TextStyle(color: Colors.redAccent)))
               : _projects.isEmpty
                   ? Center(
                       child: Column(
@@ -289,11 +289,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         children: [
                           Icon(Icons.folder_open_rounded,
                               size: 56, color: HubColors.textoSecundario.withOpacity(0.5)),
-                          const SizedBox(height: 12),
-                          const Text('No hay proyectos todavía',
+                          SizedBox(height: 12),
+                          Text('No hay proyectos todavía',
                               style: TextStyle(color: HubColors.textoSecundario, fontSize: 15)),
-                          const SizedBox(height: 6),
-                          const Text('Toca + para crear el primero',
+                          SizedBox(height: 6),
+                          Text('Toca + para crear el primero',
                               style: TextStyle(color: HubColors.textoAcento, fontSize: 13)),
                         ],
                       ),
@@ -304,7 +304,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       child: ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
                         itemCount: _projects.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        separatorBuilder: (_, __) => SizedBox(height: 10),
                         itemBuilder: (context, i) {
                           final p = _projects[i];
                           return Container(
@@ -326,14 +326,14 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                 child: const Icon(Icons.code_rounded, color: Colors.white, size: 22),
                               ),
                               title: Text(p.name,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: HubColors.textoPrincipal, fontWeight: FontWeight.w600)),
                               subtitle: Text(
                                 p.tags.isEmpty ? p.editor : '${p.editor} · ${p.tags.join(' · ')}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: HubColors.textoSecundario, fontSize: 12.5),
                               ),
-                              trailing: const Icon(Icons.chevron_right_rounded,
+                              trailing: Icon(Icons.chevron_right_rounded,
                                   color: HubColors.textoSecundario),
                               onTap: () => _openProject(p),
                             ),
