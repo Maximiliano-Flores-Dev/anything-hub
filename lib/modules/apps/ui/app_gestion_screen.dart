@@ -61,8 +61,8 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
     await _store.saveReview(widget.app.packageName, review);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Reseña guardada en este dispositivo'),
+      SnackBar(
+        content: const Text('Reseña guardada en este dispositivo'),
         backgroundColor: HubColors.panel,
       ),
     );
@@ -322,13 +322,13 @@ class _ActionIcon extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
-    this.color = HubColors.textoSecundario,
+    this.color,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -344,11 +344,11 @@ class _ActionIcon extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: color, size: 22),
+              Icon(icon, color: color ?? HubColors.textoSecundario, size: 22),
               const SizedBox(height: 2),
               Text(
                 label,
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 10),
+                style: TextStyle(color: color ?? HubColors.textoSecundario, fontSize: 10),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
