@@ -259,12 +259,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   break;
               }
             },
-            itemBuilder: (_) => const [
+            itemBuilder: (_) => [
               PopupMenuItem(
                 value: 'docs',
                 child: Text('Documentación', style: TextStyle(color: HubColors.textoPrincipal)),
               ),
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 'uninstall',
                 child: Text('Desinstalar módulo', style: TextStyle(color: Colors.redAccent)),
               ),
