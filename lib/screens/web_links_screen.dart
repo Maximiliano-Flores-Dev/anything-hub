@@ -588,9 +588,9 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
   }
 
   InputDecoration _decoration(String label, String hint, {String? helper, String? error}) {
-    line = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea));
-    focus = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo));
-    warn = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomeloSuave));
+    final line = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea));
+    final focus = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo));
+    final warn = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomeloSuave));
     return InputDecoration(
       labelText: label,
       hintText: hint,
