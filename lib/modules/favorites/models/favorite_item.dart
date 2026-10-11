@@ -30,7 +30,6 @@ extension FavoriteTypeLabel on FavoriteType {
     }
   }
 
-  /// Orden de secciones por defecto.
   int get sectionOrder {
     switch (this) {
       case FavoriteType.app:
@@ -55,6 +54,7 @@ class FavoriteItem {
     this.packageName,
     this.url,
     this.path,
+    this.isDirectory = false,
   });
 
   final FavoriteType type;
@@ -69,15 +69,18 @@ class FavoriteItem {
   /// Ícono real de la app (PNG) cuando type == app.
   final Uint8List? iconBytes;
 
-  // Datos de acción según tipo
   final String? packageName;
   final String? url;
   final String? path;
 
-  /// Clave usada para timestamps en SharedPreferences.
+  /// Solo relevante para type == file.
+  final bool isDirectory;
+
   String get metaKey => '${type.name}:$id';
 
-  FavoriteItem copyWith({DateTime? favoritedAt}) {
+  bool get hasKnownDate => favoritedAt.millisecondsSinceEpoch > 0;
+
+  FavoriteItem copyWith({DateTime? favoritedAt, bool? isDirectory}) {
     return FavoriteItem(
       type: type,
       id: id,
@@ -88,16 +91,16 @@ class FavoriteItem {
       packageName: packageName,
       url: url,
       path: path,
+      isDirectory: isDirectory ?? this.isDirectory,
     );
   }
 }
 
-/// Opciones de ordenación de la lista de favoritos.
+/// Ordenación (sin el antiguo "Por tipo", que ahora es filtro).
 enum FavoriteSort {
-  alphaAsc,   // A → 9
-  recent,     // más reciente primero
-  oldest,     // más antiguo primero
-  byType,     // solo reordena secciones (orden fijo de tipos)
+  alphaAsc,
+  recent,
+  oldest,
 }
 
 extension FavoriteSortLabel on FavoriteSort {
@@ -109,8 +112,6 @@ extension FavoriteSortLabel on FavoriteSort {
         return 'Recientes';
       case FavoriteSort.oldest:
         return 'Antiguos';
-      case FavoriteSort.byType:
-        return 'Por tipo';
     }
   }
 }
