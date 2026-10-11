@@ -20,6 +20,7 @@ import '../modules/apps/ui/apk_incoming_sheet.dart';
 import '../modules/favorites/ui/favorites_screen.dart';
 import 'file_explorer_screen.dart';
 import 'settings_screen.dart';
+import '../ui/groups/group_editor_sheet.dart';
 import 'web_links_screen.dart';
 import 'performance_modes_screen.dart';
 
@@ -153,11 +154,15 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       final data = jsonDecode(raw) as Map<String, dynamic>;
       final groups = (data['groups'] as List<dynamic>? ?? []).map((g) {
         final m = g as Map<String, dynamic>;
+        final colorRaw = m['colorArgb'];
         return AppGroup(
           m['label'] as String,
           <HubApp>[],
           isCustom: true,
           packages: List<String>.from(m['packages'] as List<dynamic>? ?? []),
+          colorArgb: colorRaw is int
+              ? colorRaw
+              : (colorRaw is num ? colorRaw.toInt() : null),
         );
       }).toList();
       if (!mounted) return;
@@ -175,7 +180,11 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       'consent': _consent,
       'groups': [
         for (final g in _appGroups.where((g) => g.isCustom))
-          {'label': g.label, 'packages': g.packages},
+          {
+            'label': g.label,
+            'packages': g.packages,
+            if (g.colorArgb != null) 'colorArgb': g.colorArgb,
+          },
       ],
     });
     return DeviceAppsService.saveState(json);
@@ -377,10 +386,130 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
   }
 
   void _onFabAction(RadialAction action) {
-    if (action.id == 'folder') {
-    } else if (action.id == 'scan_device') {
-      _requestDeviceAppsAndScan();
+    switch (action.id) {
+      case 'settings':
+        setState(() => _tab = 3);
+        break;
+      case 'scan_device':
+        _requestDeviceAppsAndScan();
+        break;
+      case 'folder':
+        _openCreateGroup();
+        break;
+      case 'add_app':
+        _openAddAppToGroup();
+        break;
     }
+  }
+
+  Future<void> _openCreateGroup() async {
+    final result = await showGroupEditorSheet(
+      context: context,
+      catalog: _catalog,
+      title: 'Nuevo grupo',
+    );
+    if (result == null || result.delete || !mounted) return;
+    final group = AppGroup(
+      result.label!,
+      <HubApp>[],
+      isCustom: true,
+      packages: List<String>.from(result.packages ?? const []),
+      colorArgb: result.colorArgb,
+    );
+    setState(() {
+      _appGroups = [..._appGroups, group];
+      _rebuildGroups();
+    });
+    await _saveState();
+  }
+
+  Future<void> _openEditGroup(AppGroup group) async {
+    if (!group.isCustom) return;
+    final result = await showGroupEditorSheet(
+      context: context,
+      catalog: _catalog,
+      existing: group,
+      title: 'Editar grupo',
+    );
+    if (result == null || !mounted) return;
+    if (result.delete) {
+      setState(() {
+        _appGroups.remove(group);
+        _rebuildGroups();
+      });
+      await _saveState();
+      return;
+    }
+    setState(() {
+      group.label = result.label!;
+      group.packages
+        ..clear()
+        ..addAll(result.packages ?? const []);
+      group.colorArgb = result.colorArgb;
+      _rebuildGroups();
+    });
+    await _saveState();
+  }
+
+  /// FAB «Añadir App»: elegir un grupo existente y sumar apps a él.
+  Future<void> _openAddAppToGroup() async {
+    final customs = _appGroups.where((g) => g.isCustom).toList();
+    if (customs.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Crea un grupo primero (FAB → Nuevo Grupo)',
+            style: TextStyle(color: HubColors.textoPrincipal),
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: HubColors.panel,
+        ),
+      );
+      return;
+    }
+    final target = await showModalBottomSheet<AppGroup>(
+      context: context,
+      backgroundColor: HubColors.panel,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+              child: Text(
+                'Añadir apps a…',
+                style: TextStyle(
+                  color: HubColors.textoPrincipal,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            for (final g in customs)
+              ListTile(
+                leading: CircleAvatar(
+                  radius: 12,
+                  backgroundColor: g.color ?? HubColors.pomelo,
+                ),
+                title: Text(g.label, style: TextStyle(color: HubColors.textoPrincipal)),
+                subtitle: Text(
+                  '${g.packages.length} apps',
+                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                ),
+                onTap: () => Navigator.pop(ctx, g),
+              ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+    if (target == null || !mounted) return;
+    await _openEditGroup(target);
   }
 
   void _onCardTap(String cardId) {
@@ -419,6 +548,7 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
             appGroups: _appGroups,
             onActionSelected: _onFabAction,
             onAppTap: _launchApp,
+            onEditGroup: _openEditGroup,
           )
         : null;
 
