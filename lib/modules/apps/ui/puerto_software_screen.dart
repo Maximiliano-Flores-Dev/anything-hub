@@ -227,7 +227,7 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
             child: ListView.separated(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
               itemCount: _visible.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, __) => SizedBox(height: 10),
               itemBuilder: (context, i) => _card(_visible[i]),
             ),
           ),
@@ -284,18 +284,18 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
                   _badge(e.trust),
                 ],
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 e.publisher,
                 style: TextStyle(color: HubColors.textoAcento, fontSize: 12),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 e.summary,
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
               if (e.packageName != null) ...[
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Text(
                   e.packageName!,
                   style: TextStyle(
@@ -305,7 +305,7 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
                   ),
                 ),
               ],
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 e.sha256 == null
                     ? 'SHA-256 no fijado aquí. Compara el hash con la web del proyecto antes de instalar.'
@@ -424,7 +424,7 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
     if (!mounted) return;
     if (apkUrl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se encontró un APK https en el release.')),
+        SnackBar(content: Text('No se encontró un APK https en el release.')),
       );
       return;
     }

@@ -59,22 +59,22 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
-        title: const Text(
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
+        title: Text(
           'Verificación de firma',
           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: HubColors.pomelo))
+          ? Center(child: CircularProgressIndicator(color: HubColors.pomelo))
           : ListView(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
               children: [
-                const Text(
+                Text(
                   'Comprobando la autenticidad de la aplicación',
                   style: TextStyle(color: HubColors.textoSecundario, fontSize: 14),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 Center(
                   child: Icon(
                     Icons.verified_user,
@@ -85,16 +85,16 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                         : const Color(0xFF3DDC84),
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 if (_result != null) ..._statusBlocks(_result!),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 HubPanel(
                   child: Column(
                     children: [
                       _kv('Paquete', widget.packageName),
-                      const Divider(color: HubColors.linea),
+                      Divider(color: HubColors.linea),
                       _kv('Versión', widget.versionLabel),
-                      const Divider(color: HubColors.linea),
+                      Divider(color: HubColors.linea),
                       _kv(
                         'Certificado (SHA-256)',
                         widget.certSha256 ?? '—',
@@ -103,13 +103,13 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 HubPanel(
                   child: Row(
                     children: [
-                      const Icon(Icons.lock_outline, color: HubColors.textoAcento, size: 20),
-                      const SizedBox(width: 10),
-                      const Expanded(
+                      Icon(Icons.lock_outline, color: HubColors.textoAcento, size: 20),
+                      SizedBox(width: 10),
+                      Expanded(
                         child: Text(
                           'Certificate Pinning',
                           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
@@ -133,11 +133,39 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                     ],
                   ),
                 ),
+                if (_result?.status == SignatureStatus.verified ||
+                    _result?.status == SignatureStatus.cacheHit) ...[
+                  SizedBox(height: 16),
+                  GradientPillButton(
+                    label: 'Fijar certificado (pin local)',
+                    icon: Icons.push_pin_outlined,
+                    onPressed: () async {
+                      final cert = _result?.certSha256;
+                      if (cert == null || cert.isEmpty) return;
+                      await SignatureOracleService.pinPackage(
+                        widget.packageName,
+                        cert,
+                      );
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Pin local guardado (TTL 90 días)'),
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 12),
+                  GradientPillButton(
+                    label: 'Continuar',
+                    icon: Icons.check,
+                    onPressed: () => Navigator.of(context).pop(true),
+                  ),
+                ],
                 if (_result?.status == SignatureStatus.unverified ||
                     _result?.status == SignatureStatus.error) ...[
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   HubPanel(
-                    child: const Row(
+                    child: Row(
                       children: [
                         Icon(Icons.cancel_outlined, color: Color(0xFFE53935)),
                         SizedBox(width: 10),
@@ -150,7 +178,7 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   GradientPillButton(
                     label: 'Continuar sin verificación',
                     icon: Icons.shield_outlined,
@@ -170,12 +198,12 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
           child: Row(
             children: [
               const Icon(Icons.check_circle, color: Color(0xFF3DDC84)),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Certificado coincide con el oráculo',
                       style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
                     ),
@@ -183,7 +211,34 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                       r.status == SignatureStatus.cacheHit
                           ? 'Verificación exitosa (caché)'
                           : 'Verificación exitosa',
-                      style: const TextStyle(color: Color(0xFF3DDC84), fontSize: 12),
+                      style: TextStyle(color: Color(0xFF3DDC84), fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    if (r.status == SignatureStatus.unverified || r.status == SignatureStatus.error) {
+      widgets.add(
+        HubPanel(
+          child: Row(
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Color(0xFFE53935)),
+              SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Firma no verificada',
+                      style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      r.message ?? 'No se pudo confirmar autenticidad',
+                      style: TextStyle(color: Color(0xFFE53935), fontSize: 12),
                     ),
                   ],
                 ),
@@ -194,17 +249,17 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
       );
     }
     if (r.status == SignatureStatus.cacheHit && r.cacheAgeDays != null) {
-      widgets.add(const SizedBox(height: 10));
+      widgets.add(SizedBox(height: 10));
       widgets.add(
         HubPanel(
           child: Row(
             children: [
-              const Icon(Icons.wifi_off, color: HubColors.amarillo),
-              const SizedBox(width: 10),
+              Icon(Icons.wifi_off, color: HubColors.amarillo),
+              SizedBox(width: 10),
               Expanded(
                 child: Text(
                   'Sin red, usando caché de ${r.cacheAgeDays} días\n${r.message ?? ''}',
-                  style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                 ),
               ),
             ],
@@ -223,7 +278,7 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
         children: [
           SizedBox(
             width: 120,
-            child: Text(k, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+            child: Text(k, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
           ),
           Expanded(
             child: Text(

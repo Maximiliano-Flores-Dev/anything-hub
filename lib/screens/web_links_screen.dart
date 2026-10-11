@@ -70,8 +70,8 @@ class WebLinkItem {
 }
 
 abstract final class WebLinkParser {
-  static final RegExp _markdown = RegExp(r'^\s*\[([^\]]*)\]\(\s*([^)\s]+)\s*\)\s*$');
-  static final RegExp _hasScheme = RegExp(r'^[a-zA-Z][a-zA-Z0-9+.\-]*://');
+  static final RegExp _markdown = RegExp(r'^\\s*\\[([^\\]]*)\\]\\(\\s*([^)\\s]+)\\s*\\)\\s*$');
+  static final RegExp _hasScheme = RegExp(r'^[a-zA-Z][a-zA-Z0-9+.\\-]*://');
 
   static ({String? title, String raw}) parse(String input) {
     final m = _markdown.firstMatch(input);
@@ -82,7 +82,7 @@ abstract final class WebLinkParser {
 
   static String? normalizeUrl(String raw) {
     var s = raw.trim();
-    if (s.isEmpty || s.contains(RegExp(r'\s'))) return null;
+    if (s.isEmpty || s.contains(RegExp(r'\\s'))) return null;
     if (!_hasScheme.hasMatch(s)) s = 'https://$s';
     final uri = Uri.tryParse(s);
     if (uri == null) return null;
@@ -349,7 +349,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.link_rounded, size: 40, color: HubColors.textoSecundario),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Text(
                 'Aún no tienes webs guardadas',
                 style: TextStyle(
@@ -358,13 +358,13 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text(
                 'Pega un enlace o un [Título](URL) y se abrirá en tu navegador.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               SizedBox(
                 width: 200,
                 child: GradientPillButton(
@@ -608,6 +608,7 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
   InputDecoration _decoration(String label, String hint, {String? helper, String? error}) {
     final line = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea));
     final focus = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo));
+    final warn = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomeloSuave));
     return InputDecoration(
       labelText: label,
       hintText: hint,
@@ -632,42 +633,46 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
     return AlertDialog(
       backgroundColor: HubColors.panel,
       title: Text(
-        isEdit ? 'Editar web' : 'Añadir web',
+        editing ? 'Editar web' : 'Añadir web',
         style: TextStyle(color: HubColors.textoPrincipal),
       ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _urlCtl,
-              autofocus: !isEdit,
-              style: TextStyle(color: HubColors.textoPrincipal),
-              decoration: _decoration(
-                'URL o [Título](URL)',
-                'youtube.com',
-                helper: 'También acepta formato markdown',
-                error: _error,
-              ),
-              onChanged: (_) {
-                if (_error != null) setState(() => _error = null);
-              },
-              onSubmitted: (_) => _submit(),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _urlCtl,
+            autofocus: !editing,
+            keyboardType: TextInputType.url,
+            autocorrect: false,
+            enableSuggestions: false,
+            textInputAction: TextInputAction.next,
+            style: TextStyle(color: HubColors.textoPrincipal),
+            decoration: _decoration(
+              'Enlace',
+              'youtube.com',
+              helper: 'También acepta [Título](https://…)',
+              error: _error,
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _titleCtl,
-              style: TextStyle(color: HubColors.textoPrincipal),
-              decoration: _decoration('Título (opcional)', 'Se infiere del dominio'),
-            ),
-          ],
-        ),
+            onChanged: (_) {
+              if (_error != null) setState(() => _error = null);
+            },
+          ),
+          SizedBox(height: 8),
+          TextField(
+            controller: _titleCtl,
+            textCapitalization: TextCapitalization.sentences,
+            textInputAction: TextInputAction.done,
+            style: TextStyle(color: HubColors.textoPrincipal),
+            decoration: _decoration('Título (opcional)', 'Se toma del enlace si lo dejas vacío'),
+            onSubmitted: (_) => _submit(),
+          ),
+        ],
       ),
       actions: [
         if (isEdit)
           TextButton(
             onPressed: () => Navigator.pop(context, const _LinkEditorResult.delete()),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.redAccent)),
+            child: Text('Eliminar', style: TextStyle(color: HubColors.pomeloSuave)),
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),

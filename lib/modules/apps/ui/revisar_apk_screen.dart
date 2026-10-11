@@ -48,8 +48,8 @@ class RevisarApkScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
-        title: const Text(
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
+        title: Text(
           'Revisar APK',
           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
         ),
@@ -58,10 +58,10 @@ class RevisarApkScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
           Text(report.fileName, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
-          const SizedBox(height: 2),
+          SizedBox(height: 2),
           Text(report.packageName, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
           if (advisoryNote != null && advisoryNote!.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             HubPanel(
               child: Text(
                 advisoryNote!,
@@ -69,7 +69,7 @@ class RevisarApkScreen extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           HubPanel(
             child: Column(
               children: [
@@ -82,7 +82,7 @@ class RevisarApkScreen extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 SizedBox(
                   height: 100,
                   child: CustomPaint(
@@ -118,16 +118,16 @@ class RevisarApkScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Text(
-                  'Esta APK tiene un riesgo $_levelLabel seg\u00fan el an\u00e1lisis.',
+                  'Esta APK tiene un riesgo $_levelLabel según el análisis.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           Text(
             'PERMISOS SOLICITADOS',
             style: TextStyle(
@@ -137,7 +137,7 @@ class RevisarApkScreen extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           ...report.permissions.map(
             (p) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -150,7 +150,7 @@ class RevisarApkScreen extends StatelessWidget {
                       color: p.critical ? const Color(0xFFE53935) : HubColors.textoSecundario,
                       size: 20,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,7 +177,7 @@ class RevisarApkScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'CR\u00cdTICO',
+                          'CRÍTICO',
                           style: TextStyle(
                             color: Color(0xFFE53935),
                             fontSize: 10,
@@ -191,7 +191,7 @@ class RevisarApkScreen extends StatelessWidget {
             ),
           ),
           if (report.trackingSdks.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Text(
               'SDKs DE RASTREO DETECTADOS',
               style: TextStyle(
@@ -201,7 +201,7 @@ class RevisarApkScreen extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             HubPanel(
               child: Column(
                 children: report.trackingSdks
@@ -210,10 +210,10 @@ class RevisarApkScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Row(
                           children: [
-                            const Icon(Icons.analytics_outlined, size: 18, color: HubColors.textoSecundario),
-                            const SizedBox(width: 10),
+                            Icon(Icons.analytics_outlined, size: 18, color: HubColors.textoSecundario),
+                            SizedBox(width: 10),
                             Expanded(
-                              child: Text(s, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 13)),
+                              child: Text(s, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 13)),
                             ),
                           ],
                         ),
@@ -223,7 +223,7 @@ class RevisarApkScreen extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           TextButton.icon(
             onPressed: () {
               Navigator.of(context).push(
@@ -232,8 +232,8 @@ class RevisarApkScreen extends StatelessWidget {
                 ),
               );
             },
-            icon: const Icon(Icons.travel_explore, color: HubColors.textoAcento),
-            label: const Text(
+            icon: Icon(Icons.travel_explore, color: HubColors.textoAcento),
+            label: Text(
               'Análisis complementario (opcional)',
               style: TextStyle(color: HubColors.textoAcento),
             ),
@@ -250,21 +250,21 @@ class RevisarApkScreen extends StatelessWidget {
                 ),
               );
             },
-            icon: const Icon(Icons.verified_user_outlined, color: HubColors.textoAcento),
-            label: const Text(
+            icon: Icon(Icons.verified_user_outlined, color: HubColors.textoAcento),
+            label: Text(
               'Verificar firma (oráculo)',
               style: TextStyle(color: HubColors.textoAcento),
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           HubPanel(
             padding: const EdgeInsets.all(14),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.gavel, color: HubColors.pomelo.withOpacity(0.9), size: 22),
-                const SizedBox(width: 12),
-                const Expanded(
+                SizedBox(width: 12),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -286,7 +286,7 @@ class RevisarApkScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           GradientPillButton(
             label: 'Instalar bajo mi responsabilidad',
             icon: Icons.shield_outlined,
@@ -294,10 +294,10 @@ class RevisarApkScreen extends StatelessWidget {
               onInstallOverride?.call();
             },
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+            child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
           ),
         ],
       ),

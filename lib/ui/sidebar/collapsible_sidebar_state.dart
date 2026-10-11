@@ -246,7 +246,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                           child: Row(
                             children: [
                               Icon(Icons.grid_view_rounded, color: HubColors.pomelo, size: 20),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   'Aplicaciones',
@@ -337,7 +337,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
               ),
             ],
           ),
-          child: const Center(
+          child: Center(
             child: Icon(Icons.add_rounded, color: Colors.white, size: 30),
           ),
         ),
@@ -345,4 +345,3 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
     );
   }
 }
-

@@ -76,7 +76,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     value: selectedEditor,
                     dropdownColor: HubColors.panel,
@@ -289,10 +289,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         children: [
                           Icon(Icons.folder_open_rounded,
                               size: 56, color: HubColors.textoSecundario.withOpacity(0.5)),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           Text('No hay proyectos todavía',
                               style: TextStyle(color: HubColors.textoSecundario, fontSize: 15)),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           Text('Toca + para crear el primero',
                               style: TextStyle(color: HubColors.textoAcento, fontSize: 13)),
                         ],
@@ -304,7 +304,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       child: ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
                         itemCount: _projects.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        separatorBuilder: (_, __) => SizedBox(height: 10),
                         itemBuilder: (context, i) {
                           final p = _projects[i];
                           return Container(

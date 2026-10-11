@@ -92,10 +92,10 @@ class _SidebarGroupTile extends StatelessWidget {
               ),
             )
           else ...[
-            Row(children: [cell(0), const SizedBox(width: _gap), cell(1)]),
+            Row(children: [cell(0), SizedBox(width: _gap), cell(1)]),
             if (top.length > 2) ...[
-              const SizedBox(height: _gap),
-              Row(children: [cell(2), const SizedBox(width: _gap), cell(3)]),
+              SizedBox(height: _gap),
+              Row(children: [cell(2), SizedBox(width: _gap), cell(3)]),
             ],
           ],
         ],
@@ -135,17 +135,10 @@ class _SidebarGroupTile extends StatelessWidget {
                 ),
               ),
             ),
-            if (group.isCustom && onEdit != null)
-              GestureDetector(
-                onTap: onEdit,
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 4, right: 2),
-                  child: Icon(Icons.edit_outlined, size: 14, color: HubColors.textoSecundario),
-                ),
-              ),
+            if (group.isCustom)
+              Icon(Icons.edit_outlined, size: 12, color: HubColors.textoSecundario),
             if (hidden > 0) ...[
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Text(
                 '+$hidden',
                 style: TextStyle(
@@ -210,7 +203,7 @@ class _SidebarGroupTile extends StatelessWidget {
                       child: Column(
                         children: [
                           AppAvatar(app: app, size: 52, radius: 13),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           Text(
                             app.name,
                             maxLines: 2,
@@ -340,4 +333,3 @@ class AppAvatar extends StatelessWidget {
     );
   }
 }
-
