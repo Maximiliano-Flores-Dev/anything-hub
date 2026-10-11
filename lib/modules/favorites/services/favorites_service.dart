@@ -79,7 +79,7 @@ class FavoritesService {
     final linksById = {for (final l in _webRepo.items) l.id: l};
     for (final id in webFavs) {
       final link = linksById[id];
-      if (link == null) continue;
+      if (link == null) continue; // enlace borrado
       final key = '${FavoriteType.web.name}:$id';
       items.add(FavoriteItem(
         type: FavoriteType.web,
@@ -172,6 +172,8 @@ class FavoritesService {
     await _removeMeta(item.metaKey);
   }
 
+  // ── Web favorites ─────────────────────────────────────────────────────────
+
   Future<Set<String>> loadWebFavorites() async {
     final prefs = await SharedPreferences.getInstance();
     final list = prefs.getStringList(webFavKey) ?? const [];
@@ -204,6 +206,8 @@ class FavoritesService {
     }
     await _saveMeta(meta);
   }
+
+  // ── Meta ──────────────────────────────────────────────────────────────────
 
   Future<Map<String, DateTime>> _loadMeta() async {
     final prefs = await SharedPreferences.getInstance();
