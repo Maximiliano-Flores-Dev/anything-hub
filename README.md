@@ -43,7 +43,7 @@ El proyecto se apoya en tres principios:
 
 ### 🧭 Dashboard principal
 - Pantalla *mobile-first* con tema oscuro. La paleta por defecto (**Clásico**) usa fondo `#040A16` y acento pomelo `#F05A3C`, y ahora puedes cambiarla (ver [Personalización](#-personalización)).
-- Cards con borde degradado que dan acceso a cada módulo: **Mis Aplicaciones**, **Carpetas del Proyecto**, **Webs Rápidas**, **Gestión de Archivos** y **Modos de Rendimiento**. La card **Favoritos** ya existe en pantalla, pero todavía no abre nada.
+- Cards con borde degradado que dan acceso a cada módulo: **Mis Aplicaciones**, **Carpetas del Proyecto**, **Webs Rápidas**, **Gestión de Archivos**, **Modos de Rendimiento** y **Favoritos**.
 - Botón degradado **Escanear Apps Reales** (pasa a *Apps Sincronizadas* una vez hecho el escaneo).
 - **Navegación inferior** (bottom nav): Inicio · Grid (Mis Aplicaciones) · Buscar (Explorador de archivos) · Perfil (Configuración).
 
@@ -70,6 +70,18 @@ Nueva pestaña **Personalización** dentro de Configuración (disponible desde `
 - Pantalla de gestión por app: **Lanzar**, abrir **Ajustes** del sistema, **Desinstalar** (con confirmación) y marcar como **favorita** (⭐).
 - **Reseñas personales** (rendimiento y privacidad) guardadas únicamente en tu dispositivo.
 - Bookmarks y reseñas persistidos con `shared_preferences` (local).
+
+### ⭐ Favoritos
+Nueva card del dashboard (disponible desde `v1.0.8`) que reúne en una sola pantalla todo lo que has marcado:
+- **Tres secciones**: **Apps**, **Webs** y **Archivos**.
+- **Apps**: las que marcas con la estrella en *Mis Aplicaciones*, con su **ícono real**.
+- **Webs**: tus enlaces de *Webs Rápidas* (hoy se listan todos).
+- **Archivos**: las rutas que marcas con la estrella del explorador de archivos.
+- **Chips de orden**: *A → 9*, *Recientes*, *Antiguos* y *Por tipo*.
+- **Toque para abrir**: lanza la app, abre el enlace en el navegador nativo o abre el archivo con la app externa adecuada.
+- **Quitar con la estrella** (con aviso en pantalla) y botón de refrescar.
+- Los favoritos siguen guardándose **en el dispositivo** (`shared_preferences`); la pantalla solo los agrega.
+- ⚠️ Hoy la fecha de «marcado» solo se registra para **apps**. En webs y archivos aparece *Fecha desconocida* y los órdenes por fecha no los afectan (ver [Estado del proyecto](#-estado-del-proyecto)).
 
 ### 🌐 Webs Rápidas
 - Lista vertical de tus sitios favoritos: avatar circular + título.
@@ -153,7 +165,7 @@ Accesible desde la bottom nav (Perfil).
 
 ## 🚦 Estado del proyecto
 
-**Fase actual: Alpha (`v1.0.x`).** Última versión etiquetada: **v1.0.7** (9 de octubre de 2026). La app es usable en el día a día para los módulos marcados como ✅.
+**Fase actual: Alpha (`v1.0.x`).** Última versión etiquetada: **v1.0.8** (10 de octubre de 2026). La app es usable en el día a día para los módulos marcados como ✅.
 
 | Módulo / característica | Estado |
 |---|:---:|
@@ -180,7 +192,8 @@ Accesible desde la bottom nav (Perfil).
 | Subida de APKs a VirusTotal | 🗓️ No implementada (por diseño, no se sube el archivo) |
 | Hardening de seguridad (PathSecurity, FileOpGuard, R8, logger) | ✅ Funcional |
 | Releases firmadas, con checksums y atestación de procedencia | ✅ Funcional |
-| Card **Favoritos** del dashboard | 🚧 Pendiente (card visible, sin acción) |
+| Card **Favoritos**: pantalla unificada (Apps / Webs / Archivos), abrir, quitar y ordenar | ✅ Funcional |
+| Favoritos: fecha de «marcado» en webs y archivos | 🚧 Pendiente (solo las apps guardan fecha) |
 
 **Leyenda:** ✅ funcional · 🚧 en construcción · 🗓️ planificado
 
@@ -212,6 +225,7 @@ Cada release incluye un APK por arquitectura (`--split-per-abi`), firmado y gene
 | `v1.0.5` | 2026-10-07 | Mismo código que `v1.0.4` (el tag apunta al mismo commit) |
 | `v1.0.6` | 2026-10-07 | `MainActivity` dividida en puentes Kotlin y **Puerto de Software** vía limbo |
 | `v1.0.7` | 2026-10-09 | *Code Hardening* (`PathSecurity`, `FileOpGuard`, minificación) y **Personalización**: paletas, modo zurdos, sidebar y cards configurables |
+| `v1.0.8` | 2026-10-10 | **Favoritos**: card funcional con pantalla unificada de apps, webs y archivos, con orden y quitar favoritos |
 
 > El detalle de cada versión está en sus [notas de release](https://github.com/Maximiliano-Flores-Dev/anything-hub/releases).
 
@@ -221,6 +235,7 @@ Cada release incluye un APK por arquitectura (`--split-per-abi`), firmado y gene
 
 ### ✅ Cumplido
 
+- [x] **Favoritos unificados** (`v1.0.8`): card del dashboard con pantalla que agrega apps, webs y archivos, con chips de orden, apertura directa y opción de quitar.
 - [x] **Personalización macro** (`v1.0.7`): 6 paletas, sidebar on/off, modo zurdos y cards activables y reordenables, con persistencia local y tests propios.
 - [x] **Parser del manifiesto de APK** (permisos, firma y hash SHA-256) integrado en el score de riesgo, con comportamiento *fail-closed* cuando el APK no se puede leer.
 - [x] **Verificación de firmas** con caché local de pins y política *fail-closed* (nunca declara “verificado” sin evidencia).
@@ -241,7 +256,9 @@ Cada release incluye un APK por arquitectura (`--split-per-abi`), firmado y gene
 
 - [ ] Interfaz para **crear y editar grupos personalizados** (*Nuevo Grupo* del FAB radial)
 - [ ] Acciones del FAB radial: **Añadir App** y **Ajustes**
-- [ ] Card **Favoritos** funcional en el dashboard
+- [ ] **Favoritos**: registrar la fecha de marcado también para webs y archivos (hoy solo apps) y que los órdenes *Recientes* / *Antiguos* los contemplen
+- [ ] **Favoritos**: que *Por tipo* se diferencie del orden alfabético (hoy ordena igual dentro de cada sección)
+- [ ] Tests de **Favoritos** (`FavoritesService`: agrupar, ordenar y quitar)
 - [ ] Más tests (sidebar, explorador de archivos completo, servicios nativos, modos de rendimiento)
 - [ ] Hacer que formato, analyzer y tests **bloqueen** el build en CI (hoy solo avisan)
 - [ ] Capturas de pantalla y GIFs de demostración en este README
@@ -293,9 +310,10 @@ Los colores de la interfaz se leen de la paleta activa (`HubColors` → `MacroCu
 
 ```text
 ┌────────────────────────────────────────────────────────┐
-│                  Flutter / Dart (UI)                    │
-│  screens/  ui/sidebar  ui/widgets  modules/{apps,       │
-│  projects, plugins}  core/ (paleta, modelos, logger)    │
+│                  Flutter / Dart (UI)                   │
+│  screens/  ui/sidebar  ui/widgets                      │
+│  modules/{apps, projects, plugins, favorites}          │
+│  core/ (paleta, modelos, logger)                       │
 └───────────────┬────────────────────────────────────────┘
                 │ MethodChannel / EventChannel
                 │  • anythings.hub/device_apps
@@ -322,6 +340,7 @@ anything-hub/
 │   ├── ui/                        # Sidebar colapsable y widgets compartidos
 │   └── modules/
 │       ├── apps/                  # Mis Aplicaciones + seguridad de APKs + Puerto de Software
+│       ├── favorites/             # Favoritos unificados (apps, webs y archivos)
 │       ├── projects/              # Módulo opt-in de proyectos (GitHub, Termux)
 │       └── plugins/               # Catálogo e instalación de plugins (metadatos)
 ├── android/                       # Capa nativa Kotlin y manifiesto
@@ -374,7 +393,7 @@ Los APK quedan en `build/app/outputs/flutter-apk/`.
 flutter test
 ```
 
-Cubren el *smoke test* de la app, el sandbox de rutas (`PathSecurity`), `FileOpGuard`, el oráculo de firmas, el modelo `project.md` (ida y vuelta Markdown), la configuración de OAuth de GitHub, las paletas (`HubPalettes`) y el estado de personalización (`MacroCustomization`: valores por defecto, persistencia, reordenamiento y restauración).
+Son **36 casos** en 7 archivos. Cubren el *smoke test* de la app, el sandbox de rutas (`PathSecurity`), `FileOpGuard`, el oráculo de firmas, el modelo `project.md` (ida y vuelta Markdown), la configuración de OAuth de GitHub, las paletas (`HubPalettes`) y el estado de personalización (`MacroCustomization`: valores por defecto, persistencia, reordenamiento y restauración). El módulo de Favoritos todavía no tiene tests propios.
 
 El workflow de CI (`build.yml`) ejecuta la verificación de formato, `flutter analyze` y `flutter test` en cada push y *pull request*. Por ahora estos pasos **reportan advertencias pero no bloquean el build**; lo que sí aborta el proceso es que el analyzer falle con un error grave, que no se genere ningún APK o que un release salga firmado con la clave *debug*.
 
