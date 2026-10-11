@@ -47,8 +47,8 @@ class _ProjectAdvisementModalState extends State<ProjectAdvisementModal> {
                   ),
                   child: const Icon(Icons.folder_special_rounded, color: Colors.white, size: 22),
                 ),
-                const SizedBox(width: 12),
-                const Expanded(
+                SizedBox(width: 12),
+                Expanded(
                   child: Text(
                     'Gestión de Proyectos',
                     style: TextStyle(
@@ -60,26 +60,26 @@ class _ProjectAdvisementModalState extends State<ProjectAdvisementModal> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            const Text(
+            SizedBox(height: 16),
+            Text(
               'Esta función está dirigida a desarrolladores.',
               style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14.5, height: 1.35),
             ),
-            const SizedBox(height: 10),
-            const Text(
+            SizedBox(height: 10),
+            Text(
               'Al activarla se creará la estructura local oculta .anythinghub/ '
               '(consumo mínimo de almacenamiento). Todo el procesamiento es 100 % on-device. '
               'No se envía telemetría ni código fuente a ningún servidor.',
               style: TextStyle(color: HubColors.textoSecundario, fontSize: 13.2, height: 1.4),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(builder: (_) => const LocalDocsScreen()),
                 );
               },
-              child: const Text(
+              child: Text(
                 'Ver documentación local',
                 style: TextStyle(color: HubColors.textoAcento, fontSize: 13),
               ),
@@ -92,12 +92,12 @@ class _ProjectAdvisementModalState extends State<ProjectAdvisementModal> {
                   child: Checkbox(
                     value: _dontShowAgain,
                     activeColor: HubColors.pomelo,
-                    side: const BorderSide(color: HubColors.linea),
+                    side: BorderSide(color: HubColors.linea),
                     onChanged: (v) => setState(() => _dontShowAgain = v ?? false),
                   ),
                 ),
-                const SizedBox(width: 8),
-                const Expanded(
+                SizedBox(width: 8),
+                Expanded(
                   child: Text(
                     'No volver a mostrar este aviso',
                     style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
@@ -105,7 +105,7 @@ class _ProjectAdvisementModalState extends State<ProjectAdvisementModal> {
                 ),
               ],
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: 18),
             Row(
               children: [
                 Expanded(
@@ -120,7 +120,7 @@ class _ProjectAdvisementModalState extends State<ProjectAdvisementModal> {
                     child: const Text('Cancelar'),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {

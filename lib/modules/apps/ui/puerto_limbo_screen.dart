@@ -154,28 +154,28 @@ class _PuertoLimboScreenState extends State<PuertoLimboScreen> {
       backgroundColor: HubColors.fondoPrincipal,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(widget.name, style: const TextStyle(color: HubColors.textoPrincipal)),
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
+        title: Text(widget.name, style: TextStyle(color: HubColors.textoPrincipal)),
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(_error ?? _phase, style: const TextStyle(color: HubColors.textoPrincipal)),
-            const SizedBox(height: 16),
+            Text(_error ?? _phase, style: TextStyle(color: HubColors.textoPrincipal)),
+            SizedBox(height: 16),
             LinearProgressIndicator(
               value: _done ? 1 : progress,
               color: HubColors.pomelo,
               backgroundColor: HubColors.linea,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               _total > 0 ? '$_bytes / $_total bytes' : '$_bytes bytes',
-              style: const TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+              style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
             ),
             const Spacer(),
-            const Text(
+            Text(
               'El archivo no se instala solo. Primero queda en limbo y se analiza.',
               style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
             ),

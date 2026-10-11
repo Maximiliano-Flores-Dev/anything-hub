@@ -25,6 +25,35 @@ class AppsLocalStore {
       set.remove(packageName);
     }
     await p.setStringList(_kBookmarks, set.toList());
+    // Timestamp para la colección unificada de Favoritos
+    await _touchFavoriteMeta(p, 'app:$packageName', value);
+  }
+
+  static const _kFavMeta = 'favorites_meta_v1';
+
+  static Future<void> _touchFavoriteMeta(
+    SharedPreferences p,
+    String key,
+    bool add,
+  ) async {
+    try {
+      final raw = p.getString(_kFavMeta);
+      final meta = <String, dynamic>{};
+      if (raw != null && raw.isNotEmpty) {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map) {
+          decoded.forEach((k, v) => meta[k.toString()] = v);
+        }
+      }
+      if (add) {
+        meta[key] = DateTime.now().toIso8601String();
+      } else {
+        meta.remove(key);
+      }
+      await p.setString(_kFavMeta, jsonEncode(meta));
+    } catch (_) {
+      // No romper el bookmark si el meta falla
+    }
   }
 
   Future<Map<String, LocalAppReview>> loadReviews() async {

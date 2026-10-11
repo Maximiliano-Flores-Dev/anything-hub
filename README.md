@@ -16,8 +16,8 @@
 [**⬇️ Descargar APK**](https://github.com/Maximiliano-Flores-Dev/anything-hub/releases) ·
 [Features](#-features) ·
 [Estado del proyecto](#-estado-del-proyecto) ·
-[Compilar](#-compilar-desde-el-código-fuente) ·
-[Roadmap](#-roadmap)
+[Roadmap](#-roadmap) ·
+[Compilar](#-compilar-desde-el-código-fuente)
 
 </div>
 
@@ -31,7 +31,7 @@ El proyecto se apoya en tres principios:
 
 | Principio | Qué significa en la práctica |
 |---|---|
-| 🏠 **Local-first** | La configuración de la app declara `local_mode: true` y `telemetry_enabled: false`. El escaneo de apps, el orden por uso, los proyectos y los modos de rendimiento se procesan en el dispositivo. |
+| 🏠 **Local-first** | La configuración de la app declara `local_mode: true` y `telemetry_enabled: false`. El escaneo de apps, el orden por uso, los proyectos, la personalización y los modos de rendimiento se procesan y guardan en el dispositivo. |
 | 🛡️ **Soberanía del usuario** | La app informa y advierte (riesgo de un APK, permisos que se piden, limpieza de procesos), pero la decisión final siempre es tuya. |
 | 🔌 **Modular y opt-in** | Los módulos sensibles (Proyectos, plugins) están desactivados hasta que tú los activas, y si los desinstalas **no dejan rastro** en disco. |
 
@@ -39,28 +39,49 @@ El proyecto se apoya en tres principios:
 
 ## ✨ Features
 
-> Esta sección describe **solo lo que existe hoy en el código**. Lo que aún es parcial o está en desarrollo aparece marcado y detallado en [Estado del proyecto](#-estado-del-proyecto).
+> Esta sección describe **solo lo que existe hoy en el código**. Lo que aún está pendiente aparece en [Estado del proyecto](#-estado-del-proyecto) y en el [Roadmap](#-roadmap).
 
 ### 🧭 Dashboard principal
-- Pantalla *mobile-first* con tema oscuro y paleta propia (fondo `#040A16`, acento pomelo `#F05A3C`).
-- Cards con borde degradado que dan acceso a cada módulo: **Mis Aplicaciones**, **Carpetas del Proyecto**, **Webs Rápidas**, **Favoritos**, **Gestión de Archivos** y **Modos de Rendimiento**.
-- **FAB radial** en el sidebar: *Nuevo Grupo*, *Añadir App*, *Escanear Apps* y *Ajustes*.
-- **Navegación inferior** (bottom nav): Inicio · Grid (Mis Aplicaciones) · Buscar (Explorador) · Perfil (Configuración).
+- Pantalla *mobile-first* con tema oscuro. La paleta por defecto (**Clásico**) usa fondo `#040A16` y acento pomelo `#F05A3C`, y ahora puedes cambiarla (ver [Personalización](#-personalización)).
+- Cards con borde degradado que dan acceso a cada módulo: **Mis Aplicaciones**, **Carpetas del Proyecto**, **Webs Rápidas**, **Gestión de Archivos**, **Modos de Rendimiento** y **Favoritos**.
+- Botón degradado **Escanear Apps Reales** (pasa a *Apps Sincronizadas* una vez hecho el escaneo).
+- **Navegación inferior** (bottom nav): Inicio · Grid (Mis Aplicaciones) · Buscar (Explorador de archivos) · Perfil (Configuración).
+
+### 🎨 Personalización
+Nueva pestaña **Personalización** dentro de Configuración (disponible desde `v1.0.7`). Todo se guarda localmente y se aplica al instante:
+- **6 paletas de color**: Clásico, Océano, Bosque, Violeta, Atardecer y Mono. Cambian fondos, acentos, textos y degradados de toda la app.
+- **Sidebar de apps** activable / desactivable.
+- **Modo para zurdos**: espejo funcional que mueve el sidebar al lado derecho.
+- **Cards del dashboard**: activa o desactiva cada una y **reordénalas arrastrando**. Siempre queda al menos una visible.
+- **Restaurar valores por defecto** con un solo botón.
 
 ### 📱 Sidebar inteligente de apps
 - Barra lateral **colapsable con gesto de swipe** y resorte que hereda la velocidad del dedo.
 - **Categorías automáticas preestablecidas**: Agentes de IA, Gaming Hub, Social, Multimedia, Productividad, Mapas y Navegación, Noticias y Otras apps.
-- **Ordenadas por uso frecuente** (tiempo en primer plano de los últimos días) usando el permiso *Acceso a datos de uso* de Android. Sin ese permiso, el orden es alfabético.
-- **Grupos personalizados** creados por ti, con apps elegidas a mano y auto-ordenadas por uso.
+- **Ordenadas por uso frecuente** (tiempo en primer plano de los últimos días) con el permiso *Acceso a datos de uso* de Android. Sin ese permiso, el orden es alfabético.
 - Vista **extendida**: las 4 apps más usadas de cada grupo en cuadrícula 2×2. Vista **encogida**: las 4 principales apiladas.
 - Muestra los **íconos reales** de tus apps instaladas y **se ignora a sí misma** en el escaneo.
 - Siempre con **consentimiento previo**: nada se escanea hasta que aceptas el diálogo de permiso.
+- **FAB radial**: mantén pulsado y arrastra hacia una opción. Hoy ejecuta **Escanear Apps**; el resto de las opciones (*Nuevo Grupo*, *Añadir App*, *Ajustes*) aparecen en el menú pero aún no tienen acción (ver [Estado del proyecto](#-estado-del-proyecto)).
+- **Grupos personalizados**: el modelo, el guardado local, el auto-orden por uso y el render con ícono de edición ya existen en el código; la interfaz para **crearlos y editarlos** está pendiente.
 
 ### 📱 Mis Aplicaciones
 - Cuadrícula densa de 4 columnas con pestañas **Todas / Favoritos**.
 - Pantalla de gestión por app: **Lanzar**, abrir **Ajustes** del sistema, **Desinstalar** (con confirmación) y marcar como **favorita** (⭐).
 - **Reseñas personales** (rendimiento y privacidad) guardadas únicamente en tu dispositivo.
 - Bookmarks y reseñas persistidos con `shared_preferences` (local).
+
+### ⭐ Favoritos
+Nueva card del dashboard (disponible desde `v1.0.8`) que reúne en una sola pantalla todo lo que has marcado:
+- **Tres secciones**: **Apps**, **Webs** y **Archivos**.
+- **Apps**: las que marcas con la estrella en *Mis Aplicaciones*, con su **ícono real**.
+- **Webs**: tus enlaces de *Webs Rápidas* (hoy se listan todos).
+- **Archivos**: las rutas que marcas con la estrella del explorador de archivos.
+- **Chips de orden**: *A → 9*, *Recientes*, *Antiguos* y *Por tipo*.
+- **Toque para abrir**: lanza la app, abre el enlace en el navegador nativo o abre el archivo con la app externa adecuada.
+- **Quitar con la estrella** (con aviso en pantalla) y botón de refrescar.
+- Los favoritos siguen guardándose **en el dispositivo** (`shared_preferences`); la pantalla solo los agrega.
+- ⚠️ Hoy la fecha de «marcado» solo se registra para **apps**. En webs y archivos aparece *Fecha desconocida* y los órdenes por fecha no los afectan (ver [Estado del proyecto](#-estado-del-proyecto)).
 
 ### 🌐 Webs Rápidas
 - Lista vertical de tus sitios favoritos: avatar circular + título.
@@ -74,27 +95,31 @@ El proyecto se apoya en tres principios:
 - **Crear** carpetas y archivos, **renombrar**, **copiar**, **cortar/pegar**, **mover**, **eliminar** (recursivo) y **compartir**.
 - **Buscar**, **filtrar por tipo**, mostrar **archivos ocultos** y **ordenar** (nombre, fecha o tamaño, ascendente o descendente).
 - Selección múltiple, salto directo a una **ruta**, e **información de espacio** usado/libre (barra de almacenamiento).
-- Favoritos de rutas y previsualización de archivos.
+- **Miniaturas** de imágenes y **ícono real de los APK**, con caché de íconos.
+- **Detalles de archivo** con hashes **MD5 / SHA-1** y **previsualización de texto**.
+- Favoritos de rutas.
 - Abre archivos con la app externa adecuada mediante `FileProvider`.
 
 ### ⚡ Modos de Rendimiento
 - Cuatro modos nativos (sin root, best-effort):
+
   | Modo | Qué hace |
   |---|---|
   | **Equilibrado** | Sin cambios agresivos; el sistema gestiona con normalidad. |
   | **Eco** | Prioriza batería: cierra procesos en segundo plano innecesarios de apps de usuario. |
   | **Focus** | Silencia notificaciones de terceros (siguen visibles, sin sonido) vía *Acceso a No molestar* + limpieza de procesos. |
   | **Rendimiento** | Libera memoria cerrando solo procesos en segundo plano no críticos. |
+
 - Panel de **memoria en tiempo real** (libres / total, indicador de memoria baja).
 - Solo se tocan apps de usuario; **whitelist dura** de procesos del sistema (SystemUI, GMS, launcher, phone, settings, etc.).
 - El SO puede limitar `killBackgroundProcesses`; la app informa cuántos procesos se intentaron y cuántos se trataron.
 - Canal de notificaciones propio para Focus y permiso `POST_NOTIFICATIONS` (Android 13+) cuando aplica.
 
 ### 🔌 Plugins (metadatos locales)
-- Catálogo remoto desde `plugins/catalog.json` del repositorio oficial (solo JSON).
+- Catálogo remoto desde `plugins/catalog.json` del repositorio oficial (solo JSON), con **4 plugins** de ejemplo: filtros extra de archivos, etiquetas de riesgo de APK en español, plantillas básicas de proyectos y overlay FPS / modo juegos.
+- Los plugins pueden declarar `extendsFeature` y `capabilities` para indicar qué función del núcleo extienden (por ejemplo, `performance-modes`).
 - Instalación / desinstalación en `.anythinghub/plugins/` — **solo manifiestos y metadatos**, nunca ejecuta código remoto ni carga Dex/so dinámicos.
 - Gestión desde la pestaña **Plugins** de Configuración.
-- Ejemplo de uso: plugin de overlay FPS / juegos (opcional, no forma parte del núcleo).
 
 ### 🧑‍💻 Proyectos *(módulo opt-in para desarrolladores)*
 - Se activa solo si tú lo aceptas, tras un aviso explícito, y crea la carpeta oculta `.anythinghub/`.
@@ -106,46 +131,71 @@ El proyecto se apoya en tres principios:
 - **Desinstalación completa del módulo** con doble confirmación y garantía de aislamiento: módulo desactivado = cero rastro en disco.
 
 ### 🔬 Seguridad de APKs
-- Anythings Hub se registra como destino de **“Abrir con”** y **“Compartir”** para archivos `.apk`.
-- Copia el APK recibido a caché y muestra el origen (app que lo envió, cuando Android lo expone).
-- Pantallas de **riesgo**, **soberanía de usuario** y **análisis complementario (hash SHA-256)**, con matriz de puntuación 0–100 basada en permisos críticos y trackers conocidos.
-- **PuertoPipe**: tubo de descarga HTTPS por chunks a `cacheDir/puerto_limbo`, con progreso por eventos, validación de cabecera ZIP y SHA-256 al completar. No se ofrece instalar hasta que el archivo esté íntegro.
+- Anythings Hub se registra como destino de **“Abrir con”** y **“Compartir”** para archivos `.apk`, y muestra el origen (app que lo envió, cuando Android lo expone).
+- **Inspección nativa del APK** (Kotlin): paquete, versión, permisos declarados, ícono y **SHA-256 de los certificados de firma**.
+- **Matriz de riesgo 0–100** basada en permisos críticos y trackers conocidos. Si el APK no se puede leer, el resultado es *fail-closed*: se marca como fallo de análisis con puntaje alto, nunca como riesgo bajo.
+- **Verificación de firma local** (oráculo *fail-closed*): compara contra la app ya instalada o contra *pins* guardados localmente (caché de hasta 200 pins, 90 días de vigencia). Sin evidencia, nunca dice “verificado”.
+- **Consulta a VirusTotal por hash** (opt-in): solo si tú guardas tu propia API key; se envía el hash SHA-256, **no el APK**.
+- Pantallas de **riesgo**, **soberanía de usuario** y **análisis complementario**.
 - Override de instalación siempre visible (la decisión final es del usuario).
 
+### 🚪 Puerto de Software
+- Descarga el último APK de un release público de GitHub.
+- **PuertoPipe**: tubo de descarga HTTPS por chunks a `cacheDir/puerto_limbo`, con progreso por eventos, validación de cabecera ZIP y SHA-256 al completar.
+- El APK pasa por el **limbo** antes de instalarse: se calcula el hash, se lee el manifiesto y, si hay clave, se consulta VirusTotal. No se ofrece instalar hasta que el archivo esté íntegro.
+
+### 🧱 Seguridad reforzada (*Code Hardening*)
+- **`PathSecurity`** (Kotlin): sandbox de rutas para las operaciones de archivos.
+- **`FileOpGuard`**: límites de operaciones por lotes (máx. 100 elementos por operación y 200 operaciones por minuto).
+- Copias y movimientos de archivos más seguros, con tests propios de reglas de rutas.
+- **R8 / ProGuard** con minificación activada y **`NetworkSecurityConfig`**.
+- **Logger con redacción** de datos sensibles.
+- Tokens en almacenamiento cifrado (`EncryptedSharedPreferences` en Android).
+- Pantalla de **auditoría de permisos**.
+
 ### ⚙️ Configuración
-- Pestaña **General**: ruta de `.anythinghub/`, notas de seguridad y acerca de.
-- Pestaña **Plugins**: catálogo e instalados, instalar / desinstalar.
-- Accesible desde la bottom nav (Perfil) y desde el FAB radial.
+Tres pestañas:
+- **General**: ruta de `.anythinghub/`, notas de seguridad y acerca de.
+- **Personalización**: paletas, sidebar, modo zurdos y cards (ver [Personalización](#-personalización)).
+- **Plugins**: catálogo e instalados, instalar / desinstalar.
+
+Accesible desde la bottom nav (Perfil).
 
 ---
 
 ## 🚦 Estado del proyecto
 
-**Fase actual: Alpha (`v1.0.x`).** Última release publicada: **v1.0.2**. La app es usable en el día a día para los módulos marcados como ✅; el resto está en construcción o experimental.
+**Fase actual: Alpha (`v1.0.x`).** Última versión etiquetada: **v1.0.8** (10 de octubre de 2026). La app es usable en el día a día para los módulos marcados como ✅.
 
 | Módulo / característica | Estado |
 |---|:---:|
 | Dashboard, tema y navegación (bottom nav) | ✅ Funcional |
+| **Personalización**: 6 paletas, sidebar on/off, modo zurdos, cards activables y reordenables | ✅ Funcional |
 | Sidebar: swipe, categorías y orden por uso | ✅ Funcional |
-| Grupos personalizados | ✅ Funcional |
-| FAB radial: *Nuevo Grupo*, *Añadir App*, *Escanear Apps* | ✅ Funcional |
+| Sidebar: vistas 2×2 extendida y apilada encogida | ✅ Funcional |
+| FAB radial: opción *Escanear Apps* | ✅ Funcional |
+| FAB radial: opciones *Nuevo Grupo*, *Añadir App* y *Ajustes* | 🚧 Visibles, sin acción |
+| Grupos personalizados (modelo, guardado y auto-orden por uso) | 🚧 Base lista; falta la interfaz para crearlos y editarlos |
 | Mis Aplicaciones (lanzar, ajustes, desinstalar, favoritos, reseñas) | ✅ Funcional |
 | Webs Rápidas | ✅ Funcional |
-| Gestión de Archivos (multi-select, clipboard, filtros, storage bar, share…) | ✅ Funcional |
-| Modos de Rendimiento (Eco / Focus / Rendimiento / memoria) | ✅ Funcional |
-| Configuración (General + Plugins) | ✅ Funcional |
+| Gestión de Archivos (multi-select, clipboard, filtros, miniaturas, hashes, preview) | ✅ Funcional |
+| Modos de Rendimiento (Equilibrado / Eco / Focus / Rendimiento + memoria) | ✅ Funcional |
+| Configuración (General + Personalización + Plugins) | ✅ Funcional |
 | Sistema de plugins (catálogo GitHub → metadatos locales) | ✅ Funcional |
 | Proyectos (editores, Termux, `project.md`, aislamiento) | ✅ Funcional |
 | Login con GitHub (OAuth + PKCE) | ✅ Implementado |
 | Intercepción de APKs (Abrir con / Compartir) | ✅ Funcional |
-| PuertoPipe (descarga HTTPS + SHA-256 + validación ZIP) | ✅ Funcional |
-| Análisis de riesgo de APK (UI + matriz de puntuación) | 🧪 Experimental (parser nativo parcial) |
-| Verificación de firma (oráculo + caché + *fail-closed*) | 🚧 UI de prototipo; backend pendiente |
-| Card **Favoritos** del dashboard | 🚧 Pendiente (card visible, sin acción) |
-| Acción **Ajustes** del FAB radial (ruta completa) | ✅ Cubierta por SettingsScreen vía bottom nav |
-| API de VirusTotal | 🗓️ Planificado |
+| Parser nativo de APK (permisos, firma, SHA-256, ícono) + score de riesgo | ✅ Funcional |
+| Verificación de firma local (oráculo + caché + *fail-closed*) | ✅ Funcional |
+| PuertoPipe y Puerto de Software (descarga HTTPS + SHA-256 + validación ZIP) | ✅ Funcional |
+| Consulta a VirusTotal por hash (con API key propia) | ✅ Funcional (opt-in) |
+| Subida de APKs a VirusTotal | 🗓️ No implementada (por diseño, no se sube el archivo) |
+| Hardening de seguridad (PathSecurity, FileOpGuard, R8, logger) | ✅ Funcional |
+| Releases firmadas, con checksums y atestación de procedencia | ✅ Funcional |
+| Card **Favoritos**: pantalla unificada (Apps / Webs / Archivos), abrir, quitar y ordenar | ✅ Funcional |
+| Favoritos: fecha de «marcado» en webs y archivos | 🚧 Pendiente (solo las apps guardan fecha) |
 
-**Leyenda:** ✅ funcional · 🧪 experimental · 🚧 en construcción · 🗓️ planificado
+**Leyenda:** ✅ funcional · 🚧 en construcción · 🗓️ planificado
 
 ### Descargas y versiones
 
@@ -153,7 +203,7 @@ Todas las versiones publicadas están en la pestaña de **Releases**:
 
 👉 **<https://github.com/Maximiliano-Flores-Dev/anything-hub/releases>**
 
-Cada release incluye un APK por arquitectura (`--split-per-abi`), generados automáticamente por GitHub Actions al publicar un tag `v*`.
+Cada release incluye un APK por arquitectura (`--split-per-abi`), firmado y generado automáticamente por GitHub Actions, junto con un archivo `SHA256SUMS.txt` para verificar la integridad de la descarga.
 
 | Si tu teléfono es… | Descarga el APK |
 |---|---|
@@ -163,14 +213,65 @@ Cada release incluye un APK por arquitectura (`--split-per-abi`), generados auto
 
 > 💡 ¿No sabes cuál elegir? Prueba primero con `arm64-v8a`.
 
+### Historial de versiones
+
+| Versión | Fecha | Hito principal |
+|---|---|---|
+| `v1.0.0` | 2026-10-02 | Primera release Alpha: build de APK, íconos propios y nombre de la app |
+| `v1.0.1` | 2026-10-04 | Modularización del `main.dart` monolítico (sidebar y servicios extraídos) |
+| `v1.0.2` | 2026-10-05 | Inspección nativa de APK, score de riesgo dinámico y recepción de APKs (Abrir con / Compartir) |
+| `v1.0.3` | 2026-10-06 | Estabilización de CI: workflows de build y release |
+| `v1.0.4` | 2026-10-07 | Puente nativo de Modos de Rendimiento y permisos de notificaciones para Focus |
+| `v1.0.5` | 2026-10-07 | Mismo código que `v1.0.4` (el tag apunta al mismo commit) |
+| `v1.0.6` | 2026-10-07 | `MainActivity` dividida en puentes Kotlin y **Puerto de Software** vía limbo |
+| `v1.0.7` | 2026-10-09 | *Code Hardening* (`PathSecurity`, `FileOpGuard`, minificación) y **Personalización**: paletas, modo zurdos, sidebar y cards configurables |
+| `v1.0.8` | 2026-10-10 | **Favoritos**: card funcional con pantalla unificada de apps, webs y archivos, con orden y quitar favoritos |
+
+> El detalle de cada versión está en sus [notas de release](https://github.com/Maximiliano-Flores-Dev/anything-hub/releases).
+
+---
+
+## 🗺️ Roadmap
+
+### ✅ Cumplido
+
+- [x] **Favoritos unificados** (`v1.0.8`): card del dashboard con pantalla que agrega apps, webs y archivos, con chips de orden, apertura directa y opción de quitar.
+- [x] **Personalización macro** (`v1.0.7`): 6 paletas, sidebar on/off, modo zurdos y cards activables y reordenables, con persistencia local y tests propios.
+- [x] **Parser del manifiesto de APK** (permisos, firma y hash SHA-256) integrado en el score de riesgo, con comportamiento *fail-closed* cuando el APK no se puede leer.
+- [x] **Verificación de firmas** con caché local de pins y política *fail-closed* (nunca declara “verificado” sin evidencia).
+- [x] **Integración con VirusTotal** por hash, opt-in y con la API key del usuario.
+- [x] **Ampliar el catálogo de plugins**: 4 plugins, con `extendsFeature` y `capabilities`, y documentación del catálogo en `plugins/README.md`.
+- [x] **Más tests**: reglas de rutas (`PathSecurity`), `FileOpGuard`, oráculo de firmas, modelo `project.md`, configuración OAuth de GitHub, paletas y `MacroCustomization`, además del *smoke test*.
+- [x] **Releases semiautomáticas**: workflow manual con incremento `patch` / `minor` / `major`, modo `dry-run`, versionado calculado desde los tags, APK firmados, `SHA256SUMS.txt` y atestación de procedencia.
+- [x] **CI de build y release**: formato, `flutter analyze` y tests se ejecutan en cada push y PR (hoy como avisos, sin bloquear el build), y los APK se compilan por arquitectura con **verificación de firma** obligatoria (se aborta si un release queda firmado con la clave *debug*).
+- [x] **Hardening de seguridad** (sandbox de rutas, límites de operaciones por lotes, R8, logger con redacción, almacenamiento cifrado).
+- [x] **Puerto de Software** con descarga a través del limbo antes de instalar.
+- [x] **Gestión de Archivos completa**: miniaturas, íconos de APK, hashes MD5 / SHA-1 y previsualización de texto.
+- [x] **Modos de Rendimiento** con puente nativo, acceso a No molestar y permiso de notificaciones.
+- [x] **Pantalla de Configuración** con pestañas General, Personalización y Plugins, y bottom nav con Perfil.
+- [x] **Sidebar de grupos** con vistas 2×2 (extendido) y apilada (encogido).
+- [x] **Refactor del código nativo** en puentes Kotlin separados (apps, archivos, rendimiento, PuertoPipe, Termux, inspección de APK) y del `main.dart` monolítico en módulos.
+
+### 🚧 Pendiente
+
+- [ ] Interfaz para **crear y editar grupos personalizados** (*Nuevo Grupo* del FAB radial)
+- [ ] Acciones del FAB radial: **Añadir App** y **Ajustes**
+- [ ] **Favoritos**: registrar la fecha de marcado también para webs y archivos (hoy solo apps) y que los órdenes *Recientes* / *Antiguos* los contemplen
+- [ ] **Favoritos**: que *Por tipo* se diferencie del orden alfabético (hoy ordena igual dentro de cada sección)
+- [ ] Tests de **Favoritos** (`FavoritesService`: agrupar, ordenar y quitar)
+- [ ] Más tests (sidebar, explorador de archivos completo, servicios nativos, modos de rendimiento)
+- [ ] Hacer que formato, analyzer y tests **bloqueen** el build en CI (hoy solo avisan)
+- [ ] Capturas de pantalla y GIFs de demostración en este README
+
 ---
 
 ## 📲 Instalación
 
 1. Abre la [pestaña de Releases](https://github.com/Maximiliano-Flores-Dev/anything-hub/releases) y descarga el APK que corresponda a tu dispositivo.
-2. Si Android lo pide, permite **instalar apps de orígenes desconocidos** para tu navegador o gestor de archivos.
-3. Abre el APK e instala.
-4. Al abrir la app por primera vez, concede **solo los permisos de los módulos que vayas a usar** (ver abajo).
+2. (Opcional) Verifica la integridad con `sha256sum -c SHA256SUMS.txt`.
+3. Si Android lo pide, permite **instalar apps de orígenes desconocidos** para tu navegador o gestor de archivos.
+4. Abre el APK e instala.
+5. Al abrir la app por primera vez, concede **solo los permisos de los módulos que vayas a usar** (ver abajo).
 
 ---
 
@@ -184,15 +285,19 @@ Anythings Hub pide permisos **solo cuando activas la función que los necesita**
 | Consulta de apps instaladas (`queries`) | Listar y clasificar tus apps (Android 11+). |
 | `MANAGE_EXTERNAL_STORAGE` (Acceso a todos los archivos) | Explorador de archivos. Solo se solicita al abrir ese módulo. |
 | `REQUEST_INSTALL_PACKAGES` | Instalar APKs desde el hub. |
+| `REQUEST_DELETE_PACKAGES` | Desinstalar apps desde Mis Aplicaciones. |
 | `ACCESS_NOTIFICATION_POLICY` (Acceso a No molestar) | Modo Focus: silenciar notificaciones de terceros. |
+| `KILL_BACKGROUND_PROCESSES` | Modos Eco, Focus y Rendimiento: cerrar procesos en segundo plano de apps de usuario. |
 | `POST_NOTIFICATIONS` (Android 13+) | Canal propio de avisos de rendimiento / Focus. |
-| `INTERNET` | Login con GitHub, vscode.dev, favicons de Webs Rápidas, catálogo de plugins y PuertoPipe. |
+| `com.termux.permission.RUN_COMMAND` | Módulo Proyectos: ejecutar comandos en Termux. |
+| `INTERNET` | Login con GitHub, vscode.dev, favicons de Webs Rápidas, catálogo de plugins, PuertoPipe y consulta a VirusTotal. |
 
 **Lo que hay que saber con total transparencia:**
 - No hay telemetría ni analítica propia (`telemetry_enabled: false`).
-- El escaneo de apps, el orden por uso, los proyectos y los modos de rendimiento se procesan localmente; ningún dato de ellos sale del dispositivo.
+- El escaneo de apps, el orden por uso, los proyectos, la personalización y los modos de rendimiento se procesan localmente; ningún dato de ellos sale del dispositivo.
 - Los **favicons** de Webs Rápidas se obtienen de un servicio externo de favicons de Google (el dominio del sitio se envía en esa petición). Puedes evitarlo asignando una **imagen personalizada** a cada enlace.
-- El inicio de sesión con GitHub y el catálogo de plugins se comunican con GitHub, por definición.
+- El inicio de sesión con GitHub, el catálogo de plugins y el Puerto de Software se comunican con GitHub, por definición.
+- La consulta a **VirusTotal** es opcional: solo ocurre si guardas tu propia API key, y se envía únicamente el **hash SHA-256**, nunca el APK.
 - Los plugins **solo descargan manifiestos JSON**; la app no ejecuta código remoto ni carga librerías dinámicas.
 
 ---
@@ -201,11 +306,14 @@ Anythings Hub pide permisos **solo cuando activas la función que los necesita**
 
 Anythings Hub separa la **capa de interfaz (Flutter/Dart)** de la **capa de sistema (Kotlin)**, comunicadas por `MethodChannel`s propios y sin plugins nativos de terceros para esas tareas. Así, todo lo que toca el sistema operativo (apps instaladas, estadísticas de uso, archivos, instalación de APKs, Termux, rendimiento) está en un único lugar auditable.
 
+Los colores de la interfaz se leen de la paleta activa (`HubColors` → `MacroCustomization` → `HubPalette`), por lo que un cambio en Personalización se refleja en toda la app sin reiniciarla.
+
 ```text
 ┌────────────────────────────────────────────────────────┐
-│                  Flutter / Dart (UI)                    │
-│  screens/  ui/sidebar  ui/widgets  modules/{apps,       │
-│  projects, plugins}  core/ (paleta, modelos, logger)    │
+│                  Flutter / Dart (UI)                   │
+│  screens/  ui/sidebar  ui/widgets                      │
+│  modules/{apps, projects, plugins, favorites}          │
+│  core/ (paleta, modelos, logger)                       │
 └───────────────┬────────────────────────────────────────┘
                 │ MethodChannel / EventChannel
                 │  • anythings.hub/device_apps
@@ -216,7 +324,7 @@ Anythings Hub separa la **capa de interfaz (Flutter/Dart)** de la **capa de sist
 │                Kotlin — MainActivity                    │
 │  DeviceAppsBridge · DeviceFilesBridge ·                 │
 │  PerformanceBridge · PuertoPipeBridge · TermuxHelper ·  │
-│  ApkInspectHelper · UsageStatsManager · FileProvider    │
+│  ApkInspectHelper · PathSecurity · FileProvider         │
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -226,15 +334,17 @@ Anythings Hub separa la **capa de interfaz (Flutter/Dart)** de la **capa de sist
 anything-hub/
 ├── lib/
 │   ├── main.dart                  # Punto de entrada y tema
-│   ├── core/                      # Paleta (HubColors), modelos y logger
-│   ├── screens/                   # Dashboard, Webs, Explorador, Settings, Performance
+│   ├── core/                      # Paletas, personalización, HubColors, modelos y logger
+│   ├── screens/                   # Dashboard, Webs, Explorador, Settings, Personalización, Performance
 │   ├── services/                  # Puente Dart ↔ Android (apps, archivos, perf, preview)
 │   ├── ui/                        # Sidebar colapsable y widgets compartidos
 │   └── modules/
-│       ├── apps/                  # Mis Aplicaciones + seguridad de APKs
+│       ├── apps/                  # Mis Aplicaciones + seguridad de APKs + Puerto de Software
+│       ├── favorites/             # Favoritos unificados (apps, webs y archivos)
 │       ├── projects/              # Módulo opt-in de proyectos (GitHub, Termux)
 │       └── plugins/               # Catálogo e instalación de plugins (metadatos)
 ├── android/                       # Capa nativa Kotlin y manifiesto
+├── plugins/                       # Catálogo oficial de plugins (catalog.json)
 ├── assets/                        # Logo, imágenes y config.json
 ├── docs/                          # Notas de diseño, integración y big_update
 ├── test/                          # Tests unitarios y de widgets
@@ -266,7 +376,7 @@ cd anything-hub
 flutter pub get
 
 # 3. Generar los íconos de la app
-flutter pub run flutter_launcher_icons
+dart run flutter_launcher_icons
 
 # 4. Ejecutar en un dispositivo o emulador Android
 flutter run
@@ -283,28 +393,18 @@ Los APK quedan en `build/app/outputs/flutter-apk/`.
 flutter test
 ```
 
-Actualmente cubren el *smoke test* de la app, el modelo `project.md` (ida y vuelta Markdown) y la configuración de OAuth de GitHub.
+Son **36 casos** en 7 archivos. Cubren el *smoke test* de la app, el sandbox de rutas (`PathSecurity`), `FileOpGuard`, el oráculo de firmas, el modelo `project.md` (ida y vuelta Markdown), la configuración de OAuth de GitHub, las paletas (`HubPalettes`) y el estado de personalización (`MacroCustomization`: valores por defecto, persistencia, reordenamiento y restauración). El módulo de Favoritos todavía no tiene tests propios.
+
+El workflow de CI (`build.yml`) ejecuta la verificación de formato, `flutter analyze` y `flutter test` en cada push y *pull request*. Por ahora estos pasos **reportan advertencias pero no bloquean el build**; lo que sí aborta el proceso es que el analyzer falle con un error grave, que no se genere ningún APK o que un release salga firmado con la clave *debug*.
 
 ### Publicar un release
 
-Los workflows de `.github/workflows/` compilan y publican los APK automáticamente al subir un tag con formato `v*`:
+Los releases se lanzan a mano desde **Actions → Release → Run workflow** en la rama principal:
 
-```bash
-git tag v1.0.3
-git push origin v1.0.3
-```
-
----
-
-## 🗺️ Roadmap
-
-- [ ] Parser completo del manifiesto de APK (permisos, firma y hash SHA-256) integrado en el score de riesgo
-- [ ] Verificación de firmas con caché local y política *fail-closed*
-- [ ] Integración con la API de VirusTotal
-- [ ] Card **Favoritos** funcional en el dashboard
-- [ ] Más tests (sidebar, explorador de archivos, servicios nativos, modos de rendimiento)
-- [ ] Capturas de pantalla y GIFs de demostración en este README
-- [ ] Ampliar catálogo de plugins y documentación de manifiestos
+1. Elige el tipo de incremento: `patch`, `minor` o `major`.
+2. (Opcional) Activa `dry-run` para calcular la versión sin compilar ni publicar.
+3. El workflow calcula la siguiente versión a partir de los tags `v*`, compila los APK por arquitectura con la firma de release, genera `SHA256SUMS.txt`, atesta la procedencia del build y publica el release en GitHub.
+4. La publicación corre en el entorno `release`, que permite exigir una aprobación manual antes de salir.
 
 ---
 

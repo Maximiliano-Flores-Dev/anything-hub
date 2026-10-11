@@ -37,7 +37,7 @@ class AppIconCell extends StatelessWidget {
               children: [
                 _buildIcon(),
                 if (bookmarked)
-                  const Positioned(
+                  Positioned(
                     top: -4,
                     right: -4,
                     child: Icon(
@@ -48,25 +48,25 @@ class AppIconCell extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 color: HubColors.textoPrincipal,
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: 2),
             Text(
               category,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 color: HubColors.textoSecundario,
                 fontSize: 11,
               ),
@@ -97,7 +97,7 @@ class AppIconCell extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: HubColors.linea),
       ),
-      child: const Icon(Icons.android, color: HubColors.textoSecundario),
+      child: Icon(Icons.android, color: HubColors.textoSecundario),
     );
   }
 }

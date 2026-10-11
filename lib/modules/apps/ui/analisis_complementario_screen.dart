@@ -74,6 +74,7 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 14),
+                SizedBox(height: 14),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -90,14 +91,14 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                         : () {
                             Clipboard.setData(ClipboardData(text: report.sha256!));
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Hash copiado')),
+                              SnackBar(content: Text('Hash copiado')),
                             );
                           },
                     icon: const Icon(Icons.copy),
-                    label: const Text('Copiar hash'),
+                    label: Text('Copiar hash'),
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(

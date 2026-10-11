@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:typed_data';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -18,12 +17,14 @@ class CollapsibleSidebar extends StatefulWidget {
     required this.appGroups,
     required this.onActionSelected,
     required this.onAppTap,
+    this.onEditGroup,
   });
 
   final double screenWidth;
   final List<AppGroup> appGroups;
   final ValueChanged<RadialAction> onActionSelected;
   final ValueChanged<HubApp> onAppTap;
+  final ValueChanged<AppGroup>? onEditGroup;
 
   @override
   State<CollapsibleSidebar> createState() => _CollapsibleSidebarState();

@@ -156,7 +156,7 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
     return AlertDialog(
       backgroundColor: HubColors.panel,
       title: Text(e.name,
-          style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 16)),
+          style: TextStyle(color: HubColors.textoPrincipal, fontSize: 16)),
       content: SizedBox(
         width: double.maxFinite,
         child: SingleChildScrollView(
@@ -175,7 +175,7 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
               if (!e.isDirectory) _row('Tamaño', e.sizeLabel),
               if (e.modifiedMs > 0) _row('Modificado', _fmt(e.modified)),
               if (_loading)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(12),
                   child: Center(
                       child: CircularProgressIndicator(
@@ -186,8 +186,8 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
                 _row('SHA-1', _sha1 ?? '—', mono: true),
               ],
               if (!_loading && _apk != null) ...[
-                const SizedBox(height: 8),
-                const Text('APK (solo lectura)',
+                SizedBox(height: 8),
+                Text('APK (solo lectura)',
                     style: TextStyle(
                         color: HubColors.pomelo, fontWeight: FontWeight.w700)),
                 _row('Paquete', '${_apk!['packageName'] ?? '—'}'),
@@ -199,20 +199,20 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
                     final s = p.toString();
                     final short = s.contains('.') ? s.split('.').last : s;
                     return Text('• $short',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: HubColors.textoPrincipal, fontSize: 12));
                   })),
               ],
               if (!_loading &&
                   _textPreview != null &&
                   _textPreview!.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                const Text('Vista previa (20 líneas)',
+                SizedBox(height: 10),
+                Text('Vista previa (20 líneas)',
                     style: TextStyle(
                         color: HubColors.textoSecundario,
                         fontSize: 11,
                         fontWeight: FontWeight.w600)),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(10),
@@ -223,7 +223,7 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
                   ),
                   child: Text(
                     _textPreview!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: HubColors.textoPrincipal,
                       fontSize: 11,
                       fontFamily: 'monospace',
@@ -239,7 +239,7 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cerrar',
+          child: Text('Cerrar',
               style: TextStyle(color: HubColors.pomelo)),
         ),
       ],
@@ -258,9 +258,9 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(
+              style: TextStyle(
                   color: HubColors.textoSecundario, fontSize: 11)),
-          const SizedBox(height: 2),
+          SizedBox(height: 2),
           SelectableText(
             value,
             style: TextStyle(

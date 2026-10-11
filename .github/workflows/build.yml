@@ -78,34 +78,19 @@ jobs:
 
       - name: Check formatting
         run: |
-          if ! dart format --output=none --set-exit-if-changed .; then
-            echo "::warning::Hay archivos sin formatear. Ejecuta localmente: dart format ."
-            echo "::notice::No se bloquea el build por formato (temporal)."
-          fi
+          dart format --output=none --set-exit-if-changed .
+          echo "::notice::Formato OK"
 
       - name: Static analysis
         run: |
-          set +e
-          flutter analyze
-          code=$?
-          set -e
-          if [ "$code" -eq 1 ]; then
-            echo "::warning::Analyzer reportó issues (infos/warnings). No se bloquea el build."
-          elif [ "$code" -ne 0 ]; then
-            echo "::error::Analyzer falló con código $code"
-            exit "$code"
-          fi
+          # Infos (prefer_const, withOpacity, etc.) no bloquean.
+          # Warnings y errors sí fallan el pipeline.
+          flutter analyze --no-fatal-infos
 
       - name: Run tests
         run: |
           if [ -d test ] && [ -n "$(find test -name '*_test.dart' -print -quit)" ]; then
-            set +e
             flutter test --no-pub
-            code=$?
-            set -e
-            if [ "$code" -ne 0 ]; then
-              echo "::warning::Algunos tests fallaron (código $code). No se bloquea el build de release."
-            fi
           else
             echo "::notice::No hay tests en /test, se omite este paso"
           fi

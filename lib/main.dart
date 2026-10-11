@@ -2,24 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'core/hub_colors.dart';
+import 'core/macro_customization.dart';
 import 'modules/projects/services/oauth_deep_link_handler.dart';
 import 'screens/main_layout_screen.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: HubColors.fondoPrincipal,
-    systemNavigationBarIconBrightness: Brightness.light,
-  ));
+  await MacroCustomization.instance.load();
+  _applySystemUi();
   // Deep-link OAuth (solo activo cuando el módulo de proyectos se use)
   OAuthDeepLinkHandler.init();
   runApp(const AnythingsHubApp());
 }
 
-class AnythingsHubApp extends StatelessWidget {
+void _applySystemUi() {
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    systemNavigationBarColor: HubColors.fondoPrincipal,
+    systemNavigationBarIconBrightness: Brightness.light,
+  ));
+}
+
+class AnythingsHubApp extends StatefulWidget {
   const AnythingsHubApp({super.key});
+
+  @override
+  State<AnythingsHubApp> createState() => _AnythingsHubAppState();
+}
+
+class _AnythingsHubAppState extends State<AnythingsHubApp> {
+  @override
+  void initState() {
+    super.initState();
+    MacroCustomization.instance.addListener(_onMacroChanged);
+  }
+
+  @override
+  void dispose() {
+    MacroCustomization.instance.removeListener(_onMacroChanged);
+    super.dispose();
+  }
+
+  void _onMacroChanged() {
+    _applySystemUi();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +57,7 @@ class AnythingsHubApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: HubColors.fondoPrincipal,
-        colorScheme: const ColorScheme(
+        colorScheme: ColorScheme(
           brightness: Brightness.dark,
           surface: HubColors.fondoPrincipal,
           onSurface: HubColors.textoPrincipal,

@@ -61,7 +61,7 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
     if (!mounted) return;
     setState(() => _authenticated = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text('Tokens revocados y eliminados del dispositivo'),
         backgroundColor: HubColors.panel,
       ),
@@ -75,11 +75,11 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
       appBar: AppBar(
         backgroundColor: HubColors.fondoSidebar,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'GitHub · OAuth 2.0 + PKCE',
           style: TextStyle(color: HubColors.textoPrincipal),
         ),
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
@@ -101,11 +101,11 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
                       color: _authenticated ? Colors.greenAccent : HubColors.pomelo,
                       size: 28,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         _authenticated ? 'Cuenta vinculada' : 'No autenticado',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: HubColors.textoPrincipal,
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
@@ -114,8 +114,8 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                const Text(
+                SizedBox(height: 14),
+                Text(
                   'Los tokens se almacenan únicamente en el Keystore del sistema. '
                   'Nunca se envían a servidores de Anythings Hub ni se incluyen en la URL de vscode.dev.\n\n'
                   'Scope: repo + read:user.',
@@ -124,7 +124,7 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           if (_error != null) ...[
             Container(
               width: double.infinity,
@@ -133,18 +133,18 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
                 color: Colors.redAccent.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Text(_error!, style: const TextStyle(color: Colors.redAccent, fontSize: 13, height: 1.35)),
+              child: Text(_error!, style: TextStyle(color: Colors.redAccent, fontSize: 13, height: 1.35)),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
           ],
           if (_authenticated)
             OutlinedButton.icon(
               onPressed: _revoke,
               icon: const Icon(Icons.link_off_rounded, color: Colors.redAccent),
-              label: const Text('Desvincular y revocar tokens',
+              label: Text('Desvincular y revocar tokens',
                   style: TextStyle(color: Colors.redAccent)),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.redAccent),
+                side: BorderSide(color: Colors.redAccent),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
             )
@@ -152,7 +152,7 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
             ElevatedButton.icon(
               onPressed: _loading ? null : _startAuth,
               icon: _loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(strokeWidth: 2, color: HubColors.fondoPrincipal),
