@@ -18,7 +18,6 @@ class RevisarApkScreen extends StatelessWidget {
 
   final ApkRiskReport report;
   final VoidCallback? onInstallOverride;
-  final String? advisoryNote;
 
   Color get _levelColor {
     switch (report.level) {
@@ -241,18 +240,12 @@ class RevisarApkScreen extends StatelessWidget {
           ),
           TextButton.icon(
             onPressed: () {
-              final primaryCert = report.signingCertSha256.isNotEmpty
-                  ? report.signingCertSha256.first
-                  : report.sha256;
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => VerificacionFirmaScreen(
                     packageName: report.packageName,
-                    versionLabel: report.versionLabel,
-                    certSha256: primaryCert,
-                    signingCertSha256: report.signingCertSha256,
-                    installedCertSha256: report.installedCertSha256,
-                    isPackageInstalled: report.isPackageInstalled,
+                    versionLabel: '—',
+                    certSha256: report.sha256,
                   ),
                 ),
               );

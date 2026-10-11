@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../core/hub_colors.dart';
 import '../core/logger.dart';
 import '../ui/widgets/gradient_pill_button.dart';
+import '../modules/favorites/services/favorites_service.dart';
 
 class WebLinkItem {
   const WebLinkItem({
@@ -185,10 +186,32 @@ class WebLinksScreen extends StatefulWidget {
 }
 
 class _WebLinksScreenState extends State<WebLinksScreen> {
+  final _favService = FavoritesService();
+  Set<String> _webFavs = {};
+
   @override
   void initState() {
     super.initState();
     widget.repository.load();
+    _loadWebFavs();
+  }
+
+  Future<void> _loadWebFavs() async {
+    final set = await _favService.loadWebFavorites();
+    if (mounted) setState(() => _webFavs = set);
+  }
+
+  Future<void> _toggleWebFav(WebLinkItem item) async {
+    final next = !_webFavs.contains(item.id);
+    await _favService.setWebFavorite(item.id, next);
+    if (!mounted) return;
+    setState(() {
+      if (next) {
+        _webFavs.add(item.id);
+      } else {
+        _webFavs.remove(item.id);
+      }
+    });
   }
 
   void _toast(String message, {SnackBarAction? action}) {
@@ -375,8 +398,10 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
               return _WebLinkTile(
                 key: ValueKey(item.id),
                 item: item,
+                isFavorite: _webFavs.contains(item.id),
                 onOpen: () => _open(item),
                 onEdit: () => _addOrEdit(item),
+                onToggleFavorite: () => _toggleWebFav(item),
               );
             },
           ),
@@ -384,7 +409,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
         Padding(
           padding: EdgeInsets.fromLTRB(24, 4, 24, 12),
           child: Text(
-            'Toca el título para abrir · el ícono para editar · mantén pulsado para reordenar',
+            'Toca el título para abrir · el ícono para editar · estrella para favoritos · mantén para reordenar',
             textAlign: TextAlign.center,
             style: TextStyle(color: HubColors.textoSecundario, fontSize: 11.5),
           ),
@@ -398,13 +423,17 @@ class _WebLinkTile extends StatelessWidget {
   const _WebLinkTile({
     super.key,
     required this.item,
+    required this.isFavorite,
     required this.onOpen,
     required this.onEdit,
+    required this.onToggleFavorite,
   });
 
   final WebLinkItem item;
+  final bool isFavorite;
   final VoidCallback onOpen;
   final VoidCallback onEdit;
+  final VoidCallback onToggleFavorite;
 
   @override
   Widget build(BuildContext context) {
@@ -437,6 +466,15 @@ class _WebLinkTile extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+        ),
+        IconButton(
+          tooltip: isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos',
+          onPressed: onToggleFavorite,
+          icon: Icon(
+            isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
+            color: isFavorite ? HubColors.amarillo : HubColors.textoSecundario,
+            size: 22,
           ),
         ),
       ],
@@ -584,17 +622,16 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
       errorStyle: TextStyle(color: HubColors.pomeloSuave),
       enabledBorder: line,
       focusedBorder: focus,
-      errorBorder: warn,
-      focusedErrorBorder: warn,
+      errorBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomeloSuave)),
+      focusedErrorBorder: focus,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final editing = widget.existing != null;
+    final isEdit = widget.existing != null;
     return AlertDialog(
       backgroundColor: HubColors.panel,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
         editing ? 'Editar web' : 'Añadir web',
         style: TextStyle(color: HubColors.textoPrincipal),
@@ -632,7 +669,7 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
         ],
       ),
       actions: [
-        if (editing)
+        if (isEdit)
           TextButton(
             onPressed: () => Navigator.pop(context, const _LinkEditorResult.delete()),
             child: Text('Eliminar', style: TextStyle(color: HubColors.pomeloSuave)),
@@ -641,10 +678,9 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
         ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),
+        TextButton(
           onPressed: _submit,
-          child: const Text('Guardar', style: TextStyle(color: Colors.white)),
+          child: Text('Guardar', style: TextStyle(color: HubColors.pomelo)),
         ),
       ],
     );

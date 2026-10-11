@@ -7,6 +7,7 @@ class _SidebarGroupTile extends StatelessWidget {
     required this.width,
     required this.onAppTap,
     required this.onExpand,
+    this.onEdit,
   });
 
   final AppGroup group;
@@ -14,6 +15,7 @@ class _SidebarGroupTile extends StatelessWidget {
   final double width;
   final ValueChanged<HubApp> onAppTap;
   final VoidCallback onExpand;
+  final VoidCallback? onEdit;
 
   static const int _maxShown = 4;
   // Tamaño fijo de cada logo en la cuadrícula (antes crecía con el sidebar).
@@ -109,6 +111,17 @@ class _SidebarGroupTile extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(0, 2, 0, 8),
         child: Row(
           children: [
+            if (group.isCustom && group.color != null) ...[
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: group.color,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 6),
+            ],
             Expanded(
               child: Text(
                 group.label,

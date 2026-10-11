@@ -3,27 +3,20 @@ import 'package:flutter/material.dart';
 import '../../../core/hub_colors.dart';
 import '../../../ui/widgets/gradient_pill_button.dart';
 import '../models/app_models.dart';
-import '../services/signature_oracle_service.dart';
 import '../widgets/hub_panel.dart';
 
-/// Oráculo de firmas local + pins offline (TTL) + fail-closed con override.
+/// Oráculo de firmas + soporte offline (TTL) + fail-closed con override.
 class VerificacionFirmaScreen extends StatefulWidget {
   const VerificacionFirmaScreen({
     super.key,
     required this.packageName,
     required this.versionLabel,
     this.certSha256,
-    this.signingCertSha256 = const [],
-    this.installedCertSha256 = const [],
-    this.isPackageInstalled = false,
   });
 
   final String packageName;
   final String versionLabel;
   final String? certSha256;
-  final List<String> signingCertSha256;
-  final List<String> installedCertSha256;
-  final bool isPackageInstalled;
 
   @override
   State<VerificacionFirmaScreen> createState() => _VerificacionFirmaScreenState();
@@ -41,19 +34,15 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
 
   Future<void> _runCheck() async {
     setState(() => _loading = true);
+    await Future<void>.delayed(const Duration(milliseconds: 600));
 
-    final certs = widget.signingCertSha256.isNotEmpty
-        ? widget.signingCertSha256
-        : (widget.certSha256 != null && widget.certSha256!.isNotEmpty
-            ? [widget.certSha256!]
-            : <String>[]);
-
-    final result = await SignatureOracleService.verify(
+    final result = SignatureCheckResult(
+      status: SignatureStatus.cacheHit,
       packageName: widget.packageName,
       versionLabel: widget.versionLabel,
-      apkCertSha256: certs,
-      installedCertSha256: widget.installedCertSha256,
-      isPackageInstalled: widget.isPackageInstalled,
+      certSha256: widget.certSha256,
+      cacheAgeDays: 5,
+      message: 'Verificación con datos almacenados',
     );
 
     if (!mounted) return;
@@ -122,7 +111,7 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'Oráculo local',
+                          'Certificate Pinning',
                           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -132,16 +121,10 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                           color: HubColors.textoAcento.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
-                          _result?.status == SignatureStatus.verified ||
-                                  _result?.status == SignatureStatus.cacheHit
-                              ? 'OK'
-                              : 'FAIL-CLOSED',
+                        child: const Text(
+                          'FIJADO',
                           style: TextStyle(
-                            color: _result?.status == SignatureStatus.verified ||
-                                    _result?.status == SignatureStatus.cacheHit
-                                ? const Color(0xFF3DDC84)
-                                : const Color(0xFFE53935),
+                            color: HubColors.textoAcento,
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
                           ),

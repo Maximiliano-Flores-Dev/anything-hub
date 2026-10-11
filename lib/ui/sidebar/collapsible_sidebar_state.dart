@@ -289,6 +289,9 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                         width: w,
                         onAppTap: widget.onAppTap,
                         onExpand: () => _settle(open: true),
+                        onEdit: group.isCustom && widget.onEditGroup != null
+                            ? () => widget.onEditGroup!(group)
+                            : null,
                       );
                     },
                   ),

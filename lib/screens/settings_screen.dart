@@ -280,7 +280,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         _sectionTitle('Permisos del sistema'),
         _card(
           child: _loadingPerms
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(12),
                   child: Center(
                     child: SizedBox(
@@ -418,7 +418,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           const SizedBox(height: 8),
           if (_loadingCatalog)
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               child: Center(
                   child: CircularProgressIndicator(color: HubColors.pomelo)),
             )
