@@ -1,0 +1,37 @@
+name: Auto format
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Format
+        run: dart format .
+      - name: Commit if needed
+        run: |
+          if git diff --quiet; then
+            echo "Already formatted"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          branch="chore/dart-format-$(date +%Y%m%d%H%M)"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m "chore: dart format entire codebase"
+          git push -u origin "$branch"
+          gh pr create --base main --head "$branch" --title "chore: dart format" --body "Formato automático con dart format. Merge para que el quality gate de formato pase en verde."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
