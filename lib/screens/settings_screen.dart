@@ -281,7 +281,6 @@ class _SettingsScreenState extends State<SettingsScreen>
         _card(
           child: _loadingPerms
               ? const Padding(
-              ? Padding(
                   padding: EdgeInsets.all(12),
                   child: Center(
                     child: SizedBox(
