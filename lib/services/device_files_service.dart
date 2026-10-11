@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
@@ -78,15 +77,6 @@ class StorageInfo {
   final int freeBytes;
   int get usedBytes => totalBytes - freeBytes;
   double get usedRatio => totalBytes == 0 ? 0 : usedBytes / totalBytes;
-
-  String get totalLabel => _fmt(totalBytes);
-  String get freeLabel => _fmt(freeBytes);
-  String get usedLabel => _fmt(usedBytes);
-
-  static String _fmt(int b) {
-    if (b < 1024 * 1024 * 1024) return '${(b / (1024 * 1024)).toStringAsFixed(0)} MB';
-    return '${(b / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-  }
 }
 
 class DeviceFilesService {
