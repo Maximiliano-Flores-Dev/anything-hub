@@ -19,8 +19,8 @@ class AnalisisComplementarioScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
-        title: Text(
+        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
+        title: const Text(
           'Análisis complementario',
           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
         ),
@@ -28,16 +28,16 @@ class AnalisisComplementarioScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          Text(
+          const Text(
             'Verifica la integridad y seguridad del APK de forma adicional.',
             style: TextStyle(color: HubColors.textoSecundario, fontSize: 14),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           HubPanel(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   children: [
                     Icon(Icons.fingerprint, color: HubColors.textoSecundario, size: 20),
                     SizedBox(width: 8),
@@ -50,12 +50,12 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 4),
-                Text(
+                const SizedBox(height: 4),
+                const Text(
                   'Identificador único del APK analizado.',
                   style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
                 ),
-                SizedBox(height: 14),
+                const SizedBox(height: 14),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
@@ -66,13 +66,14 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                   ),
                   child: SelectableText(
                     '$hash\n(SHA-256)',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: HubColors.textoPrincipal,
                       fontSize: 12,
                       fontFamily: 'monospace',
                     ),
                   ),
                 ),
+                const SizedBox(height: 14),
                 SizedBox(height: 14),
                 SizedBox(
                   width: double.infinity,
@@ -103,7 +104,7 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
                       foregroundColor: HubColors.textoPrincipal,
-                      side: BorderSide(color: HubColors.linea),
+                      side: const BorderSide(color: HubColors.linea),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(radius12),
@@ -111,24 +112,24 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                     ),
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Text('Exportar APK: conectar con FileProvider'),
                         ),
                       );
                     },
                     icon: const Icon(Icons.file_upload_outlined),
-                    label: Text('Exportar APK'),
+                    label: const Text('Exportar APK'),
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           HubPanel(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   children: [
                     Icon(Icons.menu_book_outlined, color: HubColors.textoSecundario, size: 20),
                     SizedBox(width: 8),
@@ -141,23 +142,23 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
-                Text(
+                const SizedBox(height: 12),
+                const Text(
                   'Este análisis es opcional y no afecta la instalación. '
                   'Puedes verificar el APK manualmente para mayor confianza:',
                   style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 _step('1', 'Sube el APK a VirusTotal (virustotal.com) para escanearlo en la nube.'),
                 _step('2', 'O escanea el APK con tu antivirus local de confianza.'),
                 _step('3', 'Revisa los resultados y decide si deseas instalarlo.'),
               ],
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           HubPanel(
             padding: const EdgeInsets.all(12),
-            child: Row(
+            child: const Row(
               children: [
                 Icon(Icons.info_outline, color: HubColors.textoAcento, size: 18),
                 SizedBox(width: 10),
@@ -191,16 +192,16 @@ class AnalisisComplementarioScreen extends StatelessWidget {
             ),
             child: Text(
               n,
-              style: TextStyle(
+              style: const TextStyle(
                 color: HubColors.pomelo,
                 fontWeight: FontWeight.w700,
                 fontSize: 12,
               ),
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
-            child: Text(text, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+            child: Text(text, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
           ),
         ],
       ),

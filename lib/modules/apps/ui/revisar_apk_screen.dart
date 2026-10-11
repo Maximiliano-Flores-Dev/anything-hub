@@ -7,7 +7,7 @@ import '../widgets/hub_panel.dart';
 import 'analisis_complementario_screen.dart';
 import 'verificacion_firma_screen.dart';
 
-/// Puente de soberan\u00eda: risk score + permisos + override del usuario.
+/// Puente de soberanía: risk score + permisos + override del usuario.
 class RevisarApkScreen extends StatelessWidget {
   const RevisarApkScreen({
     super.key,
@@ -18,7 +18,6 @@ class RevisarApkScreen extends StatelessWidget {
 
   final ApkRiskReport report;
   final VoidCallback? onInstallOverride;
-  final String? advisoryNote;
 
   Color get _levelColor {
     switch (report.level) {
@@ -49,8 +48,8 @@ class RevisarApkScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
-        title: Text(
+        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
+        title: const Text(
           'Revisar APK',
           style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
         ),
@@ -211,10 +210,10 @@ class RevisarApkScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Row(
                           children: [
-                            Icon(Icons.analytics_outlined, size: 18, color: HubColors.textoSecundario),
+                            const Icon(Icons.analytics_outlined, size: 18, color: HubColors.textoSecundario),
                             const SizedBox(width: 10),
                             Expanded(
-                              child: Text(s, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 13)),
+                              child: Text(s, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 13)),
                             ),
                           ],
                         ),
@@ -233,33 +232,27 @@ class RevisarApkScreen extends StatelessWidget {
                 ),
               );
             },
-            icon: Icon(Icons.travel_explore, color: HubColors.textoAcento),
-            label: Text(
-              'An\u00e1lisis complementario (opcional)',
+            icon: const Icon(Icons.travel_explore, color: HubColors.textoAcento),
+            label: const Text(
+              'Análisis complementario (opcional)',
               style: TextStyle(color: HubColors.textoAcento),
             ),
           ),
           TextButton.icon(
             onPressed: () {
-              final primaryCert = report.signingCertSha256.isNotEmpty
-                  ? report.signingCertSha256.first
-                  : report.sha256;
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => VerificacionFirmaScreen(
                     packageName: report.packageName,
-                    versionLabel: report.versionLabel,
-                    certSha256: primaryCert,
-                    signingCertSha256: report.signingCertSha256,
-                    installedCertSha256: report.installedCertSha256,
-                    isPackageInstalled: report.isPackageInstalled,
+                    versionLabel: '—',
+                    certSha256: report.sha256,
                   ),
                 ),
               );
             },
-            icon: Icon(Icons.verified_user_outlined, color: HubColors.textoAcento),
-            label: Text(
-              'Verificar firma (or\u00e1culo)',
+            icon: const Icon(Icons.verified_user_outlined, color: HubColors.textoAcento),
+            label: const Text(
+              'Verificar firma (oráculo)',
               style: TextStyle(color: HubColors.textoAcento),
             ),
           ),
@@ -271,12 +264,12 @@ class RevisarApkScreen extends StatelessWidget {
               children: [
                 Icon(Icons.gavel, color: HubColors.pomelo.withOpacity(0.9), size: 22),
                 const SizedBox(width: 12),
-                Expanded(
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Tu soberan\u00eda, tu decisi\u00f3n.',
+                        'Tu soberanía, tu decisión.',
                         style: TextStyle(
                           color: HubColors.textoPrincipal,
                           fontWeight: FontWeight.w700,
@@ -284,7 +277,7 @@ class RevisarApkScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'El sistema no te impide instalar. Si contin\u00faas, es bajo tu responsabilidad.',
+                        'El sistema no te impide instalar. Si continúas, es bajo tu responsabilidad.',
                         style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                       ),
                     ],
@@ -304,7 +297,7 @@ class RevisarApkScreen extends StatelessWidget {
           const SizedBox(height: 12),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+            child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
           ),
         ],
       ),
