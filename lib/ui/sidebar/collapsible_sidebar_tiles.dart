@@ -7,6 +7,7 @@ class _SidebarGroupTile extends StatelessWidget {
     required this.width,
     required this.onAppTap,
     required this.onExpand,
+    this.onEdit,
   });
 
   final AppGroup group;
@@ -14,6 +15,7 @@ class _SidebarGroupTile extends StatelessWidget {
   final double width;
   final void Function(AppItem) onAppTap;
   final VoidCallback onExpand;
+  final VoidCallback? onEdit;
 
   static const double _gap = 6;
 
@@ -58,7 +60,7 @@ class _SidebarGroupTile extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           if (top.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 2, top: 2),
               child: Text(
                 'Grupo vacío',
@@ -66,10 +68,10 @@ class _SidebarGroupTile extends StatelessWidget {
               ),
             )
           else ...[
-            Row(children: [cell(0), const SizedBox(width: _gap), cell(1)]),
+            Row(children: [cell(0), SizedBox(width: _gap), cell(1)]),
             if (top.length > 2) ...[
-              const SizedBox(height: _gap),
-              Row(children: [cell(2), const SizedBox(width: _gap), cell(3)]),
+              SizedBox(height: _gap),
+              Row(children: [cell(2), SizedBox(width: _gap), cell(3)]),
             ],
           ],
         ],

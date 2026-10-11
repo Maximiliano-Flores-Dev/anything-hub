@@ -245,8 +245,8 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Row(
                             children: [
-                              const Icon(Icons.grid_view_rounded, color: HubColors.pomelo, size: 20),
-                              const SizedBox(width: 8),
+                              Icon(Icons.grid_view_rounded, color: HubColors.pomelo, size: 20),
+                              SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   'Aplicaciones',
@@ -272,7 +272,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                       : Center(
                           child: IconButton(
                             onPressed: _toggle,
-                            icon: const Icon(Icons.menu_rounded, color: HubColors.textoSecundario),
+                            icon: Icon(Icons.menu_rounded, color: HubColors.textoSecundario),
                           ),
                         ),
                 ),
@@ -289,6 +289,9 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                         width: w,
                         onAppTap: widget.onAppTap,
                         onExpand: () => _settle(open: true),
+                        onEdit: group.isCustom && widget.onEditGroup != null
+                            ? () => widget.onEditGroup!(group)
+                            : null,
                       );
                     },
                   ),
@@ -334,7 +337,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
               ),
             ],
           ),
-          child: const Center(
+          child: Center(
             child: Icon(Icons.add_rounded, color: Colors.white, size: 30),
           ),
         ),
@@ -342,4 +345,3 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
     );
   }
 }
-
