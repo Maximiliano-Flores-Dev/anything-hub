@@ -17,8 +17,15 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - name: Format
-        run: dart format .
+      - name: Format (continue on parse errors)
+        run: |
+          set +e
+          dart format .
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            echo "::warning::dart format exit $code (posible archivo no parseable). Se sigue con lo formateado."
+          fi
       - name: Commit if needed
         run: |
           if git diff --quiet; then
@@ -32,6 +39,6 @@ jobs:
           git add -A
           git commit -m "chore: dart format entire codebase"
           git push -u origin "$branch"
-          gh pr create --base main --head "$branch" --title "chore: dart format" --body "Formato automático con dart format. Merge para que el quality gate de formato pase en verde."
+          gh pr create --base main --head "$branch" --title "chore: dart format" --body "Formato automático con dart format."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
