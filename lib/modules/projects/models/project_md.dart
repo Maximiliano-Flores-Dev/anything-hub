@@ -119,11 +119,27 @@ class ProjectMd {
         description = descMatch.group(1)!.trim();
       }
       final notesMatch = RegExp(
-        r'## Notas\s*\n([\s\S]*?)$',
+        r'## Notas\s*\n([\s\S]*?)(?=\n## |$)',
         multiLine: true,
       ).firstMatch(body);
       if (notesMatch != null) {
         notes = notesMatch.group(1)!.trim();
+      }
+      // Preserve ## Commands / ## Comandos útiles so updateLastOpened does not wipe them
+      final commands = <String, String>{};
+      final cmdsMatch = RegExp(
+        r'## (?:Commands|Comandos útiles)\s*\n([\s\S]*?)(?=\n## |$)',
+        multiLine: true,
+      ).firstMatch(body);
+      if (cmdsMatch != null) {
+        final block = cmdsMatch.group(1)!;
+        final lineRe = RegExp(r'^-\s*([^:]+):\s*`([^`]*)`');
+        for (final line in block.split('\n')) {
+          final m = lineRe.firstMatch(line.trim());
+          if (m != null) {
+            commands[m.group(1)!.trim()] = m.group(2)!;
+          }
+        }
       }
       return ProjectMd(
         name: name,
@@ -136,6 +152,7 @@ class ProjectMd {
         language: map['language'],
         description: description,
         notes: notes,
+        commands: commands,
       );
     } catch (_) {
       return null;

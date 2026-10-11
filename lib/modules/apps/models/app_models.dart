@@ -73,6 +73,10 @@ class ApkRiskReport {
     required this.fileName,
     required this.packageName,
     this.sha256,
+    this.versionLabel = '—',
+    this.signingCertSha256 = const [],
+    this.installedCertSha256 = const [],
+    this.isPackageInstalled = false,
   });
 
   final int score; // 0–100
@@ -81,7 +85,14 @@ class ApkRiskReport {
   final List<String> trackingSdks;
   final String fileName;
   final String packageName;
+  /// Hash del archivo APK (contenido), no del certificado.
   final String? sha256;
+  final String versionLabel;
+  /// Huellas SHA-256 de certificados de firma del APK.
+  final List<String> signingCertSha256;
+  /// Huellas de la app ya instalada (si existe).
+  final List<String> installedCertSha256;
+  final bool isPackageInstalled;
 
   static RiskLevel levelFromScore(int score) {
     if (score <= 30) return RiskLevel.bajo;

@@ -403,6 +403,7 @@ class _SliderRow extends StatelessWidget {
         Text(
           value.toStringAsFixed(1),
           style: const TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
+          style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
         ),
       ],
     );

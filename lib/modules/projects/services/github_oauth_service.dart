@@ -16,7 +16,10 @@ class GitHubOAuthService {
       'https://github.com/login/oauth/access_token';
   static const List<String> scopes = ['repo', 'read:user'];
 
-  static const FlutterSecureStorage _storage = FlutterSecureStorage();
+  /// Keystore-backed storage; en Android usa EncryptedSharedPreferences.
+  static final FlutterSecureStorage _storage = FlutterSecureStorage(
+    aOptions: const AndroidOptions(encryptedSharedPreferences: true),
+  );
 
   static const String _keyAccess = 'gh_access_token';
   static const String _keyRefresh = 'gh_refresh_token';

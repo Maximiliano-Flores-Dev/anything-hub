@@ -51,4 +51,10 @@ class ProjectActivationService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyActivated, false);
   }
+
+  /// Permite reactivar el aviso tras "No volver a mostrar".
+  static Future<void> clearAdvisementDismissal() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyDontShowAgain, false);
+  }
 }

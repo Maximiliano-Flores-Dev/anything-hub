@@ -13,6 +13,7 @@ class RevisarApkScreen extends StatelessWidget {
     super.key,
     required this.report,
     this.onInstallOverride,
+    this.advisoryNote,
   });
 
   final ApkRiskReport report;
@@ -56,14 +57,23 @@ class RevisarApkScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          Text(report.fileName, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
+          Text(report.fileName, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
           const SizedBox(height: 2),
-          Text(report.packageName, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+          Text(report.packageName, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+          if (advisoryNote != null && advisoryNote!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            HubPanel(
+              child: Text(
+                advisoryNote!,
+                style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+              ),
+            ),
+          ],
           const SizedBox(height: 24),
           HubPanel(
             child: Column(
               children: [
-                const Text(
+                Text(
                   'NIVEL DE RIESGO',
                   style: TextStyle(
                     color: HubColors.textoSecundario,
@@ -110,15 +120,15 @@ class RevisarApkScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Esta APK tiene un riesgo $_levelLabel según el análisis.',
+                  'Esta APK tiene un riesgo $_levelLabel seg\u00fan el an\u00e1lisis.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'PERMISOS SOLICITADOS',
             style: TextStyle(
               color: HubColors.textoSecundario,
@@ -147,14 +157,14 @@ class RevisarApkScreen extends StatelessWidget {
                         children: [
                           Text(
                             p.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: HubColors.textoPrincipal,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           Text(
                             p.description,
-                            style: const TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                            style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
                           ),
                         ],
                       ),
@@ -166,8 +176,8 @@ class RevisarApkScreen extends StatelessWidget {
                           color: const Color(0xFFE53935).withOpacity(0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
-                          'CRÍTICO',
+                        child: Text(
+                          'CR\u00cdTICO',
                           style: TextStyle(
                             color: Color(0xFFE53935),
                             fontSize: 10,
@@ -182,7 +192,7 @@ class RevisarApkScreen extends StatelessWidget {
           ),
           if (report.trackingSdks.isNotEmpty) ...[
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'SDKs DE RASTREO DETECTADOS',
               style: TextStyle(
                 color: HubColors.textoSecundario,

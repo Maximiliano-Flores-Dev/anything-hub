@@ -40,10 +40,10 @@ class GradientPillButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(icon, size: 19, color: HubColors.fondoPrincipal),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: HubColors.fondoPrincipal,
                     fontWeight: FontWeight.w700,
                     fontSize: 15,

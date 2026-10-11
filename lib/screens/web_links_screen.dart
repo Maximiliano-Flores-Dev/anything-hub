@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../core/hub_colors.dart';
 import '../core/logger.dart';
 import '../ui/widgets/gradient_pill_button.dart';
+import '../modules/favorites/services/favorites_service.dart';
 
 class WebLinkItem {
   const WebLinkItem({
@@ -26,7 +27,6 @@ class WebLinkItem {
 
   String get host => Uri.tryParse(url)?.host ?? '';
 
-  /// Endpoint ligero de favicons. sz=128 se reduce en memoria al tamaño del avatar.
   String get faviconUrl => 'https://www.google.com/s2/favicons?domain=$host&sz=128';
 
   WebLinkItem copyWith({String? title, String? url}) => WebLinkItem(
@@ -43,7 +43,6 @@ class WebLinkItem {
         if (imagePath != null) 'imagePath': imagePath,
       };
 
-  /// Tolerante a datos corruptos: devuelve null en vez de lanzar.
   static WebLinkItem? tryFromJson(Object? raw) {
     if (raw is! Map) return null;
     final id = raw['id'];
@@ -59,20 +58,17 @@ class WebLinkItem {
     );
   }
 
-  /// UUID v4 sin dependencias externas.
   static String newId() {
     final r = math.Random.secure();
     final b = List<int>.generate(16, (_) => r.nextInt(256));
-    b[6] = (b[6] & 0x0F) | 0x40; // versión 4
-    b[8] = (b[8] & 0x3F) | 0x80; // variante RFC 4122
+    b[6] = (b[6] & 0x0F) | 0x40;
+    b[8] = (b[8] & 0x3F) | 0x80;
     final h = b.map((x) => x.toRadixString(16).padLeft(2, '0')).join();
     return '${h.substring(0, 8)}-${h.substring(8, 12)}-${h.substring(12, 16)}-'
         '${h.substring(16, 20)}-${h.substring(20)}';
   }
 }
 
-/// Extrae título y URL de lo que el usuario pegue: "[Título](URL)", una URL
-/// completa o un dominio suelto.
 abstract final class WebLinkParser {
   static final RegExp _markdown = RegExp(r'^\s*\[([^\]]*)\]\(\s*([^)\s]+)\s*\)\s*$');
   static final RegExp _hasScheme = RegExp(r'^[a-zA-Z][a-zA-Z0-9+.\-]*://');
@@ -84,8 +80,6 @@ abstract final class WebLinkParser {
     return (title: t.isEmpty ? null : t, raw: m.group(2)!.trim());
   }
 
-  /// Devuelve una URL http(s) válida o null. Solo se aceptan http/https, así
-  /// que esquemas como javascript: o file: quedan descartados.
   static String? normalizeUrl(String raw) {
     var s = raw.trim();
     if (s.isEmpty || s.contains(RegExp(r'\s'))) return null;
@@ -98,7 +92,6 @@ abstract final class WebLinkParser {
     return uri.toString();
   }
 
-  /// "https://www.youtube.com/..." → "Youtube"
   static String titleFromUrl(String url) {
     var host = Uri.tryParse(url)?.host ?? url;
     if (host.startsWith('www.')) host = host.substring(4);
@@ -108,8 +101,6 @@ abstract final class WebLinkParser {
   }
 }
 
-/// CRUD + orden persistente. Usa shared_preferences (ya declarado en pubspec)
-/// en una clave propia, sin tocar el estado existente de grupos y permisos.
 class WebLinkRepository extends ChangeNotifier {
   static const String _key = 'web_links_v1';
 
@@ -160,7 +151,6 @@ class WebLinkRepository extends ChangeNotifier {
     await _persist();
   }
 
-  /// Devuelve la posición que ocupaba, para poder deshacer.
   Future<int> remove(String id) async {
     final i = _items.indexWhere((e) => e.id == id);
     if (i < 0) return -1;
@@ -177,7 +167,7 @@ class WebLinkRepository extends ChangeNotifier {
   }
 
   Future<void> reorder(int oldIndex, int newIndex) async {
-    if (newIndex > oldIndex) newIndex -= 1; // convención de ReorderableListView
+    if (newIndex > oldIndex) newIndex -= 1;
     if (oldIndex == newIndex) return;
     final item = _items.removeAt(oldIndex);
     _items.insert(newIndex, item);
@@ -186,7 +176,6 @@ class WebLinkRepository extends ChangeNotifier {
   }
 }
 
-// ------------------------------------------------------------------ Pantalla
 class WebLinksScreen extends StatefulWidget {
   const WebLinksScreen({super.key, required this.repository});
 
@@ -197,10 +186,32 @@ class WebLinksScreen extends StatefulWidget {
 }
 
 class _WebLinksScreenState extends State<WebLinksScreen> {
+  final _favService = FavoritesService();
+  Set<String> _webFavs = {};
+
   @override
   void initState() {
     super.initState();
     widget.repository.load();
+    _loadWebFavs();
+  }
+
+  Future<void> _loadWebFavs() async {
+    final set = await _favService.loadWebFavorites();
+    if (mounted) setState(() => _webFavs = set);
+  }
+
+  Future<void> _toggleWebFav(WebLinkItem item) async {
+    final next = !_webFavs.contains(item.id);
+    await _favService.setWebFavorite(item.id, next);
+    if (!mounted) return;
+    setState(() {
+      if (next) {
+        _webFavs.add(item.id);
+      } else {
+        _webFavs.remove(item.id);
+      }
+    });
   }
 
   void _toast(String message, {SnackBarAction? action}) {
@@ -211,12 +222,11 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
           behavior: SnackBarBehavior.floating,
           backgroundColor: HubColors.panel,
           action: action,
-          content: Text(message, style: const TextStyle(color: HubColors.textoPrincipal)),
+          content: Text(message, style: TextStyle(color: HubColors.textoPrincipal)),
         ),
       );
   }
 
-  // Delegamos al sistema: sin WebView embebido.
   Future<void> _open(WebLinkItem item) async {
     final uri = Uri.tryParse(item.url);
     if (uri == null || !uri.hasScheme) {
@@ -276,7 +286,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'Webs Rápidas',
                       style: TextStyle(
                         color: HubColors.textoPrincipal,
@@ -289,7 +299,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
                       child: IconButton(
                         tooltip: 'Volver',
                         onPressed: () => Navigator.of(context).maybePop(),
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                        icon: Icon(Icons.arrow_back_ios_new_rounded,
                             color: HubColors.textoSecundario, size: 20),
                       ),
                     ),
@@ -298,7 +308,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
                       child: IconButton(
                         tooltip: 'Añadir web',
                         onPressed: () => _addOrEdit(),
-                        icon: const Icon(Icons.add_rounded, color: HubColors.pomelo, size: 28),
+                        icon: Icon(Icons.add_rounded, color: HubColors.pomelo, size: 28),
                       ),
                     ),
                   ],
@@ -321,7 +331,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
   Widget _buildBody() {
     final repo = widget.repository;
     if (!repo.loaded) {
-      return const Center(
+      return Center(
         child: SizedBox(
           width: 22,
           height: 22,
@@ -338,9 +348,9 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.link_rounded, size: 40, color: HubColors.textoSecundario),
+              Icon(Icons.link_rounded, size: 40, color: HubColors.textoSecundario),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Aún no tienes webs guardadas',
                 style: TextStyle(
                   color: HubColors.textoPrincipal,
@@ -349,7 +359,7 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
                 ),
               ),
               const SizedBox(height: 6),
-              const Text(
+              Text(
                 'Pega un enlace o un [Título](URL) y se abrirá en tu navegador.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
@@ -388,16 +398,18 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
               return _WebLinkTile(
                 key: ValueKey(item.id),
                 item: item,
+                isFavorite: _webFavs.contains(item.id),
                 onOpen: () => _open(item),
                 onEdit: () => _addOrEdit(item),
+                onToggleFavorite: () => _toggleWebFav(item),
               );
             },
           ),
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.fromLTRB(24, 4, 24, 12),
           child: Text(
-            'Toca el título para abrir · el ícono para editar · mantén pulsado para reordenar',
+            'Toca el título para abrir · el ícono para editar · estrella para favoritos · mantén para reordenar',
             textAlign: TextAlign.center,
             style: TextStyle(color: HubColors.textoSecundario, fontSize: 11.5),
           ),
@@ -407,18 +419,21 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
   }
 }
 
-// ---------------------------------------------------------------- Fila + avatar
 class _WebLinkTile extends StatelessWidget {
   const _WebLinkTile({
     super.key,
     required this.item,
+    required this.isFavorite,
     required this.onOpen,
     required this.onEdit,
+    required this.onToggleFavorite,
   });
 
   final WebLinkItem item;
+  final bool isFavorite;
   final VoidCallback onOpen;
   final VoidCallback onEdit;
+  final VoidCallback onToggleFavorite;
 
   @override
   Widget build(BuildContext context) {
@@ -444,7 +459,7 @@ class _WebLinkTile extends StatelessWidget {
                 item.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   color: HubColors.textoPrincipal,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
@@ -453,13 +468,20 @@ class _WebLinkTile extends StatelessWidget {
             ),
           ),
         ),
+        IconButton(
+          tooltip: isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos',
+          onPressed: onToggleFavorite,
+          icon: Icon(
+            isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
+            color: isFavorite ? HubColors.amarillo : HubColors.textoSecundario,
+            size: 22,
+          ),
+        ),
       ],
     );
   }
 }
 
-/// Avatar circular estricto. Si la imagen falla (sin red, dominio inválido,
-/// archivo borrado) cae a una inicial con la paleta de la app.
 class _LinkAvatar extends StatelessWidget {
   const _LinkAvatar({required this.item, this.size = 30});
 
@@ -494,7 +516,6 @@ class _LinkAvatar extends StatelessWidget {
     final custom = item.imagePath;
     final isRemoteCustom = custom != null && custom.startsWith('http');
     final isLocal = custom != null && custom.isNotEmpty && !isRemoteCustom;
-    // Decodificar a tamaño real del avatar: memoria mínima aunque el origen sea 128 px.
     final px = (size * MediaQuery.devicePixelRatioOf(context)).round();
 
     Widget image;
@@ -530,7 +551,6 @@ class _LinkAvatar extends StatelessWidget {
   }
 }
 
-// ------------------------------------------------------------- Diálogo editor
 class _LinkEditorResult {
   const _LinkEditorResult.save(this.title, this.url) : delete = false;
   const _LinkEditorResult.delete()
@@ -543,8 +563,6 @@ class _LinkEditorResult {
   final bool delete;
 }
 
-// StatefulWidget propio: los controllers se liberan en su dispose(), después de
-// terminar la animación de cierre del diálogo.
 class _LinkEditorDialog extends StatefulWidget {
   const _LinkEditorDialog({this.existing});
 
@@ -588,89 +606,78 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
   }
 
   InputDecoration _decoration(String label, String hint, {String? helper, String? error}) {
-    const line = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea));
-    const focus = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo));
-    const warn = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomeloSuave));
+    final line = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea));
+    final focus = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo));
     return InputDecoration(
       labelText: label,
       hintText: hint,
       helperText: helper,
       helperMaxLines: 2,
       errorText: error,
-      labelStyle: const TextStyle(color: HubColors.textoSecundario),
-      floatingLabelStyle: const TextStyle(color: HubColors.pomelo),
+      labelStyle: TextStyle(color: HubColors.textoSecundario),
+      floatingLabelStyle: TextStyle(color: HubColors.pomelo),
       hintStyle: TextStyle(color: HubColors.textoSecundario.withOpacity(0.6), fontSize: 13),
-      helperStyle: const TextStyle(color: HubColors.textoSecundario, fontSize: 11),
-      errorStyle: const TextStyle(color: HubColors.pomeloSuave),
+      helperStyle: TextStyle(color: HubColors.textoSecundario, fontSize: 11),
+      errorStyle: TextStyle(color: HubColors.pomeloSuave),
       enabledBorder: line,
       focusedBorder: focus,
-      errorBorder: warn,
-      focusedErrorBorder: warn,
+      errorBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomeloSuave)),
+      focusedErrorBorder: focus,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final editing = widget.existing != null;
+    final isEdit = widget.existing != null;
     return AlertDialog(
       backgroundColor: HubColors.panel,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
-        editing ? 'Editar web' : 'Añadir web',
-        style: const TextStyle(color: HubColors.textoPrincipal),
+        isEdit ? 'Editar web' : 'Añadir web',
+        style: TextStyle(color: HubColors.textoPrincipal),
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _urlCtl,
-            autofocus: !editing,
-            keyboardType: TextInputType.url,
-            autocorrect: false,
-            enableSuggestions: false,
-            textInputAction: TextInputAction.next,
-            style: const TextStyle(color: HubColors.textoPrincipal),
-            decoration: _decoration(
-              'Enlace',
-              'youtube.com',
-              helper: 'También acepta [Título](https://…)',
-              error: _error,
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _urlCtl,
+              autofocus: !isEdit,
+              style: TextStyle(color: HubColors.textoPrincipal),
+              decoration: _decoration(
+                'URL o [Título](URL)',
+                'youtube.com',
+                helper: 'También acepta formato markdown',
+                error: _error,
+              ),
+              onChanged: (_) {
+                if (_error != null) setState(() => _error = null);
+              },
+              onSubmitted: (_) => _submit(),
             ),
-            onChanged: (_) {
-              if (_error != null) setState(() => _error = null);
-            },
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _titleCtl,
-            textCapitalization: TextCapitalization.sentences,
-            textInputAction: TextInputAction.done,
-            style: const TextStyle(color: HubColors.textoPrincipal),
-            decoration: _decoration('Título (opcional)', 'Se toma del enlace si lo dejas vacío'),
-            onSubmitted: (_) => _submit(),
-          ),
-        ],
+            const SizedBox(height: 12),
+            TextField(
+              controller: _titleCtl,
+              style: TextStyle(color: HubColors.textoPrincipal),
+              decoration: _decoration('Título (opcional)', 'Se infiere del dominio'),
+            ),
+          ],
+        ),
       ),
       actions: [
-        if (editing)
+        if (isEdit)
           TextButton(
             onPressed: () => Navigator.pop(context, const _LinkEditorResult.delete()),
-            child: const Text('Eliminar', style: TextStyle(color: HubColors.pomeloSuave)),
+            child: const Text('Eliminar', style: TextStyle(color: Colors.redAccent)),
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+          child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
         ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),
+        TextButton(
           onPressed: _submit,
-          child: const Text('Guardar', style: TextStyle(color: Colors.white)),
+          child: Text('Guardar', style: TextStyle(color: HubColors.pomelo)),
         ),
       ],
     );
   }
 }
-
-// ============================================================================
-// ILUSTRACIONES VECTORIALES DE LAS CARDS
-// ============================================================================

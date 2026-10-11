@@ -42,7 +42,7 @@ class _EditorSettingsSheetState extends State<EditorSettingsSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: HubColors.panel,
         borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
       ),
@@ -61,8 +61,8 @@ class _EditorSettingsSheetState extends State<EditorSettingsSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          const Text(
+          SizedBox(height: 16),
+          Text(
             'Editor predeterminado',
             style: TextStyle(
               color: HubColors.textoPrincipal,
@@ -70,20 +70,20 @@ class _EditorSettingsSheetState extends State<EditorSettingsSheet> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 6),
-          const Text(
+          SizedBox(height: 6),
+          Text(
             'Prioridad: editor local instalado → vscode.dev',
             style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           if (_loading)
-            const Center(child: CircularProgressIndicator(color: HubColors.pomelo))
+            Center(child: CircularProgressIndicator(color: HubColors.pomelo))
           else ...[
             _tile('vscode.dev', 'vscode.dev (web)', 'Fallback seguro', _prefs?.preferred == 'vscode.dev',
                 () => _setPreferred('vscode.dev')),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             if (_installed.isEmpty)
-              const Text(
+              Text(
                 'No se detectaron editores locales de la lista blanca.\n'
                 'Instala Acode, Markor o Termux para usar editores nativos.',
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13, height: 1.35),
@@ -123,7 +123,7 @@ class _EditorSettingsSheetState extends State<EditorSettingsSheet> {
                 color: selected ? HubColors.pomelo : HubColors.textoSecundario,
                 size: 22,
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,12 +135,12 @@ class _EditorSettingsSheetState extends State<EditorSettingsSheet> {
                           fontSize: 14.5,
                         )),
                     Text(subtitle,
-                        style: const TextStyle(color: HubColors.textoSecundario, fontSize: 12)),
+                        style: TextStyle(color: HubColors.textoSecundario, fontSize: 12)),
                   ],
                 ),
               ),
               if (selected)
-                const Icon(Icons.check_circle_rounded, color: HubColors.pomelo, size: 20),
+                Icon(Icons.check_circle_rounded, color: HubColors.pomelo, size: 20),
             ],
           ),
         ),

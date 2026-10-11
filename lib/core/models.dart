@@ -29,13 +29,23 @@ class HubApp {
 }
 
 class AppGroup {
-  AppGroup(this.label, this.apps, {this.isCustom = false, List<String>? packages})
-      : packages = packages ?? <String>[];
+  AppGroup(
+    this.label,
+    this.apps, {
+    this.isCustom = false,
+    List<String>? packages,
+    this.colorArgb,
+  }) : packages = packages ?? <String>[];
 
-  final String label;
+  String label;
   final List<HubApp> apps;
   final bool isCustom; // True si fue creado manualmente por el usuario
   final List<String> packages; // Membresía manual (solo grupos personalizados)
+
+  /// Color de acento del grupo (ARGB). Solo grupos personalizados.
+  int? colorArgb;
+
+  Color? get color => colorArgb != null ? Color(colorArgb!) : null;
 
   void sortByUsage() {
     apps.sort((a, b) {
@@ -46,6 +56,18 @@ class AppGroup {
     });
   }
 }
+
+/// Colores de acento disponibles para grupos personalizados.
+const List<int> kGroupColorOptions = [
+  0xFFF05A3C, // pomelo
+  0xFFF2B531, // amarillo
+  0xFF5B8DEF, // azul
+  0xFF3DDC84, // verde
+  0xFFE85D75, // rosa
+  0xFF9B7EDE, // violeta
+  0xFF26C6DA, // cyan
+  0xFFFF8A65, // naranja suave
+];
 
 // =============================================================================
 // CATEGORÍAS AUTOMÁTICAS (PREESTABLECIDAS)
@@ -92,7 +114,6 @@ class DeviceAppInfo {
   final int usageMinutes;
   final Uint8List? icon;
 }
-
 
 class RadialAction {
   const RadialAction(this.id, this.label, this.icon);

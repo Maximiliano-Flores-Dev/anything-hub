@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/hub_colors.dart';
 import '../../../ui/widgets/gradient_pill_button.dart';
+import '../../../services/device_apps_service.dart';
 import '../models/app_models.dart';
 import '../services/apk_risk_scorer.dart';
 import '../widgets/hub_panel.dart';
@@ -42,7 +43,7 @@ class ApkIncomingSheet extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
+              Text(
                 'Anythings Hub',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -51,18 +52,18 @@ class ApkIncomingSheet extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 4),
-              const Text(
+              SizedBox(height: 4),
+              Text(
                 'Todo en un solo lugar',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: 28),
               HubPanel(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
                         Icon(Icons.download_rounded, color: HubColors.pomelo),
                         SizedBox(width: 10),
@@ -76,16 +77,16 @@ class ApkIncomingSheet extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    const Text(
+                    SizedBox(height: 4),
+                    Text(
                       'Archivo APK entrante compartido con Anythings Hub.',
                       style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     _row(Icons.insert_drive_file_outlined, 'Nombre del archivo', fileName),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     _row(Icons.sd_storage_outlined, 'Tamaño', _sizeLabel),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     _row(
                       Icons.shield_outlined,
                       'Aplicación que comparte',
@@ -96,8 +97,8 @@ class ApkIncomingSheet extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-              const Text(
+              SizedBox(height: 24),
+              Text(
                 '¿Qué deseas hacer?',
                 style: TextStyle(
                   color: HubColors.textoPrincipal,
@@ -105,35 +106,35 @@ class ApkIncomingSheet extends StatelessWidget {
                   fontSize: 15,
                 ),
               ),
-              const SizedBox(height: 4),
-              const Text(
+              SizedBox(height: 4),
+              Text(
                 'Elige cómo quieres manejar este APK.',
                 style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               GradientPillButton(
                 label: 'Analizar antes de instalar',
                 icon: Icons.search,
                 onPressed: () => _analyze(context),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: HubColors.textoPrincipal,
-                  side: const BorderSide(color: HubColors.linea),
+                  side: BorderSide(color: HubColors.linea),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(radius12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 onPressed: () {
                   Navigator.of(context).pop({'action': 'save', 'path': cacheRelativePath});
                 },
                 icon: const Icon(Icons.folder_outlined),
-                label: const Text('Solo guardar'),
+                label: Text('Solo guardar'),
               ),
               const Spacer(),
-              const Row(
+              Row(
                 children: [
                   Icon(Icons.verified_user_outlined, size: 16, color: HubColors.textoSecundario),
                   SizedBox(width: 8),
@@ -152,23 +153,76 @@ class ApkIncomingSheet extends StatelessWidget {
     );
   }
 
-  void _analyze(BuildContext context) {
-    final report = ApkRiskScorer.score(
-      fileName: fileName,
-      packageName: 'com.desconocido.apk',
-      rawPermissions: const [
-        'android.permission.INTERNET',
-        'android.permission.BIND_ACCESSIBILITY_SERVICE',
-      ],
-      detectedPackages: const [],
-      sha256: null,
+  Future<void> _analyze(BuildContext context) async {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Center(
+        child: CircularProgressIndicator(color: HubColors.pomelo),
+      ),
     );
 
+    Map<String, dynamic>? meta;
+    try {
+      meta = await DeviceAppsService.inspectApk(cacheRelativePath);
+    } catch (_) {
+      meta = null;
+    }
+
+    if (!context.mounted) return;
+    Navigator.of(context).pop();
+
+    final packageName = (meta?['packageName'] as String?)?.trim();
+    final appLabel = (meta?['appLabel'] as String?)?.trim();
+    final rawPerms = (meta?['permissions'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        <String>[];
+    final versionName = (meta?['versionName'] as String?)?.trim() ?? '';
+    final versionCode = meta?['versionCode'];
+    final versionLabel = [
+      if (versionName.isNotEmpty) versionName,
+      if (versionCode != null) '($versionCode)',
+    ].join(' ').trim();
+    final signingCerts = (meta?['signingCertSha256'] as List?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        <String>[];
+    final installedCerts = (meta?['installedCertSha256'] as List?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        <String>[];
+    final isInstalled = meta?['isPackageInstalled'] == true;
+
+    final parseFailed = packageName == null || packageName.isEmpty;
+    final displayName = (appLabel != null && appLabel.isNotEmpty)
+        ? appLabel
+        : fileName;
+    final displayPackage = parseFailed ? 'com.desconocido.apk' : packageName!;
+
+    final report = ApkRiskScorer.score(
+      fileName: displayName,
+      packageName: displayPackage,
+      rawPermissions: parseFailed
+          ? const ['android.permission.PARSE_FAILED']
+          : rawPerms,
+      detectedPackages: const [],
+      sha256: null,
+      parseFailed: parseFailed,
+      versionLabel: versionLabel.isEmpty ? '—' : versionLabel,
+      signingCertSha256: signingCerts,
+      installedCertSha256: installedCerts,
+      isPackageInstalled: isInstalled,
+    );
+
+    if (!context.mounted) return;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => RevisarApkScreen(
           report: report,
-          onInstallOverride: () {},
+          onInstallOverride: () {
+            DeviceAppsService.installApkFromCache(cacheRelativePath);
+          },
         ),
       ),
     );
@@ -179,13 +233,13 @@ class ApkIncomingSheet extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, size: 18, color: HubColors.textoSecundario),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 12)),
-              Text(value, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
+              Text(label, style: TextStyle(color: HubColors.textoSecundario, fontSize: 12)),
+              Text(value, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
             ],
           ),
         ),

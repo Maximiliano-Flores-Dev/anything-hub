@@ -14,17 +14,17 @@ class LocalDocsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: HubColors.fondoSidebar,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Documentación del módulo',
           style: TextStyle(color: HubColors.textoPrincipal),
         ),
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
         children: [
           _section('Resumen', LocalDocs.moduleOverview),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           _section('Seguridad', LocalDocs.securityChecklist),
         ],
       ),
@@ -44,16 +44,16 @@ class LocalDocsScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: HubColors.pomelo,
               fontSize: 14,
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Text(
             body.trim(),
-            style: const TextStyle(
+            style: TextStyle(
               color: HubColors.textoSecundario,
               fontSize: 13.2,
               height: 1.45,
