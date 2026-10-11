@@ -239,8 +239,7 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Cerrar',
-              style: TextStyle(color: HubColors.pomelo)),
+          child: Text('Cerrar', style: TextStyle(color: HubColors.pomelo)),
         ),
       ],
     );
@@ -258,8 +257,7 @@ class _FileDetailsDialogState extends State<FileDetailsDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: TextStyle(
-                  color: HubColors.textoSecundario, fontSize: 11)),
+              style: TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
           SizedBox(height: 2),
           SelectableText(
             value,

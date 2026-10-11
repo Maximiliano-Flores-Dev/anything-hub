@@ -53,7 +53,8 @@ class _SettingsScreenState extends State<SettingsScreen>
       final root = await ProjectFsService.getRootDirectory();
       if (mounted) setState(() => _hubPath = root.path);
     } catch (_) {}
-    await Future.wait([_loadInstalled(), _loadCatalog(), _refreshPermissions()]);
+    await Future.wait(
+        [_loadInstalled(), _loadCatalog(), _refreshPermissions()]);
   }
 
   Future<void> _refreshPermissions() async {
@@ -218,9 +219,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               Text(
                 granted ? 'Concedido' : 'No concedido — toca para gestionar',
                 style: TextStyle(
-                  color: granted
-                      ? const Color(0xFF3DDC84)
-                      : HubColors.pomelo,
+                  color: granted ? const Color(0xFF3DDC84) : HubColors.pomelo,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                 ),
@@ -231,7 +230,8 @@ class _SettingsScreenState extends State<SettingsScreen>
         IconButton(
           tooltip: 'Abrir ajustes del sistema',
           onPressed: onOpen,
-          icon: const Icon(Icons.open_in_new, size: 18, color: HubColors.textoAcento),
+          icon: const Icon(Icons.open_in_new,
+              size: 18, color: HubColors.textoAcento),
         ),
       ],
     );
@@ -248,20 +248,19 @@ class _SettingsScreenState extends State<SettingsScreen>
             children: [
               Text(
                 'Raíz .anythinghub',
-                style: TextStyle(
-                    color: HubColors.textoSecundario, fontSize: 12),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 12),
               ),
               const SizedBox(height: 4),
               Text(
                 _hubPath ?? '…',
-                style: TextStyle(
-                    color: HubColors.textoPrincipal, fontSize: 13),
+                style: TextStyle(color: HubColors.textoPrincipal, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Text(
                 'Subcarpetas: cache/, config/, logs/, projects/, plugins/',
-                style: TextStyle(
-                    color: HubColors.textoSecundario, fontSize: 12),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 12),
               ),
             ],
           ),
@@ -273,7 +272,8 @@ class _SettingsScreenState extends State<SettingsScreen>
             'Los plugins se instalan solo como metadatos JSON en el dispositivo. '
             'Anythings Hub no ejecuta código remoto ni carga Dex/so dinámicos. '
             'Sin telemetría. Local-first.',
-            style: TextStyle(color: HubColors.textoSecundario, fontSize: 13, height: 1.35),
+            style: TextStyle(
+                color: HubColors.textoSecundario, fontSize: 13, height: 1.35),
           ),
         ),
         const SizedBox(height: 20),
@@ -322,7 +322,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                       'Silenciar notificaciones de terceros',
                       _permFocus,
                       () async {
-                        await PerformanceService.openNotificationPolicySettings();
+                        await PerformanceService
+                            .openNotificationPolicySettings();
                         await Future<void>.delayed(const Duration(seconds: 1));
                         await _refreshPermissions();
                       },
@@ -334,7 +335,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                       _permPostNotif,
                       () async {
                         await PerformanceService.requestPostNotifications();
-                        await Future<void>.delayed(const Duration(milliseconds: 800));
+                        await Future<void>.delayed(
+                            const Duration(milliseconds: 800));
                         await _refreshPermissions();
                       },
                     ),
@@ -343,7 +345,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed: _refreshPermissions,
-                        icon: const Icon(Icons.refresh, size: 18, color: HubColors.textoAcento),
+                        icon: const Icon(Icons.refresh,
+                            size: 18, color: HubColors.textoAcento),
                         label: const Text('Actualizar',
                             style: TextStyle(color: HubColors.textoAcento)),
                       ),
@@ -364,7 +367,8 @@ class _SettingsScreenState extends State<SettingsScreen>
               const SizedBox(height: 4),
               Text(
                 'Hub local para apps, archivos y proyectos. Sin telemetría.',
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
             ],
           ),
@@ -406,8 +410,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               IconButton(
                 tooltip: 'Actualizar catálogo',
                 onPressed: _loadingCatalog ? null : _loadCatalog,
-                icon: Icon(Icons.refresh_rounded,
-                    color: HubColors.pomelo),
+                icon: Icon(Icons.refresh_rounded, color: HubColors.pomelo),
               ),
             ],
           ),
@@ -510,8 +513,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               const SizedBox(height: 8),
               Text(
                 'Permisos declarados: ${m.permissions.join(', ')}',
-                style: TextStyle(
-                    color: HubColors.textoAcento, fontSize: 11),
+                style: TextStyle(color: HubColors.textoAcento, fontSize: 11),
               ),
             ],
             const SizedBox(height: 12),

@@ -93,10 +93,9 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
     ];
   }
 
-  List<String> get _visibleCardIds =>
-      MacroCustomization.instance.activeCardIds
-          .where((id) => _allCards.containsKey(id))
-          .toList();
+  List<String> get _visibleCardIds => MacroCustomization.instance.activeCardIds
+      .where((id) => _allCards.containsKey(id))
+      .toList();
 
   @override
   void initState() {
@@ -140,7 +139,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
             sizeBytes: (pending['sizeBytes'] as num?)?.toInt() ?? 0,
             cacheRelativePath: path,
             callerPackage: pending['callerPackage'] as String?,
-            callerVerified: (pending['callerPackage'] as String?)?.isNotEmpty == true,
+            callerVerified:
+                (pending['callerPackage'] as String?)?.isNotEmpty == true,
           ),
         ));
       }
@@ -222,16 +222,19 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
         backgroundColor: HubColors.panel,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(title, style: TextStyle(color: HubColors.textoPrincipal)),
-        content: Text(body, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+        content: Text(body,
+            style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(cancelLabel, style: TextStyle(color: HubColors.textoSecundario)),
+            child: Text(cancelLabel,
+                style: TextStyle(color: HubColors.textoSecundario)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: HubColors.pomelo),
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(confirmLabel, style: const TextStyle(color: Colors.white)),
+            child:
+                Text(confirmLabel, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -244,7 +247,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       SnackBar(
         behavior: SnackBarBehavior.floating,
         backgroundColor: HubColors.panel,
-        content: Text(message, style: TextStyle(color: HubColors.textoPrincipal)),
+        content:
+            Text(message, style: TextStyle(color: HubColors.textoPrincipal)),
       ),
     );
   }
@@ -257,7 +261,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
         if (!userInitiated) return;
         final accepted = await _confirmDialog(
           title: 'Permiso de Acceso a Apps',
-          body: 'Anythings Hub necesita consultar las aplicaciones instaladas en tu dispositivo para clasificarlas por categorías. Todo se procesa en el dispositivo y no se envía a ningún servidor.',
+          body:
+              'Anythings Hub necesita consultar las aplicaciones instaladas en tu dispositivo para clasificarlas por categorías. Todo se procesa en el dispositivo y no se envía a ningún servidor.',
           confirmLabel: 'Permitir',
           cancelLabel: 'Cancelar',
         );
@@ -269,7 +274,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       if (!usageOk && userInitiated && !_usagePromptDismissed) {
         final goToSettings = await _confirmDialog(
           title: 'Acceso a datos de uso',
-          body: 'Para ordenar tus apps por uso frecuente, activa "Acceso a datos de uso" para Anythings Hub en Ajustes.',
+          body:
+              'Para ordenar tus apps por uso frecuente, activa "Acceso a datos de uso" para Anythings Hub en Ajustes.',
           confirmLabel: 'Abrir Ajustes',
         );
         if (!mounted) return;
@@ -283,7 +289,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       final found = await DeviceAppsService.listApps();
       if (!mounted) return;
       if (found == null) {
-        if (userInitiated) _toast('El escaneo de apps solo está disponible en Android.');
+        if (userInitiated)
+          _toast('El escaneo de apps solo está disponible en Android.');
         return;
       }
       _catalog.clear();
@@ -305,7 +312,9 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
         _rebuildGroups();
         _deviceScanned = true;
       });
-      _toast(usageOk ? 'Apps sincronizadas y ordenadas por uso.' : 'Apps sincronizadas (orden alfabético).');
+      _toast(usageOk
+          ? 'Apps sincronizadas y ordenadas por uso.'
+          : 'Apps sincronizadas (orden alfabético).');
     } finally {
       _scanning = false;
     }
@@ -313,7 +322,8 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
 
   void _openWebLinks() {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => WebLinksScreen(repository: _webLinks)),
+      MaterialPageRoute<void>(
+          builder: (_) => WebLinksScreen(repository: _webLinks)),
     );
   }
 
@@ -340,14 +350,19 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: HubColors.panel,
-          title: Text('Módulo de proyectos', style: TextStyle(color: HubColors.textoPrincipal)),
+          title: Text('Módulo de proyectos',
+              style: TextStyle(color: HubColors.textoPrincipal)),
           content: Text(
             'Habías elegido no volver a mostrar el aviso. ¿Quieres reactivar el módulo de proyectos?',
             style: TextStyle(color: HubColors.textoSecundario),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('No')),
-            TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Reactivar')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('No')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Reactivar')),
           ],
         ),
       );
@@ -496,10 +511,12 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
                   radius: 12,
                   backgroundColor: g.color ?? HubColors.pomelo,
                 ),
-                title: Text(g.label, style: TextStyle(color: HubColors.textoPrincipal)),
+                title: Text(g.label,
+                    style: TextStyle(color: HubColors.textoPrincipal)),
                 subtitle: Text(
                   '${g.packages.length} apps',
-                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                  style:
+                      TextStyle(color: HubColors.textoSecundario, fontSize: 12),
                 ),
                 onTap: () => Navigator.pop(ctx, g),
               ),
@@ -629,7 +646,9 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
             child: FractionallySizedBox(
               widthFactor: 0.74,
               child: GradientPillButton(
-                label: _deviceScanned ? 'Apps Sincronizadas' : 'Escanear Apps Reales',
+                label: _deviceScanned
+                    ? 'Apps Sincronizadas'
+                    : 'Escanear Apps Reales',
                 icon: Icons.sync_rounded,
                 onPressed: _requestDeviceAppsAndScan,
               ),
@@ -675,11 +694,15 @@ class _BottomNav extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(isSel ? activeIcon : idleIcon,
-                      color: isSel ? HubColors.pomelo : HubColors.textoSecundario, size: 24),
+                      color:
+                          isSel ? HubColors.pomelo : HubColors.textoSecundario,
+                      size: 24),
                   const SizedBox(height: 2),
                   Text(label,
                       style: TextStyle(
-                        color: isSel ? HubColors.pomelo : HubColors.textoSecundario,
+                        color: isSel
+                            ? HubColors.pomelo
+                            : HubColors.textoSecundario,
                         fontSize: 10,
                         fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
                       )),

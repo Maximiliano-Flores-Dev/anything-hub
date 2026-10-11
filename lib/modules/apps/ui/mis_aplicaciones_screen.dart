@@ -323,7 +323,8 @@ class _AppsSearchDelegate extends SearchDelegate<ManagedApp?> {
           leading: a.icon != null
               ? Image.memory(a.icon!, width: 40, height: 40)
               : Icon(Icons.android, color: HubColors.textoSecundario),
-          title: Text(a.name, style: TextStyle(color: HubColors.textoPrincipal)),
+          title:
+              Text(a.name, style: TextStyle(color: HubColors.textoPrincipal)),
           subtitle: Text(
             a.packageName,
             style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),

@@ -41,17 +41,20 @@ void main() {
   group('groupAndSort', () {
     test('alphaAsc ordena por título dentro de cada sección', () {
       final g = service.groupAndSort(sample(), FavoriteSort.alphaAsc);
-      expect(g[FavoriteType.app]!.map((e) => e.title).toList(), ['Alpha', 'Zebra']);
+      expect(g[FavoriteType.app]!.map((e) => e.title).toList(),
+          ['Alpha', 'Zebra']);
     });
 
     test('recent ordena por fecha descendente', () {
       final g = service.groupAndSort(sample(), FavoriteSort.recent);
-      expect(g[FavoriteType.app]!.map((e) => e.title).toList(), ['Alpha', 'Zebra']);
+      expect(g[FavoriteType.app]!.map((e) => e.title).toList(),
+          ['Alpha', 'Zebra']);
     });
 
     test('oldest ordena por fecha ascendente', () {
       final g = service.groupAndSort(sample(), FavoriteSort.oldest);
-      expect(g[FavoriteType.app]!.map((e) => e.title).toList(), ['Zebra', 'Alpha']);
+      expect(g[FavoriteType.app]!.map((e) => e.title).toList(),
+          ['Zebra', 'Alpha']);
     });
 
     test('typeFilter deja solo un tipo', () {
@@ -66,7 +69,8 @@ void main() {
     });
 
     test('secciones vacías no aparecen', () {
-      final onlyApps = sample().where((e) => e.type == FavoriteType.app).toList();
+      final onlyApps =
+          sample().where((e) => e.type == FavoriteType.app).toList();
       final g = service.groupAndSort(onlyApps, FavoriteSort.alphaAsc);
       expect(g.containsKey(FavoriteType.web), isFalse);
       expect(g.containsKey(FavoriteType.file), isFalse);

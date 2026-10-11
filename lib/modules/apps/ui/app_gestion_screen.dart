@@ -97,7 +97,8 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: Text('Desinstalar', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text('Desinstalar',
+            style: TextStyle(color: HubColors.textoPrincipal)),
         content: Text(
           '¿Desinstalar ${widget.app.name}? Esta acción usa el desinstalador del sistema.',
           style: TextStyle(color: HubColors.textoSecundario),
@@ -109,7 +110,8 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Desinstalar', style: TextStyle(color: HubColors.pomelo)),
+            child:
+                Text('Desinstalar', style: TextStyle(color: HubColors.pomelo)),
           ),
         ],
       ),
@@ -164,7 +166,8 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
               child: widget.app.icon != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(18),
-                      child: Image.memory(widget.app.icon!, width: 72, height: 72),
+                      child:
+                          Image.memory(widget.app.icon!, width: 72, height: 72),
                     )
                   : Container(
                       width: 72,
@@ -173,7 +176,8 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                         color: HubColors.panel,
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      child: Icon(Icons.android, size: 40, color: HubColors.textoSecundario),
+                      child: Icon(Icons.android,
+                          size: 40, color: HubColors.textoSecundario),
                     ),
             ),
             SizedBox(height: 14),
@@ -198,7 +202,9 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
               children: [
                 Icon(Icons.circle, size: 8, color: Color(0xFF3DDC84)),
                 SizedBox(width: 6),
-                Text('Instalada', style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+                Text('Instalada',
+                    style: TextStyle(
+                        color: HubColors.textoSecundario, fontSize: 13)),
               ],
             ),
             SizedBox(height: 24),
@@ -226,9 +232,13 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                 ),
                 SizedBox(width: 8),
                 _ActionIcon(
-                  icon: _bookmarked ? Icons.star_rounded : Icons.star_outline_rounded,
+                  icon: _bookmarked
+                      ? Icons.star_rounded
+                      : Icons.star_outline_rounded,
                   label: 'Guardar',
-                  color: _bookmarked ? HubColors.amarillo : HubColors.textoSecundario,
+                  color: _bookmarked
+                      ? HubColors.amarillo
+                      : HubColors.textoSecundario,
                   onTap: _toggleBookmark,
                 ),
               ],
@@ -240,7 +250,8 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.rate_review_outlined, size: 18, color: HubColors.textoSecundario),
+                      Icon(Icons.rate_review_outlined,
+                          size: 18, color: HubColors.textoSecundario),
                       SizedBox(width: 8),
                       Text(
                         'Reseña local',
@@ -255,7 +266,8 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                   SizedBox(height: 4),
                   Text(
                     'Tu evaluación privada de esta app',
-                    style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                    style: TextStyle(
+                        color: HubColors.textoSecundario, fontSize: 12),
                   ),
                   SizedBox(height: 16),
                   _SliderRow(
@@ -297,7 +309,8 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: _saveReview,
-                      child: Text('Guardar reseña', style: TextStyle(color: HubColors.pomelo)),
+                      child: Text('Guardar reseña',
+                          style: TextStyle(color: HubColors.pomelo)),
                     ),
                   ),
                 ],
@@ -307,7 +320,8 @@ class _AppGestionScreenState extends State<AppGestionScreen> {
             Center(
               child: Text(
                 'Solo en este dispositivo',
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 12),
               ),
             ),
           ],
@@ -348,7 +362,8 @@ class _ActionIcon extends StatelessWidget {
               SizedBox(height: 2),
               Text(
                 label,
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 10),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 10),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -381,7 +396,8 @@ class _SliderRow extends StatelessWidget {
         SizedBox(width: 8),
         SizedBox(
           width: 88,
-          child: Text(label, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+          child: Text(label,
+              style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
         ),
         Expanded(
           child: SliderTheme(
@@ -402,7 +418,8 @@ class _SliderRow extends StatelessWidget {
         ),
         Text(
           value.toStringAsFixed(1),
-          style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
         ),
       ],
     );

@@ -119,8 +119,7 @@ class EditorService {
           await _ch.invokeMethod<List<dynamic>>('listInstalledPackages');
       if (raw != null) {
         for (final pkg in raw.whereType<String>()) {
-          if (prefs.whitelist.contains(pkg) ||
-              _knownLabels.containsKey(pkg)) {
+          if (prefs.whitelist.contains(pkg) || _knownLabels.containsKey(pkg)) {
             found.add(InstalledEditor(
               packageName: pkg,
               label: _knownLabels[pkg] ?? pkg.split('.').last,
@@ -130,8 +129,7 @@ class EditorService {
         }
       }
     } on MissingPluginException {
-    } on PlatformException {
-    }
+    } on PlatformException {}
 
     return found;
   }

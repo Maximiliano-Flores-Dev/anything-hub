@@ -47,7 +47,8 @@ class ProjectMd {
       ..writeln('---')
       ..writeln()
       ..writeln('# Descripción')
-      ..writeln(description.isEmpty ? 'Breve descripción del proyecto.' : description)
+      ..writeln(
+          description.isEmpty ? 'Breve descripción del proyecto.' : description)
       ..writeln()
       ..writeln('## Comandos útiles');
     if (commands.isEmpty) {
@@ -61,7 +62,9 @@ class ProjectMd {
     buf
       ..writeln()
       ..writeln('## Notas')
-      ..writeln(notes.isEmpty ? 'Cualquier nota adicional del desarrollador.' : notes);
+      ..writeln(notes.isEmpty
+          ? 'Cualquier nota adicional del desarrollador.'
+          : notes);
     return buf.toString();
   }
 

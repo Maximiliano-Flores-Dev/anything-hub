@@ -90,13 +90,17 @@ class PuertoPipeService {
   static Future<String?> latestGithubApk(String ownerRepo) async {
     final res = await http.get(
       Uri.parse('https://api.github.com/repos/$ownerRepo/releases/latest'),
-      headers: {'User-Agent': 'AnythingsHub', 'Accept': 'application/vnd.github+json'},
+      headers: {
+        'User-Agent': 'AnythingsHub',
+        'Accept': 'application/vnd.github+json'
+      },
     );
     if (res.statusCode != 200) return null;
     final json = jsonDecode(res.body) as Map<String, dynamic>;
     final assets = json['assets'] as List? ?? [];
     for (final a in assets) {
-      if (a is Map && (a['name'] as String? ?? '').toLowerCase().endsWith('.apk')) {
+      if (a is Map &&
+          (a['name'] as String? ?? '').toLowerCase().endsWith('.apk')) {
         final url = a['browser_download_url'] as String?;
         if (url != null && url.startsWith('https://')) return url;
       }

@@ -19,9 +19,18 @@ void main() {
     });
 
     test('sortByUsage ordena por score y nombre', () {
-      final a = HubApp('Zebra', background: const Color(0xFF000000), foreground: const Color(0xFFFFFFFF), usageScore: 1);
-      final b = HubApp('Alpha', background: const Color(0xFF000000), foreground: const Color(0xFFFFFFFF), usageScore: 5);
-      final c = HubApp('Beta', background: const Color(0xFF000000), foreground: const Color(0xFFFFFFFF), usageScore: 5);
+      final a = HubApp('Zebra',
+          background: const Color(0xFF000000),
+          foreground: const Color(0xFFFFFFFF),
+          usageScore: 1);
+      final b = HubApp('Alpha',
+          background: const Color(0xFF000000),
+          foreground: const Color(0xFFFFFFFF),
+          usageScore: 5);
+      final c = HubApp('Beta',
+          background: const Color(0xFF000000),
+          foreground: const Color(0xFFFFFFFF),
+          usageScore: 5);
       final g = AppGroup('G', [a, b, c]);
       g.sortByUsage();
       expect(g.apps.map((e) => e.name).toList(), ['Alpha', 'Beta', 'Zebra']);

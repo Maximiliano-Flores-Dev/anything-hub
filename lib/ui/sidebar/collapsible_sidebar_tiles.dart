@@ -36,7 +36,8 @@ class _SidebarGroupTile extends StatelessWidget {
                   group.name,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: HubColors.textoSecundario.withOpacity(0.55 + 0.45 * progress),
+                    color: HubColors.textoSecundario
+                        .withOpacity(0.55 + 0.45 * progress),
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.3,
@@ -44,7 +45,8 @@ class _SidebarGroupTile extends StatelessWidget {
                 ),
               ),
               if (group.isCustom)
-                Icon(Icons.edit_outlined, size: 12, color: HubColors.textoSecundario),
+                Icon(Icons.edit_outlined,
+                    size: 12, color: HubColors.textoSecundario),
               if (hidden > 0) ...[
                 const SizedBox(width: 6),
                 Text(
@@ -64,7 +66,8 @@ class _SidebarGroupTile extends StatelessWidget {
               padding: EdgeInsets.only(left: 2, top: 2),
               child: Text(
                 'Grupo vacío',
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 12),
               ),
             )
           else ...[

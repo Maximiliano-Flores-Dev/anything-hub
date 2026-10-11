@@ -34,7 +34,8 @@ class PluginService {
       final mf = File(p.join(entity.path, 'manifest.json'));
       if (!await mf.exists()) continue;
       try {
-        final json = jsonDecode(await mf.readAsString()) as Map<String, dynamic>;
+        final json =
+            jsonDecode(await mf.readAsString()) as Map<String, dynamic>;
         final m = HubPluginManifest.fromJson(json);
         if (m.isValid) {
           out.add(HubPluginEntry(
@@ -88,7 +89,8 @@ class PluginService {
     }
   }
 
-  static Future<bool> install(HubPluginManifest manifest, {String? bundleUrl}) async {
+  static Future<bool> install(HubPluginManifest manifest,
+      {String? bundleUrl}) async {
     if (!manifest.isValid) return false;
     try {
       await ProjectFsService.ensureStructure();

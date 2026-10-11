@@ -44,6 +44,7 @@ class MacroCustomization extends ChangeNotifier {
   HubPaletteId _paletteId = HubPaletteId.classic;
   bool _sidebarEnabled = true;
   bool _leftHandedMode = false;
+
   /// Orden de cards visibles. Las que no están aquí están desactivadas.
   List<String> _activeCardIds = List.of(DashboardCardIds.defaultOrder);
 

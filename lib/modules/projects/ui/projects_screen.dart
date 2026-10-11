@@ -61,7 +61,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           builder: (ctx, setLocal) {
             return AlertDialog(
               backgroundColor: HubColors.panel,
-              title: Text('Nuevo proyecto', style: TextStyle(color: HubColors.textoPrincipal)),
+              title: Text('Nuevo proyecto',
+                  style: TextStyle(color: HubColors.textoPrincipal)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -71,9 +72,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     style: TextStyle(color: HubColors.textoPrincipal),
                     decoration: InputDecoration(
                       hintText: 'Nombre del proyecto',
-                      hintStyle: TextStyle(color: HubColors.textoSecundario.withOpacity(0.7)),
-                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
-                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
+                      hintStyle: TextStyle(
+                          color: HubColors.textoSecundario.withOpacity(0.7)),
+                      enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: HubColors.linea)),
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: HubColors.pomelo)),
                     ),
                   ),
                   SizedBox(height: 16),
@@ -85,7 +89,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       DropdownMenuItem(value: 'acode', child: Text('Acode')),
                       DropdownMenuItem(value: 'markor', child: Text('Markor')),
                       DropdownMenuItem(value: 'termux', child: Text('Termux')),
-                      DropdownMenuItem(value: 'vscode.dev', child: Text('vscode.dev')),
+                      DropdownMenuItem(
+                          value: 'vscode.dev', child: Text('vscode.dev')),
                     ],
                     onChanged: (v) {
                       if (v != null) setLocal(() => selectedEditor = v);
@@ -96,15 +101,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+                  child: Text('Cancelar',
+                      style: TextStyle(color: HubColors.textoSecundario)),
                 ),
                 TextButton(
                   onPressed: () {
                     final name = nameCtrl.text.trim();
                     if (name.isEmpty) return;
-                    Navigator.pop(ctx, {'name': name, 'editor': selectedEditor});
+                    Navigator.pop(
+                        ctx, {'name': name, 'editor': selectedEditor});
                   },
-                  child: Text('Crear', style: TextStyle(color: HubColors.pomelo)),
+                  child:
+                      Text('Crear', style: TextStyle(color: HubColors.pomelo)),
                 ),
               ],
             );
@@ -171,16 +179,20 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: Text('Desinstalar módulo', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text('Desinstalar módulo',
+            style: TextStyle(color: HubColors.textoPrincipal)),
         content: Text(
           'Se eliminará completamente .anythinghub/ y todos los proyectos.',
           style: TextStyle(color: HubColors.textoSecundario),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancelar')),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Continuar', style: TextStyle(color: Colors.redAccent)),
+            child: const Text('Continuar',
+                style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -191,16 +203,20 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: Text('Confirmación final', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text('Confirmación final',
+            style: TextStyle(color: HubColors.textoPrincipal)),
         content: Text(
           '¿Estás seguro? Se borrará todo el módulo de proyectos.',
           style: TextStyle(color: HubColors.textoSecundario),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('No')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('No')),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sí, borrar todo', style: TextStyle(color: Colors.redAccent)),
+            child: const Text('Sí, borrar todo',
+                style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -220,7 +236,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       appBar: AppBar(
         backgroundColor: HubColors.fondoSidebar,
         elevation: 0,
-        title: Text('Proyectos', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text('Proyectos',
+            style: TextStyle(color: HubColors.textoPrincipal)),
         iconTheme: IconThemeData(color: HubColors.textoPrincipal),
         actions: [
           IconButton(
@@ -240,7 +257,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             tooltip: 'GitHub OAuth',
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => const GitHubAuthScreen()),
+                MaterialPageRoute<void>(
+                    builder: (_) => const GitHubAuthScreen()),
               );
             },
           ),
@@ -251,7 +269,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               switch (value) {
                 case 'docs':
                   Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (_) => const LocalDocsScreen()),
+                    MaterialPageRoute<void>(
+                        builder: (_) => const LocalDocsScreen()),
                   );
                   break;
                 case 'uninstall':
@@ -262,11 +281,13 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             itemBuilder: (_) => [
               PopupMenuItem(
                 value: 'docs',
-                child: Text('Documentación', style: TextStyle(color: HubColors.textoPrincipal)),
+                child: Text('Documentación',
+                    style: TextStyle(color: HubColors.textoPrincipal)),
               ),
               const PopupMenuItem(
                 value: 'uninstall',
-                child: Text('Desinstalar módulo', style: TextStyle(color: Colors.redAccent)),
+                child: Text('Desinstalar módulo',
+                    style: TextStyle(color: Colors.redAccent)),
               ),
             ],
           ),
@@ -281,20 +302,27 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       body: _loading
           ? Center(child: CircularProgressIndicator(color: HubColors.pomelo))
           : _error != null
-              ? Center(child: Text(_error!, style: TextStyle(color: Colors.redAccent)))
+              ? Center(
+                  child:
+                      Text(_error!, style: TextStyle(color: Colors.redAccent)))
               : _projects.isEmpty
                   ? Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.folder_open_rounded,
-                              size: 56, color: HubColors.textoSecundario.withOpacity(0.5)),
+                              size: 56,
+                              color:
+                                  HubColors.textoSecundario.withOpacity(0.5)),
                           SizedBox(height: 12),
                           Text('No hay proyectos todavía',
-                              style: TextStyle(color: HubColors.textoSecundario, fontSize: 15)),
+                              style: TextStyle(
+                                  color: HubColors.textoSecundario,
+                                  fontSize: 15)),
                           SizedBox(height: 6),
                           Text('Toca + para crear el primero',
-                              style: TextStyle(color: HubColors.textoAcento, fontSize: 13)),
+                              style: TextStyle(
+                                  color: HubColors.textoAcento, fontSize: 13)),
                         ],
                       ),
                     )
@@ -311,11 +339,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                             decoration: BoxDecoration(
                               color: HubColors.panel,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: HubColors.linea.withOpacity(0.6)),
+                              border: Border.all(
+                                  color: HubColors.linea.withOpacity(0.6)),
                             ),
                             child: ListTile(
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
                               leading: Container(
                                 width: 42,
                                 height: 42,
@@ -323,15 +352,20 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                   gradient: HubColors.degradado,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Icon(Icons.code_rounded, color: Colors.white, size: 22),
+                                child: const Icon(Icons.code_rounded,
+                                    color: Colors.white, size: 22),
                               ),
                               title: Text(p.name,
                                   style: TextStyle(
-                                      color: HubColors.textoPrincipal, fontWeight: FontWeight.w600)),
+                                      color: HubColors.textoPrincipal,
+                                      fontWeight: FontWeight.w600)),
                               subtitle: Text(
-                                p.tags.isEmpty ? p.editor : '${p.editor} · ${p.tags.join(' · ')}',
+                                p.tags.isEmpty
+                                    ? p.editor
+                                    : '${p.editor} · ${p.tags.join(' · ')}',
                                 style: TextStyle(
-                                    color: HubColors.textoSecundario, fontSize: 12.5),
+                                    color: HubColors.textoSecundario,
+                                    fontSize: 12.5),
                               ),
                               trailing: Icon(Icons.chevron_right_rounded,
                                   color: HubColors.textoSecundario),

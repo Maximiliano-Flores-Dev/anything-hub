@@ -12,12 +12,21 @@ import '../modules/projects/services/project_fs_service.dart';
 /// No abre ni ejecuta archivos externos.
 class FilePreviewService {
   static const _iconCacheSubdir = 'icons';
-  static const textExtensions = {'txt', 'md', 'json', 'log', 'csv', 'yaml', 'yml'};
+  static const textExtensions = {
+    'txt',
+    'md',
+    'json',
+    'log',
+    'csv',
+    'yaml',
+    'yml'
+  };
   static const imageExtensions = {'jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'};
 
   static Future<Directory> _iconsCacheDir() async {
     final root = await ProjectFsService.getRootDirectory();
-    final dir = Directory(p.join(root.path, ProjectFsService.cacheDir, _iconCacheSubdir));
+    final dir = Directory(
+        p.join(root.path, ProjectFsService.cacheDir, _iconCacheSubdir));
     if (!await dir.exists()) {
       await dir.create(recursive: true);
     }
@@ -80,7 +89,8 @@ class FilePreviewService {
     }
   }
 
-  static bool isImage(String ext) => imageExtensions.contains(ext.toLowerCase());
+  static bool isImage(String ext) =>
+      imageExtensions.contains(ext.toLowerCase());
 
   static bool isText(String ext) => textExtensions.contains(ext.toLowerCase());
 
@@ -114,7 +124,8 @@ class FilePreviewService {
 
   /// Clave estable para un path de APK (hash del path + size).
   static String apkCacheKey(String path, int size) {
-    final h = md5.convert(utf8.encode('$path|$size')).toString().substring(0, 16);
+    final h =
+        md5.convert(utf8.encode('$path|$size')).toString().substring(0, 16);
     return 'apk_$h';
   }
 }

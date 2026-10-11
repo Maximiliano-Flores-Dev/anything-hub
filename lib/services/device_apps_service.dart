@@ -41,12 +41,13 @@ class DeviceAppsService {
 
   static Future<bool> installApkFromCache(String cacheRelativePath) async =>
       await _call<bool>('installApkFromCache', {
-            'cacheRelativePath': cacheRelativePath,
-          }) ??
-          false;
+        'cacheRelativePath': cacheRelativePath,
+      }) ??
+      false;
 
   /// Metadatos reales del APK en caché (PackageManager.getPackageArchiveInfo).
-  static Future<Map<String, dynamic>?> inspectApk(String cacheRelativePath) async {
+  static Future<Map<String, dynamic>?> inspectApk(
+      String cacheRelativePath) async {
     final raw = await _call<Map<dynamic, dynamic>>('inspectApk', {
       'cacheRelativePath': cacheRelativePath,
     });
@@ -54,7 +55,8 @@ class DeviceAppsService {
     return raw.map((k, v) => MapEntry(k.toString(), v));
   }
 
-  static Future<Map<String, dynamic>?> inspectApkPath(String absolutePath) async {
+  static Future<Map<String, dynamic>?> inspectApkPath(
+      String absolutePath) async {
     final raw = await _call<Map<dynamic, dynamic>>('inspectApkPath', {
       'path': absolutePath,
     });

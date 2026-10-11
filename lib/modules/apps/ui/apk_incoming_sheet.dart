@@ -56,7 +56,8 @@ class ApkIncomingSheet extends StatelessWidget {
               Text(
                 'Todo en un solo lugar',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
               SizedBox(height: 28),
               HubPanel(
@@ -80,10 +81,12 @@ class ApkIncomingSheet extends StatelessWidget {
                     SizedBox(height: 4),
                     Text(
                       'Archivo APK entrante compartido con Anythings Hub.',
-                      style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                      style: TextStyle(
+                          color: HubColors.textoSecundario, fontSize: 12),
                     ),
                     SizedBox(height: 16),
-                    _row(Icons.insert_drive_file_outlined, 'Nombre del archivo', fileName),
+                    _row(Icons.insert_drive_file_outlined, 'Nombre del archivo',
+                        fileName),
                     const SizedBox(height: 10),
                     _row(Icons.sd_storage_outlined, 'Tama\u00f1o', _sizeLabel),
                     const SizedBox(height: 10),
@@ -109,7 +112,8 @@ class ApkIncomingSheet extends StatelessWidget {
               SizedBox(height: 4),
               Text(
                 'Elige cómo quieres manejar este APK.',
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
               SizedBox(height: 16),
               GradientPillButton(
@@ -128,7 +132,8 @@ class ApkIncomingSheet extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop({'action': 'save', 'path': cacheRelativePath});
+                  Navigator.of(context)
+                      .pop({'action': 'save', 'path': cacheRelativePath});
                 },
                 icon: const Icon(Icons.folder_outlined),
                 label: Text('Solo guardar'),
@@ -136,12 +141,14 @@ class ApkIncomingSheet extends StatelessWidget {
               const Spacer(),
               Row(
                 children: [
-                  Icon(Icons.verified_user_outlined, size: 16, color: HubColors.textoSecundario),
+                  Icon(Icons.verified_user_outlined,
+                      size: 16, color: HubColors.textoSecundario),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Origen verificado con getCallingPackage cuando el sistema lo expone.',
-                      style: TextStyle(color: HubColors.textoSecundario, fontSize: 11),
+                      style: TextStyle(
+                          color: HubColors.textoSecundario, fontSize: 11),
                     ),
                   ),
                 ],
@@ -195,17 +202,15 @@ class ApkIncomingSheet extends StatelessWidget {
     final isInstalled = meta?['isPackageInstalled'] == true;
 
     final parseFailed = packageName == null || packageName.isEmpty;
-    final displayName = (appLabel != null && appLabel.isNotEmpty)
-        ? appLabel
-        : fileName;
+    final displayName =
+        (appLabel != null && appLabel.isNotEmpty) ? appLabel : fileName;
     final displayPackage = parseFailed ? 'com.desconocido.apk' : packageName!;
 
     final report = ApkRiskScorer.score(
       fileName: displayName,
       packageName: displayPackage,
-      rawPermissions: parseFailed
-          ? const ['android.permission.PARSE_FAILED']
-          : rawPerms,
+      rawPermissions:
+          parseFailed ? const ['android.permission.PARSE_FAILED'] : rawPerms,
       detectedPackages: const [],
       sha256: null,
       parseFailed: parseFailed,
@@ -238,8 +243,12 @@ class ApkIncomingSheet extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(color: HubColors.textoSecundario, fontSize: 12)),
-              Text(value, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
+              Text(label,
+                  style: TextStyle(
+                      color: HubColors.textoSecundario, fontSize: 12)),
+              Text(value,
+                  style:
+                      TextStyle(color: HubColors.textoPrincipal, fontSize: 14)),
             ],
           ),
         ),

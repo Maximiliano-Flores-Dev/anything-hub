@@ -44,17 +44,20 @@ class HubPluginManifest {
       description: (j['description'] as String?)?.trim() ?? '',
       author: (j['author'] as String?)?.trim() ?? '',
       category: (j['category'] as String?)?.trim() ?? 'misc',
-      tags: (j['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
+      tags: (j['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+          const [],
       homepage: (j['homepage'] as String?)?.trim() ?? '',
       minHubVersion: (j['minHubVersion'] as String?)?.trim() ?? '1.0.0',
-      permissions:
-          (j['permissions'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
-              const [],
+      permissions: (j['permissions'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
       configSchema: (j['configSchema'] as Map<String, dynamic>?) ?? const {},
       extendsFeature: (j['extendsFeature'] as String?)?.trim() ?? '',
-      capabilities:
-          (j['capabilities'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
-              const [],
+      capabilities: (j['capabilities'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
     );
   }
 

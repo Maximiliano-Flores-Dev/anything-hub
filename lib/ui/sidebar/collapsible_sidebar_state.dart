@@ -59,7 +59,8 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
         spring,
         _controller.value,
         open ? 1.0 : 0.0,
-        velocityPxPerSec / _travel, // px/s -> unidades del controller por segundo
+        velocityPxPerSec /
+            _travel, // px/s -> unidades del controller por segundo
       ),
     );
   }
@@ -199,7 +200,9 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                   child: Icon(
                     action.icon,
                     size: 20,
-                    color: selected ? HubColors.fondoPrincipal : HubColors.textoPrincipal,
+                    color: selected
+                        ? HubColors.fondoPrincipal
+                        : HubColors.textoPrincipal,
                   ),
                 ),
               ),
@@ -222,15 +225,18 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
           behavior: HitTestBehavior.opaque,
           gestures: <Type, GestureRecognizerFactory>{
             HorizontalDragGestureRecognizer:
-                GestureRecognizerFactoryWithHandlers<HorizontalDragGestureRecognizer>(
+                GestureRecognizerFactoryWithHandlers<
+                    HorizontalDragGestureRecognizer>(
               () => HorizontalDragGestureRecognizer(),
               (r) => r
-                ..gestureSettings = const DeviceGestureSettings(touchSlop: _dragSlop)
+                ..gestureSettings =
+                    const DeviceGestureSettings(touchSlop: _dragSlop)
                 ..dragStartBehavior = DragStartBehavior.down
                 ..onStart = _onDragStart
                 ..onUpdate = _onDragUpdate
                 ..onEnd = _onDragEnd
-                ..onCancel = () => _settle(open: _controller.value > _openThreshold),
+                ..onCancel =
+                    () => _settle(open: _controller.value > _openThreshold),
             ),
           },
           child: Container(
@@ -245,14 +251,16 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Row(
                             children: [
-                              Icon(Icons.grid_view_rounded, color: HubColors.pomelo, size: 20),
+                              Icon(Icons.grid_view_rounded,
+                                  color: HubColors.pomelo, size: 20),
                               SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   'Aplicaciones',
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: HubColors.textoPrincipal.withOpacity(progress),
+                                    color: HubColors.textoPrincipal
+                                        .withOpacity(progress),
                                     fontWeight: FontWeight.w600,
                                     fontSize: 15,
                                   ),
@@ -263,7 +271,8 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                                 onPressed: _toggle,
                                 icon: Icon(
                                   Icons.chevron_left_rounded,
-                                  color: HubColors.textoSecundario.withOpacity(progress),
+                                  color: HubColors.textoSecundario
+                                      .withOpacity(progress),
                                 ),
                               ),
                             ],
@@ -272,7 +281,8 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                       : Center(
                           child: IconButton(
                             onPressed: _toggle,
-                            icon: Icon(Icons.menu_rounded, color: HubColors.textoSecundario),
+                            icon: Icon(Icons.menu_rounded,
+                                color: HubColors.textoSecundario),
                           ),
                         ),
                 ),

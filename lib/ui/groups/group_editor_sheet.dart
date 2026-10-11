@@ -125,7 +125,8 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Eliminar grupo', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text('Eliminar grupo',
+            style: TextStyle(color: HubColors.textoPrincipal)),
         content: Text(
           '¿Eliminar "${widget.existing?.label}"? Las apps no se desinstalan.',
           style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
@@ -133,11 +134,13 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+            child: Text('Cancelar',
+                style: TextStyle(color: HubColors.textoSecundario)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.redAccent)),
+            child: const Text('Eliminar',
+                style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -187,13 +190,15 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                   if (isEdit)
                     TextButton(
                       onPressed: _confirmDelete,
-                      child: const Text('Eliminar', style: TextStyle(color: Colors.redAccent)),
+                      child: const Text('Eliminar',
+                          style: TextStyle(color: Colors.redAccent)),
                     ),
                   TextButton(
                     onPressed: _submit,
                     child: Text(
                       isEdit ? 'Guardar' : 'Crear',
-                      style: TextStyle(color: HubColors.pomelo, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                          color: HubColors.pomelo, fontWeight: FontWeight.w700),
                     ),
                   ),
                 ],
@@ -210,9 +215,12 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                   hintText: 'Nombre del grupo',
                   labelStyle: TextStyle(color: HubColors.textoSecundario),
                   floatingLabelStyle: TextStyle(color: HubColors.pomelo),
-                  hintStyle: TextStyle(color: HubColors.textoSecundario.withOpacity(0.6)),
-                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea)),
-                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo)),
+                  hintStyle: TextStyle(
+                      color: HubColors.textoSecundario.withOpacity(0.6)),
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: HubColors.linea)),
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: HubColors.pomelo)),
                 ),
               ),
             ),
@@ -222,7 +230,10 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Color',
-                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 12, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      color: HubColors.textoSecundario,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -230,7 +241,8 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
               height: 48,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 itemCount: kGroupColorOptions.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 10),
                 itemBuilder: (_, i) {
@@ -245,15 +257,22 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                         color: Color(c),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: selected ? HubColors.textoPrincipal : Colors.transparent,
+                          color: selected
+                              ? HubColors.textoPrincipal
+                              : Colors.transparent,
                           width: 2.5,
                         ),
                         boxShadow: selected
-                            ? [BoxShadow(color: Color(c).withOpacity(0.45), blurRadius: 8)]
+                            ? [
+                                BoxShadow(
+                                    color: Color(c).withOpacity(0.45),
+                                    blurRadius: 8)
+                              ]
                             : null,
                       ),
                       child: selected
-                          ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
+                          ? const Icon(Icons.check_rounded,
+                              size: 16, color: Colors.white)
                           : null,
                     ),
                   );
@@ -267,9 +286,12 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                 onChanged: (v) => setState(() => _query = v),
                 style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search_rounded, color: HubColors.textoSecundario, size: 20),
+                  prefixIcon: Icon(Icons.search_rounded,
+                      color: HubColors.textoSecundario, size: 20),
                   hintText: 'Buscar apps…',
-                  hintStyle: TextStyle(color: HubColors.textoSecundario.withOpacity(0.6), fontSize: 13),
+                  hintStyle: TextStyle(
+                      color: HubColors.textoSecundario.withOpacity(0.6),
+                      fontSize: 13),
                   isDense: true,
                   filled: true,
                   fillColor: HubColors.fondoPrincipal,
@@ -277,7 +299,8 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
               ),
             ),
@@ -287,12 +310,16 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                 children: [
                   Text(
                     'Apps',
-                    style: TextStyle(color: HubColors.textoSecundario, fontSize: 12, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        color: HubColors.textoSecundario,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
                   ),
                   const Spacer(),
                   Text(
                     '${_selected.length} seleccionadas',
-                    style: TextStyle(color: HubColors.textoAcento, fontSize: 12),
+                    style:
+                        TextStyle(color: HubColors.textoAcento, fontSize: 12),
                   ),
                 ],
               ),
@@ -304,7 +331,8 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                       child: Text(
                         'No hay apps escaneadas. Usa «Escanear Apps» en el FAB primero.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                        style: TextStyle(
+                            color: HubColors.textoSecundario, fontSize: 13),
                       ),
                     )
                   : ListView.builder(
@@ -321,11 +349,16 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                             app.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
+                            style: TextStyle(
+                                color: HubColors.textoPrincipal, fontSize: 14),
                           ),
                           trailing: Icon(
-                            on ? Icons.check_circle_rounded : Icons.circle_outlined,
-                            color: on ? Color(_colorArgb) : HubColors.textoSecundario,
+                            on
+                                ? Icons.check_circle_rounded
+                                : Icons.circle_outlined,
+                            color: on
+                                ? Color(_colorArgb)
+                                : HubColors.textoSecundario,
                             size: 22,
                           ),
                           onTap: () {
