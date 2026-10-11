@@ -8,7 +8,7 @@ import '../services/apk_risk_scorer.dart';
 import '../widgets/hub_panel.dart';
 import 'revisar_apk_screen.dart';
 
-/// Bottom sheet / pantalla al recibir un APK vía Compartir o Abrir con.
+/// Bottom sheet / pantalla al recibir un APK v\u00eda Compartir o Abrir con.
 class ApkIncomingSheet extends StatelessWidget {
   const ApkIncomingSheet({
     super.key,
@@ -84,12 +84,12 @@ class ApkIncomingSheet extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     _row(Icons.insert_drive_file_outlined, 'Nombre del archivo', fileName),
-                    SizedBox(height: 10),
-                    _row(Icons.sd_storage_outlined, 'Tamaño', _sizeLabel),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
+                    _row(Icons.sd_storage_outlined, 'Tama\u00f1o', _sizeLabel),
+                    const SizedBox(height: 10),
                     _row(
                       Icons.shield_outlined,
-                      'Aplicación que comparte',
+                      'Aplicaci\u00f3n que comparte',
                       callerPackage == null || callerPackage!.isEmpty
                           ? 'Desconocido'
                           : '$callerPackage${callerVerified ? ' ✓' : ''}',
@@ -209,7 +209,7 @@ class ApkIncomingSheet extends StatelessWidget {
       detectedPackages: const [],
       sha256: null,
       parseFailed: parseFailed,
-      versionLabel: versionLabel.isEmpty ? '—' : versionLabel,
+      versionLabel: versionLabel.isEmpty ? '\u2014' : versionLabel,
       signingCertSha256: signingCerts,
       installedCertSha256: installedCerts,
       isPackageInstalled: isInstalled,

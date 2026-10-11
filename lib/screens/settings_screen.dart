@@ -206,13 +206,13 @@ class _SettingsScreenState extends State<SettingsScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: HubColors.textoPrincipal,
                       fontWeight: FontWeight.w600,
                       fontSize: 13)),
               const SizedBox(height: 2),
               Text(subtitle,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: HubColors.textoSecundario, fontSize: 12)),
               const SizedBox(height: 2),
               Text(
@@ -231,7 +231,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         IconButton(
           tooltip: 'Abrir ajustes del sistema',
           onPressed: onOpen,
-          icon: Icon(Icons.open_in_new, size: 18, color: HubColors.textoAcento),
+          icon: const Icon(Icons.open_in_new, size: 18, color: HubColors.textoAcento),
         ),
       ],
     );
@@ -280,6 +280,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         _sectionTitle('Permisos del sistema'),
         _card(
           child: _loadingPerms
+              ? const Padding(
               ? Padding(
                   padding: EdgeInsets.all(12),
                   child: Center(
@@ -316,7 +317,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                         await _refreshPermissions();
                       },
                     ),
-                    Divider(color: HubColors.linea, height: 20),
+                    const Divider(color: HubColors.linea, height: 20),
                     _permRow(
                       'No molestar / Focus',
                       'Silenciar notificaciones de terceros',
@@ -327,7 +328,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                         await _refreshPermissions();
                       },
                     ),
-                    Divider(color: HubColors.linea, height: 20),
+                    const Divider(color: HubColors.linea, height: 20),
                     _permRow(
                       'Notificaciones propias',
                       'Avisos del modo rendimiento (Android 13+)',
@@ -343,8 +344,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed: _refreshPermissions,
-                        icon: Icon(Icons.refresh, size: 18, color: HubColors.textoAcento),
-                        label: Text('Actualizar',
+                        icon: const Icon(Icons.refresh, size: 18, color: HubColors.textoAcento),
+                        label: const Text('Actualizar',
                             style: TextStyle(color: HubColors.textoAcento)),
                       ),
                     ),

@@ -7,7 +7,7 @@ import '../widgets/hub_panel.dart';
 import 'analisis_complementario_screen.dart';
 import 'verificacion_firma_screen.dart';
 
-/// Puente de soberanía: risk score + permisos + override del usuario.
+/// Puente de soberan\u00eda: risk score + permisos + override del usuario.
 class RevisarApkScreen extends StatelessWidget {
   const RevisarApkScreen({
     super.key,
@@ -120,7 +120,7 @@ class RevisarApkScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Esta APK tiene un riesgo $_levelLabel según el análisis.',
+                  'Esta APK tiene un riesgo $_levelLabel seg\u00fan el an\u00e1lisis.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                 ),
@@ -176,8 +176,8 @@ class RevisarApkScreen extends StatelessWidget {
                           color: const Color(0xFFE53935).withOpacity(0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Text(
-                          'CRÍTICO',
+                        child: const Text(
+                          'CR\u00cdTICO',
                           style: TextStyle(
                             color: Color(0xFFE53935),
                             fontSize: 10,
@@ -232,27 +232,33 @@ class RevisarApkScreen extends StatelessWidget {
                 ),
               );
             },
-            icon: Icon(Icons.travel_explore, color: HubColors.textoAcento),
-            label: Text(
-              'Análisis complementario (opcional)',
+            icon: const Icon(Icons.travel_explore, color: HubColors.textoAcento),
+            label: const Text(
+              'An\u00e1lisis complementario (opcional)',
               style: TextStyle(color: HubColors.textoAcento),
             ),
           ),
           TextButton.icon(
             onPressed: () {
+              final primaryCert = report.signingCertSha256.isNotEmpty
+                  ? report.signingCertSha256.first
+                  : report.sha256;
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => VerificacionFirmaScreen(
                     packageName: report.packageName,
-                    versionLabel: '—',
-                    certSha256: report.sha256,
+                    versionLabel: report.versionLabel,
+                    certSha256: primaryCert,
+                    signingCertSha256: report.signingCertSha256,
+                    installedCertSha256: report.installedCertSha256,
+                    isPackageInstalled: report.isPackageInstalled,
                   ),
                 ),
               );
             },
-            icon: Icon(Icons.verified_user_outlined, color: HubColors.textoAcento),
-            label: Text(
-              'Verificar firma (oráculo)',
+            icon: const Icon(Icons.verified_user_outlined, color: HubColors.textoAcento),
+            label: const Text(
+              'Verificar firma (or\u00e1culo)',
               style: TextStyle(color: HubColors.textoAcento),
             ),
           ),
@@ -269,7 +275,7 @@ class RevisarApkScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Tu soberanía, tu decisión.',
+                        'Tu soberan\u00eda, tu decisi\u00f3n.',
                         style: TextStyle(
                           color: HubColors.textoPrincipal,
                           fontWeight: FontWeight.w700,
@@ -277,7 +283,7 @@ class RevisarApkScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'El sistema no te impide instalar. Si continúas, es bajo tu responsabilidad.',
+                        'El sistema no te impide instalar. Si contin\u00faas, es bajo tu responsabilidad.',
                         style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                       ),
                     ],

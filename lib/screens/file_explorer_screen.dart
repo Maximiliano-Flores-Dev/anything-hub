@@ -518,7 +518,7 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
           _selectionMode ? '${_selected.length} seleccionados' : (_currentPath.split('/').last.isEmpty ? 'Archivos' : _currentPath.split('/').last),
           style: TextStyle(color: HubColors.textoPrincipal, fontSize: 16),
         ),
-        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
+        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
         actions: [
           if (_selectionMode) ...[
             IconButton(icon: const Icon(Icons.copy_rounded), onPressed: () => _copySelected(cut: false), tooltip: 'Copiar'),
@@ -537,12 +537,12 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      ListTile(leading: Icon(Icons.sort, color: HubColors.textoAcento), title: Text('Ordenar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showSortMenu(); }),
-                      ListTile(leading: Icon(_view == _ViewMode.list ? Icons.grid_view_rounded : Icons.view_list_rounded, color: HubColors.textoAcento), title: Text(_view == _ViewMode.list ? 'Vista cuadrícula' : 'Vista lista', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() => _view = _view == _ViewMode.list ? _ViewMode.grid : _ViewMode.list); }),
-                      ListTile(leading: Icon(_showHidden ? Icons.visibility_off : Icons.visibility, color: HubColors.textoAcento), title: Text(_showHidden ? 'Ocultar ocultos' : 'Mostrar ocultos', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() => _showHidden = !_showHidden); _navigateTo(_currentPath); }),
-                      ListTile(leading: Icon(Icons.star_rounded, color: HubColors.amarillo), title: Text('Favoritos', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showFavorites(); }),
-                      ListTile(leading: Icon(Icons.drive_file_move_outline, color: HubColors.textoAcento), title: Text('Ir a ruta', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _goToPath(); }),
-                      SizedBox(height: 8),
+                      ListTile(leading: const Icon(Icons.sort, color: HubColors.textoAcento), title: const Text('Ordenar', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showSortMenu(); }),
+                      ListTile(leading: Icon(_view == _ViewMode.list ? Icons.grid_view_rounded : Icons.view_list_rounded, color: HubColors.textoAcento), title: Text(_view == _ViewMode.list ? 'Vista cuadrícula' : 'Vista lista', style: const TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() => _view = _view == _ViewMode.list ? _ViewMode.grid : _ViewMode.list); }),
+                      ListTile(leading: Icon(_showHidden ? Icons.visibility_off : Icons.visibility, color: HubColors.textoAcento), title: Text(_showHidden ? 'Ocultar ocultos' : 'Mostrar ocultos', style: const TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); setState(() => _showHidden = !_showHidden); _navigateTo(_currentPath); }),
+                      ListTile(leading: const Icon(Icons.star_rounded, color: HubColors.amarillo), title: const Text('Favoritos', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _showFavorites(); }),
+                      ListTile(leading: const Icon(Icons.drive_file_move_outline, color: HubColors.textoAcento), title: const Text('Ir a ruta', style: TextStyle(color: HubColors.textoPrincipal)), onTap: () { Navigator.pop(ctx); _goToPath(); }),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -574,8 +574,8 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                       minHeight: 4,
                     ),
                   ),
-                  SizedBox(height: 2),
-                  Text('${_storageInfo!.usedLabel} / ${_storageInfo!.totalLabel}', style: TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
+                  const SizedBox(height: 2),
+                  Text('${_storageInfo!.usedLabel} / ${_storageInfo!.totalLabel}', style: const TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
                 ],
               ),
             ),
@@ -584,11 +584,11 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
             child: TextField(
               controller: _searchCtrl,
               focusNode: _searchFocus,
-              style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
+              style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'Buscar…',
-                hintStyle: TextStyle(color: HubColors.textoSecundario),
-                prefixIcon: Icon(Icons.search, color: HubColors.textoSecundario, size: 20),
+                hintStyle: const TextStyle(color: HubColors.textoSecundario),
+                prefixIcon: const Icon(Icons.search, color: HubColors.textoSecundario, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () { _searchCtrl.clear(); })
                     : null,
@@ -621,12 +621,12 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
               ],
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Expanded(
             child: _loading
-                ? Center(child: CircularProgressIndicator(color: HubColors.pomelo))
+                ? const Center(child: CircularProgressIndicator(color: HubColors.pomelo))
                 : _filtered.isEmpty
-                    ? Center(child: Text('Vacío', style: TextStyle(color: HubColors.textoSecundario)))
+                    ? const Center(child: Text('Vacío', style: TextStyle(color: HubColors.textoSecundario)))
                     : RefreshIndicator(
                         color: HubColors.pomelo,
                         onRefresh: () => _navigateTo(_currentPath),
@@ -646,10 +646,10 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
         final selected = _selected.contains(e.path);
         return ListTile(
           leading: Icon(_iconFor(e), color: _iconColor(e)),
-          title: Text(e.name, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
-          subtitle: Text(e.isDirectory ? 'Carpeta' : e.sizeLabel, style: TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
+          title: Text(e.name, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
+          subtitle: Text(e.isDirectory ? 'Carpeta' : e.sizeLabel, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
           selected: selected,
-          selectedTileColor: HubColors.pomelo.withOpacity(0.12),
+          selectedTileColor: HubColors.pomelo.withValues(alpha: 0.12),
           onTap: () {
             if (_selectionMode) {
               setState(() {
@@ -707,7 +707,7 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
           },
           child: Container(
             decoration: BoxDecoration(
-              color: selected ? HubColors.pomelo.withOpacity(0.15) : HubColors.panel,
+              color: selected ? HubColors.pomelo.withValues(alpha: 0.15) : HubColors.panel,
               borderRadius: BorderRadius.circular(12),
               border: selected ? Border.all(color: HubColors.pomelo, width: 1.5) : null,
             ),
@@ -716,8 +716,8 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(_iconFor(e), color: _iconColor(e), size: 36),
-                SizedBox(height: 6),
-                Text(e.name, style: TextStyle(color: HubColors.textoPrincipal, fontSize: 11), maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
+                const SizedBox(height: 6),
+                Text(e.name, style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 11), maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
               ],
             ),
           ),
