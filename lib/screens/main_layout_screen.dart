@@ -17,6 +17,7 @@ import '../ui/widgets/dashboard_card.dart';
 import '../ui/widgets/gradient_pill_button.dart';
 import '../modules/apps/ui/mis_aplicaciones_screen.dart';
 import '../modules/apps/ui/apk_incoming_sheet.dart';
+import '../modules/favorites/ui/favorites_screen.dart';
 import 'file_explorer_screen.dart';
 import 'settings_screen.dart';
 import 'web_links_screen.dart';
@@ -391,6 +392,12 @@ class _MainLayoutScreenState extends State<MainLayoutScreen>
       _openProjectsModule();
     } else if (cardId == DashboardCardIds.webs) {
       _openWebLinks();
+    } else if (cardId == DashboardCardIds.favorites) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => FavoritesScreen(webRepo: _webLinks),
+        ),
+      );
     } else if (cardId == DashboardCardIds.files) {
       _openFileExplorer();
     } else if (cardId == DashboardCardIds.performance) {
