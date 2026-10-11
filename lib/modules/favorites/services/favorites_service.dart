@@ -8,13 +8,14 @@ import '../../../services/device_apps_service.dart';
 import '../../apps/services/apps_local_store.dart';
 import '../models/favorite_item.dart';
 
-/// Agrega favoritos de apps, webs y archivos en una colección unificada.
+/// Colección unificada de favoritos.
 ///
 /// - Apps: bookmarks de [AppsLocalStore]
-/// - Archivos: lista `file_explorer_favorites`
-/// - Webs: todos los [WebLinkItem] (Webs Rápidas = favoritos de enlaces)
+/// - Archivos: `file_explorer_favorites`
+/// - Webs: ids en `web_link_favorites` (estrella propia, no todas las webs)
 ///
-/// Timestamps se guardan en `favorites_meta_v1` para ordenar por fecha.
+/// Timestamps en `favorites_meta_v1`. Favoritos sin fecha reciben
+/// [DateTime.now] la primera vez que se cargan (migración 1.4).
 class FavoritesService {
   FavoritesService({
     AppsLocalStore? appsStore,
@@ -25,13 +26,26 @@ class FavoritesService {
   final AppsLocalStore _appsStore;
   final WebLinkRepository _webRepo;
 
-  static const _metaKey = 'favorites_meta_v1';
-  static const _fileFavKey = 'file_explorer_favorites';
+  static const metaKey = 'favorites_meta_v1';
+  static const fileFavKey = 'file_explorer_favorites';
+  static const webFavKey = 'web_link_favorites';
 
-  /// Carga la colección completa (sin ordenar).
+  /// Carga favoritos y, si hay alguno sin fecha, le asigna ahora y persiste.
   Future<List<FavoriteItem>> loadAll() async {
     final meta = await _loadMeta();
     final items = <FavoriteItem>[];
+    final now = DateTime.now();
+    var metaDirty = false;
+
+    DateTime resolveDate(String key) {
+      final existing = meta[key];
+      if (existing != null && existing.millisecondsSinceEpoch > 0) {
+        return existing;
+      }
+      meta[key] = now;
+      metaDirty = true;
+      return now;
+    }
 
     // Apps
     final bookmarks = await _appsStore.loadBookmarks();
@@ -45,90 +59,93 @@ class FavoritesService {
           byPackage[a.packageName] = a;
         }
       }
-
       for (final pkg in bookmarks) {
         final info = byPackage[pkg];
-        final at = meta['${FavoriteType.app.name}:$pkg'] ??
-            DateTime.fromMillisecondsSinceEpoch(0);
+        final key = '${FavoriteType.app.name}:$pkg';
         items.add(FavoriteItem(
           type: FavoriteType.app,
           id: pkg,
           title: info?.name ?? pkg,
-          subtitle: null,
-          favoritedAt: at,
+          favoritedAt: resolveDate(key),
           iconBytes: info?.icon,
           packageName: pkg,
         ));
       }
     }
 
-    // Webs
+    // Webs (solo las marcadas con estrella)
     await _webRepo.load();
-    for (final link in _webRepo.items) {
-      final at = meta['${FavoriteType.web.name}:${link.id}'] ??
-          DateTime.fromMillisecondsSinceEpoch(0);
+    final webFavs = await loadWebFavorites();
+    final linksById = {for (final l in _webRepo.items) l.id: l};
+    for (final id in webFavs) {
+      final link = linksById[id];
+      if (link == null) continue;
+      final key = '${FavoriteType.web.name}:$id';
       items.add(FavoriteItem(
         type: FavoriteType.web,
-        id: link.id,
+        id: id,
         title: link.title,
         subtitle: link.host.isNotEmpty ? link.host : null,
-        favoritedAt: at,
+        favoritedAt: resolveDate(key),
         url: link.url,
       ));
     }
 
     // Archivos
     final prefs = await SharedPreferences.getInstance();
-    final filePaths = prefs.getStringList(_fileFavKey) ?? const [];
+    final filePaths = prefs.getStringList(fileFavKey) ?? const [];
     for (final path in filePaths) {
       final parts = path.split('/').where((s) => s.isNotEmpty).toList();
       final name = parts.isEmpty ? path : parts.last;
-      final at = meta['${FavoriteType.file.name}:$path'] ??
-          DateTime.fromMillisecondsSinceEpoch(0);
+      final key = '${FavoriteType.file.name}:$path';
+      final looksDir = !name.contains('.') || path.endsWith('/');
       items.add(FavoriteItem(
         type: FavoriteType.file,
         id: path,
         title: name,
         subtitle: path,
-        favoritedAt: at,
+        favoritedAt: resolveDate(key),
         path: path,
+        isDirectory: looksDir,
       ));
     }
 
+    if (metaDirty) {
+      await _saveMeta(meta);
+    }
     return items;
   }
 
-  /// Agrupa por tipo y aplica el orden solicitado dentro de cada sección.
+  /// Agrupa por tipo, aplica orden y filtro opcional de tipo.
   Map<FavoriteType, List<FavoriteItem>> groupAndSort(
     List<FavoriteItem> items,
-    FavoriteSort sort,
-  ) {
+    FavoriteSort sort, {
+    FavoriteType? typeFilter,
+  }) {
+    final filtered = typeFilter == null
+        ? items
+        : items.where((e) => e.type == typeFilter).toList();
+
     final grouped = <FavoriteType, List<FavoriteItem>>{
       for (final t in FavoriteType.values) t: <FavoriteItem>[],
     };
-
-    for (final item in items) {
+    for (final item in filtered) {
       grouped[item.type]!.add(item);
     }
 
-    final sectionOrder = List<FavoriteType>.from(FavoriteType.values);
-
-    for (final type in sectionOrder) {
+    for (final type in FavoriteType.values) {
       final list = grouped[type]!;
       switch (sort) {
         case FavoriteSort.alphaAsc:
-          list.sort((a, b) =>
-              a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+          list.sort(
+            (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+          );
           break;
         case FavoriteSort.recent:
           list.sort((a, b) => b.favoritedAt.compareTo(a.favoritedAt));
           break;
         case FavoriteSort.oldest:
           list.sort((a, b) => a.favoritedAt.compareTo(b.favoritedAt));
-          break;
-        case FavoriteSort.byType:
-          list.sort((a, b) =>
-              a.title.toLowerCase().compareTo(b.title.toLowerCase()));
           break;
       }
     }
@@ -137,36 +154,60 @@ class FavoritesService {
     return grouped;
   }
 
-  /// Quita un favorito de su store de origen y limpia el meta.
   Future<void> remove(FavoriteItem item) async {
     switch (item.type) {
       case FavoriteType.app:
         await _appsStore.setBookmarked(item.id, false);
         break;
       case FavoriteType.web:
-        await _webRepo.load();
-        await _webRepo.remove(item.id);
+        await setWebFavorite(item.id, false);
         break;
       case FavoriteType.file:
         final prefs = await SharedPreferences.getInstance();
-        final list = prefs.getStringList(_fileFavKey) ?? [];
+        final list = prefs.getStringList(fileFavKey) ?? [];
         list.remove(item.id);
-        await prefs.setStringList(_fileFavKey, list);
+        await prefs.setStringList(fileFavKey, list);
         break;
     }
     await _removeMeta(item.metaKey);
   }
 
-  /// Registra o actualiza la fecha de favorito (llamar al marcar).
-  Future<void> touchMeta(String metaKey, {DateTime? at}) async {
+  Future<Set<String>> loadWebFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList(webFavKey) ?? const [];
+    return list.toSet();
+  }
+
+  Future<void> setWebFavorite(String webId, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    final set = (prefs.getStringList(webFavKey) ?? []).toSet();
+    if (value) {
+      set.add(webId);
+    } else {
+      set.remove(webId);
+    }
+    await prefs.setStringList(webFavKey, set.toList());
+    await touchMeta('${FavoriteType.web.name}:$webId', add: value);
+  }
+
+  Future<bool> isWebFavorite(String webId) async {
+    final set = await loadWebFavorites();
+    return set.contains(webId);
+  }
+
+  Future<void> touchMeta(String key, {required bool add, DateTime? at}) async {
     final meta = await _loadMeta();
-    meta[metaKey] = at ?? DateTime.now();
+    if (add) {
+      meta[key] = at ?? DateTime.now();
+    } else {
+      meta.remove(key);
+    }
     await _saveMeta(meta);
   }
 
   Future<Map<String, DateTime>> _loadMeta() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_metaKey);
+    final raw = prefs.getString(metaKey);
     if (raw == null || raw.isEmpty) return {};
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;
@@ -184,7 +225,7 @@ class FavoritesService {
     final encoded = jsonEncode(
       meta.map((k, v) => MapEntry(k, v.toIso8601String())),
     );
-    await prefs.setString(_metaKey, encoded);
+    await prefs.setString(metaKey, encoded);
   }
 
   Future<void> _removeMeta(String key) async {
