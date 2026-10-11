@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -23,7 +24,10 @@ class _ClipboardItem {
 }
 
 class FileExplorerScreen extends StatefulWidget {
-  const FileExplorerScreen({super.key});
+  const FileExplorerScreen({super.key, this.initialPath});
+
+  /// Si se pasa, el explorador abre en esta ruta (p. ej. desde Favoritos).
+  final String? initialPath;
 
   @override
   State<FileExplorerScreen> createState() => _FileExplorerScreenState();
@@ -100,7 +104,10 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
       return;
     }
     _roots = await DeviceFilesService.getRoots();
-    if (_roots.isNotEmpty) {
+    final initial = widget.initialPath;
+    if (initial != null && initial.isNotEmpty) {
+      await _navigateTo(initial);
+    } else if (_roots.isNotEmpty) {
       await _navigateTo(_roots.first['path']!);
     } else if (mounted) {
       setState(() => _loading = false);
@@ -296,15 +303,38 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
   }
 
   void _toggleFavorite() {
-    if (_favorites.contains(_currentPath)) {
-      _favorites.remove(_currentPath);
-      _toast('Quitado de favoritos');
-    } else {
+    final adding = !_favorites.contains(_currentPath);
+    if (adding) {
       _favorites.add(_currentPath);
       _toast('Añadido a favoritos');
+    } else {
+      _favorites.remove(_currentPath);
+      _toast('Quitado de favoritos');
     }
     _saveFavorites();
+    _touchFavoriteMeta('file:$_currentPath', adding);
     setState(() {});
+  }
+
+  Future<void> _touchFavoriteMeta(String key, bool add) async {
+    const metaKey = 'favorites_meta_v1';
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(metaKey);
+      final meta = <String, dynamic>{};
+      if (raw != null && raw.isNotEmpty) {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map) {
+          decoded.forEach((k, v) => meta[k.toString()] = v);
+        }
+      }
+      if (add) {
+        meta[key] = DateTime.now().toIso8601String();
+      } else {
+        meta.remove(key);
+      }
+      await prefs.setString(metaKey, jsonEncode(meta));
+    } catch (_) {}
   }
 
   void _showFavorites() {
