@@ -25,7 +25,10 @@ class _GroupColorChips extends StatelessWidget {
                   width: 2.5,
                 ),
                 boxShadow: selected == c
-                    ? [BoxShadow(color: Color(c).withOpacity(0.55), blurRadius: 8)]
+                    ? [
+                        BoxShadow(
+                            color: Color(c).withOpacity(0.55), blurRadius: 8)
+                      ]
                     : null,
               ),
             ),

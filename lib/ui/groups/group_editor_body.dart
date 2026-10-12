@@ -120,7 +120,8 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                     ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: HubColors.textoSecundario),
+                    icon: const Icon(Icons.close,
+                        color: HubColors.textoSecundario),
                   ),
                 ],
               ),
@@ -173,8 +174,8 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                 decoration: InputDecoration(
                   hintText: 'Buscar apps…',
                   hintStyle: const TextStyle(color: HubColors.textoSecundario),
-                  prefixIcon:
-                      const Icon(Icons.search, color: HubColors.textoSecundario),
+                  prefixIcon: const Icon(Icons.search,
+                      color: HubColors.textoSecundario),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: HubColors.linea),
