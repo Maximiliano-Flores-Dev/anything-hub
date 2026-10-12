@@ -19,8 +19,8 @@ class AnalisisComplementarioScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
-        title: const Text(
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
+        title: Text(
           'Análisis complementario',
           style: TextStyle(
               color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
@@ -29,7 +29,7 @@ class AnalisisComplementarioScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          const Text(
+          Text(
             'Verifica la integridad y seguridad del APK de forma adicional.',
             style: TextStyle(color: HubColors.textoSecundario, fontSize: 14),
           ),
@@ -38,11 +38,11 @@ class AnalisisComplementarioScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.fingerprint,
                         color: HubColors.textoSecundario, size: 20),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
                       'Resumen del archivo',
                       style: TextStyle(
@@ -53,7 +53,7 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Identificador único del APK analizado.',
                   style:
                       TextStyle(color: HubColors.textoSecundario, fontSize: 12),
@@ -68,79 +68,64 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                     border: Border.all(color: HubColors.linea),
                   ),
                   child: SelectableText(
-                    '$hash\n(SHA-256)',
-                    style: const TextStyle(
+                    hash,
+                    style: TextStyle(
                       color: HubColors.textoPrincipal,
-                      fontSize: 12,
                       fontFamily: 'monospace',
+                      fontSize: 12,
                     ),
                   ),
                 ),
-                const SizedBox(height: 14),
-                SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: HubColors.pomelo,
-                      foregroundColor: HubColors.fondoPrincipal,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(radius12),
-                      ),
-                    ),
-                    onPressed: report.sha256 == null
-                        ? null
-                        : () {
-                            Clipboard.setData(
-                                ClipboardData(text: report.sha256!));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Hash copiado')),
-                            );
-                          },
-                    icon: const Icon(Icons.copy),
-                    label: Text('Copiar hash'),
-                  ),
-                ),
-                SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: HubColors.textoPrincipal,
-                      side: const BorderSide(color: HubColors.linea),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(radius12),
-                      ),
-                    ),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text('Exportar APK: conectar con FileProvider'),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: HubColors.pomelo,
+                          foregroundColor: HubColors.fondoPrincipal,
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.file_upload_outlined),
-                    label: const Text('Exportar APK'),
-                  ),
+                        onPressed: () async {
+                          await Clipboard.setData(ClipboardData(text: hash));
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Hash copiado')),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.copy, size: 18),
+                        label: const Text('Copiar hash'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: HubColors.textoPrincipal,
+                          side: BorderSide(color: HubColors.linea),
+                        ),
+                        onPressed: () {},
+                        icon: const Icon(Icons.ios_share, size: 18),
+                        label: const Text('Exportar APK'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           HubPanel(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.menu_book_outlined,
+                    Icon(Icons.security,
                         color: HubColors.textoSecundario, size: 20),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
-                      'Guía rápida (opcional)',
+                      'Verificación externa',
                       style: TextStyle(
                         color: HubColors.textoPrincipal,
                         fontWeight: FontWeight.w700,
@@ -149,7 +134,7 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Este análisis es opcional y no afecta la instalación. '
                   'Puedes verificar el APK manualmente para mayor confianza:',
                   style:
@@ -168,11 +153,11 @@ class AnalisisComplementarioScreen extends StatelessWidget {
           const SizedBox(height: 16),
           HubPanel(
             padding: const EdgeInsets.all(12),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.info_outline,
                     color: HubColors.textoAcento, size: 18),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Opcional, no bloquea la instalación',
@@ -204,7 +189,7 @@ class AnalisisComplementarioScreen extends StatelessWidget {
             ),
             child: Text(
               n,
-              style: const TextStyle(
+              style: TextStyle(
                 color: HubColors.pomelo,
                 fontWeight: FontWeight.w700,
                 fontSize: 12,
@@ -214,7 +199,7 @@ class AnalisisComplementarioScreen extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(text,
-                style: const TextStyle(
+                style: TextStyle(
                     color: HubColors.textoSecundario, fontSize: 13)),
           ),
         ],

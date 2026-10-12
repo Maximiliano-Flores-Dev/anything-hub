@@ -60,7 +60,7 @@ class _GroupAppPickTile extends StatelessWidget {
         app.name,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
+        style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
       ),
       trailing: Icon(
         selected ? Icons.check_circle_rounded : Icons.circle_outlined,
