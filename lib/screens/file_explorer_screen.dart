@@ -718,7 +718,7 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                   : _currentPath.split('/').last),
           style: TextStyle(color: HubColors.textoPrincipal, fontSize: 16),
         ),
-        iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
+        iconTheme: IconThemeData(color: HubColors.textoPrincipal),
         actions: [
           if (_selectionMode) ...[
             IconButton(
@@ -768,9 +768,9 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ListTile(
-                              leading: const Icon(Icons.sort,
+                              leading: Icon(Icons.sort,
                                   color: HubColors.textoAcento),
-                              title: const Text('Ordenar',
+                              title: Text('Ordenar',
                                   style: TextStyle(
                                       color: HubColors.textoPrincipal)),
                               onTap: () {
@@ -787,7 +787,7 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                                   _view == _ViewMode.list
                                       ? 'Vista cuadrícula'
                                       : 'Vista lista',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: HubColors.textoPrincipal)),
                               onTap: () {
                                 Navigator.pop(ctx);
@@ -805,7 +805,7 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                                   _showHidden
                                       ? 'Ocultar ocultos'
                                       : 'Mostrar ocultos',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: HubColors.textoPrincipal)),
                               onTap: () {
                                 Navigator.pop(ctx);
@@ -813,9 +813,9 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                                 _navigateTo(_currentPath);
                               }),
                           ListTile(
-                              leading: const Icon(Icons.star_rounded,
+                              leading: Icon(Icons.star_rounded,
                                   color: HubColors.amarillo),
-                              title: const Text('Favoritos',
+                              title: Text('Favoritos',
                                   style: TextStyle(
                                       color: HubColors.textoPrincipal)),
                               onTap: () {
@@ -823,9 +823,9 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                                 _showFavorites();
                               }),
                           ListTile(
-                              leading: const Icon(Icons.drive_file_move_outline,
+                              leading: Icon(Icons.drive_file_move_outline,
                                   color: HubColors.textoAcento),
-                              title: const Text('Ir a ruta',
+                              title: Text('Ir a ruta',
                                   style: TextStyle(
                                       color: HubColors.textoPrincipal)),
                               onTap: () {
@@ -869,7 +869,7 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                   const SizedBox(height: 2),
                   Text(
                       '${_storageInfo!.usedLabel} / ${_storageInfo!.totalLabel}',
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: HubColors.textoSecundario, fontSize: 11)),
                 ],
               ),
@@ -879,12 +879,12 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
             child: TextField(
               controller: _searchCtrl,
               focusNode: _searchFocus,
-              style: const TextStyle(
+              style: TextStyle(
                   color: HubColors.textoPrincipal, fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'Buscar…',
-                hintStyle: const TextStyle(color: HubColors.textoSecundario),
-                prefixIcon: const Icon(Icons.search,
+                hintStyle: TextStyle(color: HubColors.textoSecundario),
+                prefixIcon: Icon(Icons.search,
                     color: HubColors.textoSecundario, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -935,10 +935,10 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
           const SizedBox(height: 4),
           Expanded(
             child: _loading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(color: HubColors.pomelo))
                 : _filtered.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text('Vacío',
                             style: TextStyle(color: HubColors.textoSecundario)))
                     : RefreshIndicator(
@@ -963,12 +963,12 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
         return ListTile(
           leading: Icon(_iconFor(e), color: _iconColor(e)),
           title: Text(e.name,
-              style: const TextStyle(
+              style: TextStyle(
                   color: HubColors.textoPrincipal, fontSize: 14),
               maxLines: 1,
               overflow: TextOverflow.ellipsis),
           subtitle: Text(e.isDirectory ? 'Carpeta' : e.sizeLabel,
-              style: const TextStyle(
+              style: TextStyle(
                   color: HubColors.textoSecundario, fontSize: 11)),
           selected: selected,
           selectedTileColor: HubColors.pomelo.withValues(alpha: 0.12),
@@ -1063,7 +1063,7 @@ class _FileExplorerScreenState extends State<FileExplorerScreen>
                 Icon(_iconFor(e), color: _iconColor(e), size: 36),
                 const SizedBox(height: 6),
                 Text(e.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: HubColors.textoPrincipal, fontSize: 11),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

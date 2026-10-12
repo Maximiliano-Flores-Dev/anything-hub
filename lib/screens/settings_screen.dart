@@ -207,13 +207,13 @@ class _SettingsScreenState extends State<SettingsScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: HubColors.textoPrincipal,
                       fontWeight: FontWeight.w600,
                       fontSize: 13)),
               const SizedBox(height: 2),
               Text(subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: HubColors.textoSecundario, fontSize: 12)),
               const SizedBox(height: 2),
               Text(
@@ -230,7 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         IconButton(
           tooltip: 'Abrir ajustes del sistema',
           onPressed: onOpen,
-          icon: const Icon(Icons.open_in_new,
+          icon: Icon(Icons.open_in_new,
               size: 18, color: HubColors.textoAcento),
         ),
       ],
@@ -316,7 +316,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                         await _refreshPermissions();
                       },
                     ),
-                    const Divider(color: HubColors.linea, height: 20),
+                    Divider(color: HubColors.linea, height: 20),
                     _permRow(
                       'No molestar / Focus',
                       'Silenciar notificaciones de terceros',
@@ -328,7 +328,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                         await _refreshPermissions();
                       },
                     ),
-                    const Divider(color: HubColors.linea, height: 20),
+                    Divider(color: HubColors.linea, height: 20),
                     _permRow(
                       'Notificaciones propias',
                       'Avisos del modo rendimiento (Android 13+)',
@@ -345,9 +345,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed: _refreshPermissions,
-                        icon: const Icon(Icons.refresh,
+                        icon: Icon(Icons.refresh,
                             size: 18, color: HubColors.textoAcento),
-                        label: const Text('Actualizar',
+                        label: Text('Actualizar',
                             style: TextStyle(color: HubColors.textoAcento)),
                       ),
                     ),
