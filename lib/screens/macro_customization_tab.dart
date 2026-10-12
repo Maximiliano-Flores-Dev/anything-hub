@@ -24,7 +24,8 @@ class MacroCustomizationTab extends StatelessWidget {
                 children: [
                   Text(
                     'Cambia toda la interfaz con un toque.',
-                    style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                    style: TextStyle(
+                        color: HubColors.textoSecundario, fontSize: 13),
                   ),
                   const SizedBox(height: 14),
                   Wrap(
@@ -51,11 +52,13 @@ class MacroCustomizationTab extends StatelessWidget {
                     contentPadding: EdgeInsets.zero,
                     title: Text(
                       'Sidebar de apps',
-                      style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
+                      style: TextStyle(
+                          color: HubColors.textoPrincipal, fontSize: 14),
                     ),
                     subtitle: Text(
                       'Muestra u oculta la barra lateral de apps',
-                      style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                      style: TextStyle(
+                          color: HubColors.textoSecundario, fontSize: 12),
                     ),
                     value: macro.sidebarEnabled,
                     activeColor: HubColors.pomelo,
@@ -66,11 +69,13 @@ class MacroCustomizationTab extends StatelessWidget {
                     contentPadding: EdgeInsets.zero,
                     title: Text(
                       'Modo para zurdos',
-                      style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14),
+                      style: TextStyle(
+                          color: HubColors.textoPrincipal, fontSize: 14),
                     ),
                     subtitle: Text(
                       'Espejo funcional: sidebar a la derecha',
-                      style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                      style: TextStyle(
+                          color: HubColors.textoSecundario, fontSize: 12),
                     ),
                     value: macro.leftHandedMode,
                     activeColor: HubColors.pomelo,
@@ -87,7 +92,8 @@ class MacroCustomizationTab extends StatelessWidget {
                 children: [
                   Text(
                     'Activa o desactiva las cards del inicio.',
-                    style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                    style: TextStyle(
+                        color: HubColors.textoSecundario, fontSize: 13),
                   ),
                   const SizedBox(height: 4),
                   for (final id in DashboardCardIds.defaultOrder) ...[
@@ -108,7 +114,8 @@ class MacroCustomizationTab extends StatelessWidget {
                   Divider(color: HubColors.linea, height: 16),
                   Text(
                     'Orden (arrastra para reordenar)',
-                    style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                    style: TextStyle(
+                        color: HubColors.textoSecundario, fontSize: 12),
                   ),
                   const SizedBox(height: 4),
                   ReorderableListView(
@@ -157,7 +164,8 @@ class MacroCustomizationTab extends StatelessWidget {
                     );
                   }
                 },
-                icon: Icon(Icons.restore_rounded, size: 18, color: HubColors.textoAcento),
+                icon: Icon(Icons.restore_rounded,
+                    size: 18, color: HubColors.textoAcento),
                 label: Text(
                   'Restaurar valores por defecto',
                   style: TextStyle(color: HubColors.textoAcento),

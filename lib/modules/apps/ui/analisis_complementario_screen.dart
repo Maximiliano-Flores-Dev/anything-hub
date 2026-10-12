@@ -22,7 +22,8 @@ class AnalisisComplementarioScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: HubColors.textoPrincipal),
         title: const Text(
           'Análisis complementario',
-          style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
+          style: TextStyle(
+              color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
         ),
       ),
       body: ListView(
@@ -39,7 +40,8 @@ class AnalisisComplementarioScreen extends StatelessWidget {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.fingerprint, color: HubColors.textoSecundario, size: 20),
+                    Icon(Icons.fingerprint,
+                        color: HubColors.textoSecundario, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'Resumen del archivo',
@@ -53,7 +55,8 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 const Text(
                   'Identificador único del APK analizado.',
-                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                  style:
+                      TextStyle(color: HubColors.textoSecundario, fontSize: 12),
                 ),
                 const SizedBox(height: 14),
                 Container(
@@ -89,7 +92,8 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                     onPressed: report.sha256 == null
                         ? null
                         : () {
-                            Clipboard.setData(ClipboardData(text: report.sha256!));
+                            Clipboard.setData(
+                                ClipboardData(text: report.sha256!));
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Hash copiado')),
                             );
@@ -113,7 +117,8 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Exportar APK: conectar con FileProvider'),
+                          content:
+                              Text('Exportar APK: conectar con FileProvider'),
                         ),
                       );
                     },
@@ -131,7 +136,8 @@ class AnalisisComplementarioScreen extends StatelessWidget {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.menu_book_outlined, color: HubColors.textoSecundario, size: 20),
+                    Icon(Icons.menu_book_outlined,
+                        color: HubColors.textoSecundario, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'Guía rápida (opcional)',
@@ -146,12 +152,16 @@ class AnalisisComplementarioScreen extends StatelessWidget {
                 const Text(
                   'Este análisis es opcional y no afecta la instalación. '
                   'Puedes verificar el APK manualmente para mayor confianza:',
-                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                  style:
+                      TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                 ),
                 const SizedBox(height: 12),
-                _step('1', 'Sube el APK a VirusTotal (virustotal.com) para escanearlo en la nube.'),
-                _step('2', 'O escanea el APK con tu antivirus local de confianza.'),
-                _step('3', 'Revisa los resultados y decide si deseas instalarlo.'),
+                _step('1',
+                    'Sube el APK a VirusTotal (virustotal.com) para escanearlo en la nube.'),
+                _step('2',
+                    'O escanea el APK con tu antivirus local de confianza.'),
+                _step('3',
+                    'Revisa los resultados y decide si deseas instalarlo.'),
               ],
             ),
           ),
@@ -160,12 +170,14 @@ class AnalisisComplementarioScreen extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: const Row(
               children: [
-                Icon(Icons.info_outline, color: HubColors.textoAcento, size: 18),
+                Icon(Icons.info_outline,
+                    color: HubColors.textoAcento, size: 18),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Opcional, no bloquea la instalación',
-                    style: TextStyle(color: HubColors.textoAcento, fontSize: 13),
+                    style:
+                        TextStyle(color: HubColors.textoAcento, fontSize: 13),
                   ),
                 ),
               ],
@@ -201,7 +213,9 @@ class AnalisisComplementarioScreen extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(text, style: const TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+            child: Text(text,
+                style: const TextStyle(
+                    color: HubColors.textoSecundario, fontSize: 13)),
           ),
         ],
       ),

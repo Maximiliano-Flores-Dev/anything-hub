@@ -79,20 +79,27 @@ class _EditorSettingsSheetState extends State<EditorSettingsSheet> {
           if (_loading)
             Center(child: CircularProgressIndicator(color: HubColors.pomelo))
           else ...[
-            _tile('vscode.dev', 'vscode.dev (web)', 'Fallback seguro', _prefs?.preferred == 'vscode.dev',
+            _tile(
+                'vscode.dev',
+                'vscode.dev (web)',
+                'Fallback seguro',
+                _prefs?.preferred == 'vscode.dev',
                 () => _setPreferred('vscode.dev')),
             SizedBox(height: 8),
             if (_installed.isEmpty)
               Text(
                 'No se detectaron editores locales de la lista blanca.\n'
                 'Instala Acode, Markor o Termux para usar editores nativos.',
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 13, height: 1.35),
+                style: TextStyle(
+                    color: HubColors.textoSecundario,
+                    fontSize: 13,
+                    height: 1.35),
               )
             else
               ..._installed.map((e) => Padding(
                     padding: const EdgeInsets.only(bottom: 8),
-                    child: _tile(e.id, e.label, e.packageName, _prefs?.preferred == e.id,
-                        () => _setPreferred(e.id)),
+                    child: _tile(e.id, e.label, e.packageName,
+                        _prefs?.preferred == e.id, () => _setPreferred(e.id)),
                   )),
           ],
         ],
@@ -100,9 +107,12 @@ class _EditorSettingsSheetState extends State<EditorSettingsSheet> {
     );
   }
 
-  Widget _tile(String id, String label, String subtitle, bool selected, VoidCallback onTap) {
+  Widget _tile(String id, String label, String subtitle, bool selected,
+      VoidCallback onTap) {
     return Material(
-      color: selected ? HubColors.pomelo.withOpacity(0.12) : HubColors.fondoPrincipal,
+      color: selected
+          ? HubColors.pomelo.withOpacity(0.12)
+          : HubColors.fondoPrincipal,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -112,14 +122,18 @@ class _EditorSettingsSheetState extends State<EditorSettingsSheet> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: selected ? HubColors.pomelo : HubColors.linea.withOpacity(0.5),
+              color: selected
+                  ? HubColors.pomelo
+                  : HubColors.linea.withOpacity(0.5),
               width: selected ? 1.4 : 1,
             ),
           ),
           child: Row(
             children: [
               Icon(
-                id == 'vscode.dev' ? Icons.language_rounded : Icons.code_rounded,
+                id == 'vscode.dev'
+                    ? Icons.language_rounded
+                    : Icons.code_rounded,
                 color: selected ? HubColors.pomelo : HubColors.textoSecundario,
                 size: 22,
               ),
@@ -131,16 +145,19 @@ class _EditorSettingsSheetState extends State<EditorSettingsSheet> {
                     Text(label,
                         style: TextStyle(
                           color: HubColors.textoPrincipal,
-                          fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight:
+                              selected ? FontWeight.w600 : FontWeight.w500,
                           fontSize: 14.5,
                         )),
                     Text(subtitle,
-                        style: TextStyle(color: HubColors.textoSecundario, fontSize: 12)),
+                        style: TextStyle(
+                            color: HubColors.textoSecundario, fontSize: 12)),
                   ],
                 ),
               ),
               if (selected)
-                Icon(Icons.check_circle_rounded, color: HubColors.pomelo, size: 20),
+                Icon(Icons.check_circle_rounded,
+                    color: HubColors.pomelo, size: 20),
             ],
           ),
         ),

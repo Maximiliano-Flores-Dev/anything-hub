@@ -30,8 +30,7 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
   Future<void> _startAuth() async {
     if (!GitHubOAuthService.isConfigured) {
       setState(() {
-        _error =
-            'Client ID no configurado.\n\n'
+        _error = 'Client ID no configurado.\n\n'
             '1. GitHub → Settings → Developer settings → OAuth Apps\n'
             '2. New OAuth App (Public client)\n'
             '3. Callback: anythings-hub://oauth/callback\n'
@@ -47,7 +46,8 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
     try {
       final opened = await GitHubOAuthService.startAuthFlow();
       if (!opened) {
-        setState(() => _error = 'No se pudo abrir el navegador de autorización.');
+        setState(
+            () => _error = 'No se pudo abrir el navegador de autorización.');
       }
     } catch (e) {
       setState(() => _error = e.toString());
@@ -97,8 +97,12 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
                 Row(
                   children: [
                     Icon(
-                      _authenticated ? Icons.verified_rounded : Icons.lock_outline_rounded,
-                      color: _authenticated ? Colors.greenAccent : HubColors.pomelo,
+                      _authenticated
+                          ? Icons.verified_rounded
+                          : Icons.lock_outline_rounded,
+                      color: _authenticated
+                          ? Colors.greenAccent
+                          : HubColors.pomelo,
                       size: 28,
                     ),
                     SizedBox(width: 12),
@@ -119,7 +123,10 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
                   'Los tokens se almacenan únicamente en el Keystore del sistema. '
                   'Nunca se envían a servidores de Anythings Hub ni se incluyen en la URL de vscode.dev.\n\n'
                   'Scope: repo + read:user.',
-                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 13.5, height: 1.4),
+                  style: TextStyle(
+                      color: HubColors.textoSecundario,
+                      fontSize: 13.5,
+                      height: 1.4),
                 ),
               ],
             ),
@@ -133,7 +140,9 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
                 color: Colors.redAccent.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Text(_error!, style: TextStyle(color: Colors.redAccent, fontSize: 13, height: 1.35)),
+              child: Text(_error!,
+                  style: TextStyle(
+                      color: Colors.redAccent, fontSize: 13, height: 1.35)),
             ),
             SizedBox(height: 12),
           ],
@@ -155,10 +164,12 @@ class _GitHubAuthScreenState extends State<GitHubAuthScreen> {
                   ? SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: HubColors.fondoPrincipal),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: HubColors.fondoPrincipal),
                     )
                   : const Icon(Icons.login_rounded),
-              label: Text(_loading ? 'Abriendo GitHub…' : 'Continuar con GitHub'),
+              label:
+                  Text(_loading ? 'Abriendo GitHub…' : 'Continuar con GitHub'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: HubColors.pomelo,
                 foregroundColor: HubColors.fondoPrincipal,

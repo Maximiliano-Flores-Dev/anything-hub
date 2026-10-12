@@ -1,9 +1,17 @@
-
 import 'package:flutter/services.dart';
 
 import '../core/logger.dart';
 
-enum FileFilter { all, folders, images, videos, audio, documents, archives, apks }
+enum FileFilter {
+  all,
+  folders,
+  images,
+  videos,
+  audio,
+  documents,
+  archives,
+  apks
+}
 
 class FileEntry {
   const FileEntry({
@@ -52,12 +60,24 @@ class FileEntry {
         return const {'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'heic', 'svg'}
             .contains(e);
       case FileFilter.videos:
-        return const {'mp4', 'mkv', 'avi', 'mov', 'webm', '3gp', 'flv'}.contains(e);
+        return const {'mp4', 'mkv', 'avi', 'mov', 'webm', '3gp', 'flv'}
+            .contains(e);
       case FileFilter.audio:
-        return const {'mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a', 'wma'}.contains(e);
+        return const {'mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a', 'wma'}
+            .contains(e);
       case FileFilter.documents:
         return const {
-          'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'md', 'rtf', 'csv'
+          'pdf',
+          'doc',
+          'docx',
+          'xls',
+          'xlsx',
+          'ppt',
+          'pptx',
+          'txt',
+          'md',
+          'rtf',
+          'csv'
         }.contains(e);
       case FileFilter.archives:
         return const {'zip', 'rar', '7z', 'tar', 'gz', 'bz2'}.contains(e);
@@ -104,10 +124,13 @@ class DeviceFilesService {
   static Future<List<Map<String, String>>> getRoots() async {
     final raw = await _call<List<dynamic>>('getRoots');
     if (raw == null) return [];
-    return raw.whereType<Map>().map((m) => {
-          'label': m['label'] as String? ?? '',
-          'path': m['path'] as String? ?? '',
-        }).toList();
+    return raw
+        .whereType<Map>()
+        .map((m) => {
+              'label': m['label'] as String? ?? '',
+              'path': m['path'] as String? ?? '',
+            })
+        .toList();
   }
 
   static Future<StorageInfo?> getStorageInfo(String path) async {

@@ -20,8 +20,7 @@ class TermuxService {
       });
       if (result == true) return true;
     } on MissingPluginException {
-    } on PlatformException {
-    }
+    } on PlatformException {}
 
     final uri = Uri.parse(
       'termux://run?command=${Uri.encodeComponent(command)}&workdir=${Uri.encodeComponent(wd)}',
@@ -40,7 +39,8 @@ class TermuxService {
   }
 
   static Future<bool> openInFolder(String projectPath) async {
-    final uri = Uri.parse('termux://open?path=${Uri.encodeComponent(projectPath)}');
+    final uri =
+        Uri.parse('termux://open?path=${Uri.encodeComponent(projectPath)}');
     if (await canLaunchUrl(uri)) {
       return launchUrl(uri, mode: LaunchMode.externalApplication);
     }

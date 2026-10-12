@@ -67,11 +67,13 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: Text('Ahora no', style: TextStyle(color: HubColors.textoSecundario)),
+              child: Text('Ahora no',
+                  style: TextStyle(color: HubColors.textoSecundario)),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text('Abrir Ajustes', style: TextStyle(color: HubColors.pomelo)),
+              child: Text('Abrir Ajustes',
+                  style: TextStyle(color: HubColors.pomelo)),
             ),
           ],
         ),
@@ -90,7 +92,8 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
     if (trim != null) {
       final killed = trim['killed'] as int? ?? 0;
       final attempted = trim['attempted'] as int? ?? 0;
-      note = 'Modo ${mode.label}: $killed/$attempted procesos en segundo plano innecesarios tratados.';
+      note =
+          'Modo ${mode.label}: $killed/$attempted procesos en segundo plano innecesarios tratados.';
     }
     if (mode == PerfMode.focus && result?['focusNotifications'] == true) {
       note += ' Notificaciones de terceros silenciadas (visibles sin sonido).';
@@ -120,7 +123,9 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
             style: TextStyle(color: HubColors.textoPrincipal, fontSize: 17)),
         iconTheme: IconThemeData(color: HubColors.textoPrincipal),
         actions: [
-          IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _loading ? null : _refresh),
+          IconButton(
+              icon: const Icon(Icons.refresh_rounded),
+              onPressed: _loading ? null : _refresh),
         ],
       ),
       body: _loading
@@ -131,11 +136,17 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
                 _memoryCard(),
                 SizedBox(height: 16),
                 Text('Elige un modo',
-                    style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700, fontSize: 15)),
+                    style: TextStyle(
+                        color: HubColors.textoPrincipal,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15)),
                 SizedBox(height: 4),
                 Text(
                   'Solo se cierran procesos en segundo plano innecesarios de apps de usuario. Nunca apps del sistema ni el proceso en primer plano.',
-                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 12, height: 1.35),
+                  style: TextStyle(
+                      color: HubColors.textoSecundario,
+                      fontSize: 12,
+                      height: 1.35),
                 ),
                 SizedBox(height: 12),
                 for (final m in PerfMode.values) ...[
@@ -152,12 +163,14 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
                       border: Border.all(color: HubColors.linea),
                     ),
                     child: Row(children: [
-                      Icon(Icons.extension_rounded, color: Color(0xFF5B8DEF), size: 22),
+                      Icon(Icons.extension_rounded,
+                          color: Color(0xFF5B8DEF), size: 22),
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           'Plugin Overlay FPS / Juegos instalado. El modo juego y el overlay solo se activan desde el plugin (no forman parte del nucleo).',
-                          style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                          style: TextStyle(
+                              color: HubColors.textoSecundario, fontSize: 12),
                         ),
                       ),
                     ]),
@@ -165,14 +178,17 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
                 ],
                 if (_lastNote != null) ...[
                   SizedBox(height: 16),
-                  Text(_lastNote!, style: TextStyle(color: HubColors.textoAcento, fontSize: 12)),
+                  Text(_lastNote!,
+                      style: TextStyle(
+                          color: HubColors.textoAcento, fontSize: 12)),
                 ],
                 if (!_policyAccess) ...[
                   SizedBox(height: 20),
                   GradientPillButton(
                     label: 'Abrir acceso a No molestar (Focus)',
                     icon: Icons.notifications_off_outlined,
-                    onPressed: () => PerformanceService.openNotificationPolicySettings(),
+                    onPressed: () =>
+                        PerformanceService.openNotificationPolicySettings(),
                   ),
                 ],
               ],
@@ -196,11 +212,15 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
           Row(children: [
             Icon(Icons.memory_rounded, color: HubColors.pomelo, size: 20),
             SizedBox(width: 8),
-            Text('Memoria', style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700)),
+            Text('Memoria',
+                style: TextStyle(
+                    color: HubColors.textoPrincipal,
+                    fontWeight: FontWeight.w700)),
             const Spacer(),
             if (m != null)
               Text('${m.availMb} MB libres / ${m.totalMb} MB',
-                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 11)),
+                  style: TextStyle(
+                      color: HubColors.textoSecundario, fontSize: 11)),
           ]),
           SizedBox(height: 10),
           ClipRRect(
@@ -209,7 +229,11 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
               value: ratio,
               minHeight: 8,
               backgroundColor: HubColors.fondoPrincipal,
-              color: ratio > 0.85 ? Colors.redAccent : ratio > 0.7 ? HubColors.amarillo : HubColors.pomelo,
+              color: ratio > 0.85
+                  ? Colors.redAccent
+                  : ratio > 0.7
+                      ? HubColors.amarillo
+                      : HubColors.pomelo,
             ),
           ),
           if (m?.lowMemory == true) ...[
@@ -247,7 +271,9 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: selected ? color : HubColors.linea, width: selected ? 1.6 : 1),
+            border: Border.all(
+                color: selected ? color : HubColors.linea,
+                width: selected ? 1.6 : 1),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,23 +295,32 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
                     Row(children: [
                       Text(m.label,
                           style: TextStyle(
-                              color: HubColors.textoPrincipal, fontWeight: FontWeight.w700, fontSize: 14.5)),
+                              color: HubColors.textoPrincipal,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14.5)),
                       if (selected) ...[
                         SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
                             color: color.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text('Activo',
-                              style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w700)),
+                              style: TextStyle(
+                                  color: color,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700)),
                         ),
                       ],
                     ]),
                     SizedBox(height: 4),
                     Text(m.description,
-                        style: TextStyle(color: HubColors.textoSecundario, fontSize: 12, height: 1.35)),
+                        style: TextStyle(
+                            color: HubColors.textoSecundario,
+                            fontSize: 12,
+                            height: 1.35)),
                   ],
                 ),
               ),
@@ -293,7 +328,8 @@ class _PerformanceModesScreenState extends State<PerformanceModesScreen> {
                 SizedBox(
                   width: 18,
                   height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: HubColors.pomelo),
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: HubColors.pomelo),
                 ),
             ],
           ),

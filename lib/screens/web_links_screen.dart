@@ -27,7 +27,8 @@ class WebLinkItem {
 
   String get host => Uri.tryParse(url)?.host ?? '';
 
-  String get faviconUrl => 'https://www.google.com/s2/favicons?domain=$host&sz=128';
+  String get faviconUrl =>
+      'https://www.google.com/s2/favicons?domain=$host&sz=128';
 
   WebLinkItem copyWith({String? title, String? url}) => WebLinkItem(
         id: id,
@@ -70,7 +71,8 @@ class WebLinkItem {
 }
 
 abstract final class WebLinkParser {
-  static final RegExp _markdown = RegExp(r'^\\s*\\[([^\\]]*)\\]\\(\\s*([^)\\s]+)\\s*\\)\\s*$');
+  static final RegExp _markdown =
+      RegExp(r'^\\s*\\[([^\\]]*)\\]\\(\\s*([^)\\s]+)\\s*\\)\\s*$');
   static final RegExp _hasScheme = RegExp(r'^[a-zA-Z][a-zA-Z0-9+.\\-]*://');
 
   static ({String? title, String raw}) parse(String input) {
@@ -131,7 +133,8 @@ class WebLinkRepository extends ChangeNotifier {
   Future<void> _persist() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_key, jsonEncode(_items.map((e) => e.toJson()).toList()));
+      await prefs.setString(
+          _key, jsonEncode(_items.map((e) => e.toJson()).toList()));
     } catch (e) {
       SystemLogger.log('No se pudo guardar Webs Rápidas: $e');
     }
@@ -222,7 +225,8 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
           behavior: SnackBarBehavior.floating,
           backgroundColor: HubColors.panel,
           action: action,
-          content: Text(message, style: TextStyle(color: HubColors.textoPrincipal)),
+          content:
+              Text(message, style: TextStyle(color: HubColors.textoPrincipal)),
         ),
       );
   }
@@ -268,7 +272,8 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
         url: result.url!,
       ));
     } else {
-      await repo.update(existing.copyWith(title: result.title, url: result.url));
+      await repo
+          .update(existing.copyWith(title: result.title, url: result.url));
     }
   }
 
@@ -308,7 +313,8 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
                       child: IconButton(
                         tooltip: 'Añadir web',
                         onPressed: () => _addOrEdit(),
-                        icon: Icon(Icons.add_rounded, color: HubColors.pomelo, size: 28),
+                        icon: Icon(Icons.add_rounded,
+                            color: HubColors.pomelo, size: 28),
                       ),
                     ),
                   ],
@@ -335,7 +341,8 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
         child: SizedBox(
           width: 22,
           height: 22,
-          child: CircularProgressIndicator(strokeWidth: 2, color: HubColors.pomelo),
+          child: CircularProgressIndicator(
+              strokeWidth: 2, color: HubColors.pomelo),
         ),
       );
     }
@@ -348,7 +355,8 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.link_rounded, size: 40, color: HubColors.textoSecundario),
+              Icon(Icons.link_rounded,
+                  size: 40, color: HubColors.textoSecundario),
               SizedBox(height: 12),
               Text(
                 'Aún no tienes webs guardadas',
@@ -362,7 +370,8 @@ class _WebLinksScreenState extends State<WebLinksScreen> {
               Text(
                 'Pega un enlace o un [Título](URL) y se abrirá en tu navegador.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
               SizedBox(height: 20),
               SizedBox(
@@ -536,7 +545,8 @@ class _LinkAvatar extends StatelessWidget {
         fit: BoxFit.cover,
         cacheWidth: px,
         gaplessPlayback: true,
-        loadingBuilder: (_, child, progress) => progress == null ? child : fallback,
+        loadingBuilder: (_, child, progress) =>
+            progress == null ? child : fallback,
         errorBuilder: (_, __, ___) => fallback,
       );
     } else {
@@ -605,10 +615,14 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
     Navigator.pop(context, _LinkEditorResult.save(title, url));
   }
 
-  InputDecoration _decoration(String label, String hint, {String? helper, String? error}) {
-    final line = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea));
-    final focus = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo));
-    final warn = UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomeloSuave));
+  InputDecoration _decoration(String label, String hint,
+      {String? helper, String? error}) {
+    final line =
+        UnderlineInputBorder(borderSide: BorderSide(color: HubColors.linea));
+    final focus =
+        UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomelo));
+    final warn = UnderlineInputBorder(
+        borderSide: BorderSide(color: HubColors.pomeloSuave));
     return InputDecoration(
       labelText: label,
       hintText: hint,
@@ -617,12 +631,14 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
       errorText: error,
       labelStyle: TextStyle(color: HubColors.textoSecundario),
       floatingLabelStyle: TextStyle(color: HubColors.pomelo),
-      hintStyle: TextStyle(color: HubColors.textoSecundario.withOpacity(0.6), fontSize: 13),
+      hintStyle: TextStyle(
+          color: HubColors.textoSecundario.withOpacity(0.6), fontSize: 13),
       helperStyle: TextStyle(color: HubColors.textoSecundario, fontSize: 11),
       errorStyle: TextStyle(color: HubColors.pomeloSuave),
       enabledBorder: line,
       focusedBorder: focus,
-      errorBorder: UnderlineInputBorder(borderSide: BorderSide(color: HubColors.pomeloSuave)),
+      errorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: HubColors.pomeloSuave)),
       focusedErrorBorder: focus,
     );
   }
@@ -663,7 +679,8 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
             textCapitalization: TextCapitalization.sentences,
             textInputAction: TextInputAction.done,
             style: TextStyle(color: HubColors.textoPrincipal),
-            decoration: _decoration('Título (opcional)', 'Se toma del enlace si lo dejas vacío'),
+            decoration: _decoration(
+                'Título (opcional)', 'Se toma del enlace si lo dejas vacío'),
             onSubmitted: (_) => _submit(),
           ),
         ],
@@ -671,12 +688,15 @@ class _LinkEditorDialogState extends State<_LinkEditorDialog> {
       actions: [
         if (isEdit)
           TextButton(
-            onPressed: () => Navigator.pop(context, const _LinkEditorResult.delete()),
-            child: Text('Eliminar', style: TextStyle(color: HubColors.pomeloSuave)),
+            onPressed: () =>
+                Navigator.pop(context, const _LinkEditorResult.delete()),
+            child: Text('Eliminar',
+                style: TextStyle(color: HubColors.pomeloSuave)),
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Cancelar', style: TextStyle(color: HubColors.textoSecundario)),
+          child: Text('Cancelar',
+              style: TextStyle(color: HubColors.textoSecundario)),
         ),
         TextButton(
           onPressed: _submit,

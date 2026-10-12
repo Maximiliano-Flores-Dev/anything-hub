@@ -26,7 +26,8 @@ class VerificacionFirmaScreen extends StatefulWidget {
   final bool isPackageInstalled;
 
   @override
-  State<VerificacionFirmaScreen> createState() => _VerificacionFirmaScreenState();
+  State<VerificacionFirmaScreen> createState() =>
+      _VerificacionFirmaScreenState();
 }
 
 class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
@@ -73,7 +74,8 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
         iconTheme: IconThemeData(color: HubColors.textoPrincipal),
         title: Text(
           'Verificación de firma',
-          style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
+          style: TextStyle(
+              color: HubColors.textoPrincipal, fontWeight: FontWeight.w700),
         ),
       ),
       body: _loading
@@ -83,7 +85,8 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
               children: [
                 Text(
                   'Comprobando la autenticidad de la aplicación',
-                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 14),
+                  style:
+                      TextStyle(color: HubColors.textoSecundario, fontSize: 14),
                 ),
                 SizedBox(height: 24),
                 Center(
@@ -118,16 +121,20 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                 HubPanel(
                   child: Row(
                     children: [
-                      Icon(Icons.lock_outline, color: HubColors.textoAcento, size: 20),
+                      Icon(Icons.lock_outline,
+                          color: HubColors.textoAcento, size: 20),
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           'Oráculo local',
-                          style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              color: HubColors.textoPrincipal,
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: HubColors.textoAcento.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(8),
@@ -138,7 +145,8 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                               ? 'OK'
                               : 'FAIL-CLOSED',
                           style: TextStyle(
-                            color: _result?.status == SignatureStatus.verified ||
+                            color: _result?.status ==
+                                        SignatureStatus.verified ||
                                     _result?.status == SignatureStatus.cacheHit
                                 ? const Color(0xFF3DDC84)
                                 : const Color(0xFFE53935),
@@ -189,7 +197,8 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                         Expanded(
                           child: Text(
                             'No se pudo verificar. Puedes forzar bajo tu responsabilidad.',
-                            style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                            style: TextStyle(
+                                color: HubColors.textoSecundario, fontSize: 13),
                           ),
                         ),
                       ],
@@ -209,7 +218,8 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
 
   List<Widget> _statusBlocks(SignatureCheckResult r) {
     final widgets = <Widget>[];
-    if (r.status == SignatureStatus.verified || r.status == SignatureStatus.cacheHit) {
+    if (r.status == SignatureStatus.verified ||
+        r.status == SignatureStatus.cacheHit) {
       widgets.add(
         HubPanel(
           child: Row(
@@ -222,7 +232,9 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                   children: [
                     Text(
                       'Certificado coincide con el oráculo',
-                      style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          color: HubColors.textoPrincipal,
+                          fontWeight: FontWeight.w600),
                     ),
                     Text(
                       r.status == SignatureStatus.cacheHit
@@ -238,7 +250,8 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
         ),
       );
     }
-    if (r.status == SignatureStatus.unverified || r.status == SignatureStatus.error) {
+    if (r.status == SignatureStatus.unverified ||
+        r.status == SignatureStatus.error) {
       widgets.add(
         HubPanel(
           child: Row(
@@ -251,7 +264,9 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
                   children: [
                     Text(
                       'Firma no verificada',
-                      style: TextStyle(color: HubColors.textoPrincipal, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          color: HubColors.textoPrincipal,
+                          fontWeight: FontWeight.w600),
                     ),
                     Text(
                       r.message ?? 'No se pudo confirmar autenticidad',
@@ -276,7 +291,8 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
               Expanded(
                 child: Text(
                   'Sin red, usando caché de ${r.cacheAgeDays} días\n${r.message ?? ''}',
-                  style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                  style:
+                      TextStyle(color: HubColors.textoSecundario, fontSize: 13),
                 ),
               ),
             ],
@@ -295,7 +311,9 @@ class _VerificacionFirmaScreenState extends State<VerificacionFirmaScreen> {
         children: [
           SizedBox(
             width: 120,
-            child: Text(k, style: TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
+            child: Text(k,
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 13)),
           ),
           Expanded(
             child: Text(

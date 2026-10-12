@@ -116,7 +116,8 @@ class TrimResult {
 class PerformanceService {
   static const _ch = MethodChannel('anythings.hub/performance');
 
-  static Future<T?> _call<T>(String method, [Map<String, dynamic>? args]) async {
+  static Future<T?> _call<T>(String method,
+      [Map<String, dynamic>? args]) async {
     try {
       SystemLogger.channel('performance', method);
       return await _ch.invokeMethod<T>(method, args);

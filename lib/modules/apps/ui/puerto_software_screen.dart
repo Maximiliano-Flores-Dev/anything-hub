@@ -142,7 +142,8 @@ const kPuertoCatalog = <PuertoEntry>[
   ),
   PuertoEntry(
     name: 'Obtainium',
-    summary: 'Sigue releases oficiales de GitHub/GitLab/F-Droid y avisa de updates.',
+    summary:
+        'Sigue releases oficiales de GitHub/GitLab/F-Droid y avisa de updates.',
     url: 'https://github.com/ImranR98/Obtainium/releases',
     trust: PuertoTrust.trustedCatalog,
     publisher: 'ImranR98',
@@ -292,7 +293,8 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
               SizedBox(height: 8),
               Text(
                 e.summary,
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 13),
               ),
               if (e.packageName != null) ...[
                 SizedBox(height: 6),
@@ -311,7 +313,9 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
                     ? 'SHA-256 no fijado aquí. Compara el hash con la web del proyecto antes de instalar.'
                     : 'SHA-256 esperado: ${e.sha256}',
                 style: TextStyle(
-                  color: gray ? const Color(0xFFE53935) : HubColors.textoSecundario,
+                  color: gray
+                      ? const Color(0xFFE53935)
+                      : HubColors.textoSecundario,
                   fontSize: 11,
                 ),
               ),
@@ -338,7 +342,8 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
       ),
       child: Text(
         label,
-        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700),
+        style:
+            TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -351,7 +356,8 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: HubColors.panel,
-        title: Text('VirusTotal', style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text('VirusTotal',
+            style: TextStyle(color: HubColors.textoPrincipal)),
         content: TextField(
           controller: ctrl,
           obscureText: true,
@@ -362,8 +368,12 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(ctx, ctrl.text), child: const Text('Guardar')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, ctrl.text),
+              child: const Text('Guardar')),
         ],
       ),
     );
@@ -371,14 +381,16 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
   }
 
   Future<void> _open(PuertoEntry e) async {
-    if (e.trust == PuertoTrust.gray || (e.apkUrl == null && e.githubRepo == null)) {
+    if (e.trust == PuertoTrust.gray ||
+        (e.apkUrl == null && e.githubRepo == null)) {
       final canPipe = e.apkUrl != null || e.githubRepo != null;
       if (!canPipe) {
         final ok = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
             backgroundColor: HubColors.panel,
-            title: Text('Sin artefacto directo', style: TextStyle(color: HubColors.textoPrincipal)),
+            title: Text('Sin artefacto directo',
+                style: TextStyle(color: HubColors.textoPrincipal)),
             content: Text(
               e.trust == PuertoTrust.gray
                   ? 'No canalizamos este catálogo: no hay un APK firmado único que podamos hashear. Si descargas fuera, ábrelo con el Hub para el análisis.'
@@ -386,13 +398,18 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
               style: TextStyle(color: HubColors.textoSecundario),
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cerrar')),
-              TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Abrir página')),
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Cerrar')),
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Abrir página')),
             ],
           ),
         );
         if (ok == true) {
-          await launchUrl(Uri.parse(e.url), mode: LaunchMode.externalApplication);
+          await launchUrl(Uri.parse(e.url),
+              mode: LaunchMode.externalApplication);
         }
         return;
       }
@@ -403,14 +420,19 @@ class _PuertoSoftwareScreenState extends State<PuertoSoftwareScreen> {
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: HubColors.panel,
-          title: Text('Zona gris', style: TextStyle(color: HubColors.textoPrincipal)),
+          title: Text('Zona gris',
+              style: TextStyle(color: HubColors.textoPrincipal)),
           content: Text(
             'El tubo igual va a hashear y analizar, pero el origen no es el autor. El resultado es una recomendación, no una autorización.',
             style: TextStyle(color: HubColors.textoSecundario),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-            TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Seguir')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancelar')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Seguir')),
           ],
         ),
       );

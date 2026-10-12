@@ -143,7 +143,8 @@ class SignatureOracleService {
     return entry;
   }
 
-  static Future<Map<String, _PinEntry>> _loadPins(SharedPreferences prefs) async {
+  static Future<Map<String, _PinEntry>> _loadPins(
+      SharedPreferences prefs) async {
     final raw = prefs.getString(_prefsKey);
     if (raw == null || raw.isEmpty) return {};
     try {
@@ -156,7 +157,8 @@ class SignatureOracleService {
           if (cert != null && at != null) {
             out[k] = _PinEntry(
               certSha256: cert,
-              pinnedAt: DateTime.tryParse(at) ?? DateTime.fromMillisecondsSinceEpoch(0),
+              pinnedAt: DateTime.tryParse(at) ??
+                  DateTime.fromMillisecondsSinceEpoch(0),
             );
           }
         }

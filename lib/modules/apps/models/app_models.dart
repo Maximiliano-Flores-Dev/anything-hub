@@ -85,11 +85,14 @@ class ApkRiskReport {
   final List<String> trackingSdks;
   final String fileName;
   final String packageName;
+
   /// Hash del archivo APK (contenido), no del certificado.
   final String? sha256;
   final String versionLabel;
+
   /// Huellas SHA-256 de certificados de firma del APK.
   final List<String> signingCertSha256;
+
   /// Huellas de la app ya instalada (si existe).
   final List<String> installedCertSha256;
   final bool isPackageInstalled;

@@ -92,8 +92,16 @@ const List<AutoCategory> kAutoCategories = [
 // Android no tiene una categoría "IA", así que se detecta por palabras clave
 // en el package o el nombre. Edita esta lista a tu gusto.
 const List<String> kAiKeywords = [
-  'chatgpt', 'openai', 'claude', 'anthropic', 'gemini', 'copilot',
-  'perplexity', 'deepseek', 'grok', 'mistral',
+  'chatgpt',
+  'openai',
+  'claude',
+  'anthropic',
+  'gemini',
+  'copilot',
+  'perplexity',
+  'deepseek',
+  'grok',
+  'mistral',
 ];
 
 // =============================================================================
@@ -110,7 +118,8 @@ class DeviceAppInfo {
 
   final String packageName;
   final String name;
-  final String category; // game, social, media, productivity, maps, news, undefined
+  final String
+      category; // game, social, media, productivity, maps, news, undefined
   final int usageMinutes;
   final Uint8List? icon;
 }

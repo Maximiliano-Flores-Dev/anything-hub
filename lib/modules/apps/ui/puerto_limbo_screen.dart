@@ -75,7 +75,9 @@ class _PuertoLimboScreenState extends State<PuertoLimboScreen> {
     final meta = await DeviceAppsService.inspectApk(relative);
     final packageName = (meta?['packageName'] as String?)?.trim();
     final parseFailed = packageName == null || packageName.isEmpty;
-    final perms = (meta?['permissions'] as List?)?.map((e) => e.toString()).toList() ?? <String>[];
+    final perms =
+        (meta?['permissions'] as List?)?.map((e) => e.toString()).toList() ??
+            <String>[];
     final versionName = (meta?['versionName'] as String?)?.trim() ?? '';
     final versionCode = meta?['versionCode'];
     final versionLabel = [
@@ -93,8 +95,11 @@ class _PuertoLimboScreenState extends State<PuertoLimboScreen> {
     final isInstalled = meta?['isPackageInstalled'] == true;
     final report = ApkRiskScorer.score(
       fileName: widget.name,
-      packageName: parseFailed ? 'com.desconocido.apk' : (packageName ?? 'com.desconocido.apk'),
-      rawPermissions: parseFailed ? const ['android.permission.PARSE_FAILED'] : perms,
+      packageName: parseFailed
+          ? 'com.desconocido.apk'
+          : (packageName ?? 'com.desconocido.apk'),
+      rawPermissions:
+          parseFailed ? const ['android.permission.PARSE_FAILED'] : perms,
       detectedPackages: const [],
       sha256: sha,
       parseFailed: parseFailed,
@@ -107,7 +112,8 @@ class _PuertoLimboScreenState extends State<PuertoLimboScreen> {
     Map<String, dynamic>? vt;
     final key = await PuertoPipeService.virusTotalKey();
     if (key != null && sha.isNotEmpty) {
-      if (mounted) setState(() => _phase = 'Consultando VirusTotal por hash\u2026');
+      if (mounted)
+        setState(() => _phase = 'Consultando VirusTotal por hash\u2026');
       vt = await PuertoPipeService.virusTotalLookup(sha256: sha, apiKey: key);
     }
 
@@ -128,13 +134,16 @@ class _PuertoLimboScreenState extends State<PuertoLimboScreen> {
 
   String _note(String sha, Map<String, dynamic>? vt, bool gray) {
     final buf = StringBuffer()
-      ..writeln('Limbo: el APK est\u00e1 en cach\u00e9, todav\u00eda no instalado.')
+      ..writeln(
+          'Limbo: el APK est\u00e1 en cach\u00e9, todav\u00eda no instalado.')
       ..writeln('SHA-256: $sha');
     if (gray) {
-      buf.writeln('Origen en zona gris. Esto es una recomendaci\u00f3n, no un permiso.');
+      buf.writeln(
+          'Origen en zona gris. Esto es una recomendaci\u00f3n, no un permiso.');
     }
     if (vt == null) {
-      buf.writeln('VirusTotal: sin clave. El escaneo local de permisos s\u00ed se hizo.');
+      buf.writeln(
+          'VirusTotal: sin clave. El escaneo local de permisos s\u00ed se hizo.');
     } else if (vt['found'] == true) {
       buf.writeln(
         'VirusTotal: maliciosos ${vt['malicious']}, sospechosos ${vt['suspicious']}, '
@@ -154,7 +163,8 @@ class _PuertoLimboScreenState extends State<PuertoLimboScreen> {
       backgroundColor: HubColors.fondoPrincipal,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(widget.name, style: TextStyle(color: HubColors.textoPrincipal)),
+        title: Text(widget.name,
+            style: TextStyle(color: HubColors.textoPrincipal)),
         iconTheme: IconThemeData(color: HubColors.textoPrincipal),
       ),
       body: Padding(
@@ -162,7 +172,8 @@ class _PuertoLimboScreenState extends State<PuertoLimboScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(_error ?? _phase, style: TextStyle(color: HubColors.textoPrincipal)),
+            Text(_error ?? _phase,
+                style: TextStyle(color: HubColors.textoPrincipal)),
             SizedBox(height: 16),
             LinearProgressIndicator(
               value: _done ? 1 : progress,

@@ -12,10 +12,24 @@ class AppsArt extends StatelessWidget {
       height: 68,
       child: Stack(
         children: [
-          Positioned(left: 0, top: 12, child: _miniIcon(Icons.chat_bubble_outline, const Color(0xFF10A37F))),
-          Positioned(left: 28, top: 0, child: _miniIcon(Icons.auto_awesome, const Color(0xFF6C8CFF))),
-          Positioned(left: 56, top: 14, child: _miniIcon(Icons.smart_toy_outlined, const Color(0xFFD9774F))),
-          Positioned(left: 18, top: 36, child: _miniIcon(Icons.apps, HubColors.pomelo)),
+          Positioned(
+              left: 0,
+              top: 12,
+              child: _miniIcon(
+                  Icons.chat_bubble_outline, const Color(0xFF10A37F))),
+          Positioned(
+              left: 28,
+              top: 0,
+              child: _miniIcon(Icons.auto_awesome, const Color(0xFF6C8CFF))),
+          Positioned(
+              left: 56,
+              top: 14,
+              child:
+                  _miniIcon(Icons.smart_toy_outlined, const Color(0xFFD9774F))),
+          Positioned(
+              left: 18,
+              top: 36,
+              child: _miniIcon(Icons.apps, HubColors.pomelo)),
         ],
       ),
     );
@@ -108,7 +122,8 @@ class FilesArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(Icons.folder_open_rounded, size: 48, color: HubColors.textoAcento);
+    return Icon(Icons.folder_open_rounded,
+        size: 48, color: HubColors.textoAcento);
   }
 }
 

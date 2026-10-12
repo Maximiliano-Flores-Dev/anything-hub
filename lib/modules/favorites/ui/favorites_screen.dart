@@ -173,7 +173,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           _buildTypeFilterChips(),
           Expanded(
             child: _loading
-                ? Center(child: CircularProgressIndicator(color: HubColors.pomelo))
+                ? Center(
+                    child: CircularProgressIndicator(color: HubColors.pomelo))
                 : _items.isEmpty
                     ? _buildEmpty()
                     : _buildList(),
@@ -190,7 +191,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       child: Row(
         children: [
           for (final sort in FavoriteSort.values) ...[
-            _Chip(label: sort.label, selected: _sort == sort, onTap: () => _setSort(sort)),
+            _Chip(
+                label: sort.label,
+                selected: _sort == sort,
+                onTap: () => _setSort(sort)),
             const SizedBox(width: 8),
           ],
         ],
@@ -204,10 +208,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: Row(
         children: [
-          _Chip(label: 'Todos', selected: _typeFilter == null, onTap: () => _setTypeFilter(null)),
+          _Chip(
+              label: 'Todos',
+              selected: _typeFilter == null,
+              onTap: () => _setTypeFilter(null)),
           const SizedBox(width: 8),
           for (final t in FavoriteType.values) ...[
-            _Chip(label: t.sectionTitle, selected: _typeFilter == t, onTap: () => _setTypeFilter(t)),
+            _Chip(
+                label: t.sectionTitle,
+                selected: _typeFilter == t,
+                onTap: () => _setTypeFilter(t)),
             const SizedBox(width: 8),
           ],
         ],
@@ -222,11 +232,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.star_outline_rounded, size: 64, color: HubColors.textoSecundario.withOpacity(0.5)),
+            Icon(Icons.star_outline_rounded,
+                size: 64, color: HubColors.textoSecundario.withOpacity(0.5)),
             const SizedBox(height: 16),
             Text(
               'Todavía no tienes favoritos',
-              style: TextStyle(color: HubColors.textoPrincipal, fontSize: 18, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                  color: HubColors.textoPrincipal,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
@@ -243,9 +257,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   Widget _buildList() {
     if (_grouped.isEmpty) {
-      return Center(child: Text('Nada en este filtro', style: TextStyle(color: HubColors.textoSecundario)));
+      return Center(
+          child: Text('Nada en este filtro',
+              style: TextStyle(color: HubColors.textoSecundario)));
     }
-    final types = _grouped.keys.toList()..sort((a, b) => a.sectionOrder.compareTo(b.sectionOrder));
+    final types = _grouped.keys.toList()
+      ..sort((a, b) => a.sectionOrder.compareTo(b.sectionOrder));
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       itemCount: types.length,
@@ -256,10 +273,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(top: sectionIndex == 0 ? 4 : 20, bottom: 10),
+              padding:
+                  EdgeInsets.only(top: sectionIndex == 0 ? 4 : 20, bottom: 10),
               child: Text(
                 '── ${type.sectionTitle} ──',
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.5),
+                style: TextStyle(
+                    color: HubColors.textoSecundario,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.5),
               ),
             ),
             ...list.map((item) => _FavoriteTile(
@@ -276,7 +298,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({required this.label, required this.selected, required this.onTap});
+  const _Chip(
+      {required this.label, required this.selected, required this.onTap});
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -293,7 +316,9 @@ class _Chip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            border: selected ? null : Border.all(color: HubColors.linea.withOpacity(0.6)),
+            border: selected
+                ? null
+                : Border.all(color: HubColors.linea.withOpacity(0.6)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -371,14 +396,17 @@ class _FavoriteTile extends StatelessWidget {
         bg = const Color(0xFF3B82F6).withOpacity(0.2);
         break;
       case FavoriteType.file:
-        icon = item.isDirectory ? Icons.folder_rounded : Icons.insert_drive_file_rounded;
+        icon = item.isDirectory
+            ? Icons.folder_rounded
+            : Icons.insert_drive_file_rounded;
         bg = const Color(0xFF8B5CF6).withOpacity(0.2);
         break;
     }
     return Container(
       width: 40,
       height: 40,
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
+      decoration:
+          BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
       child: Icon(icon, size: 22, color: _badgeColor),
     );
   }
@@ -412,21 +440,28 @@ class _FavoriteTile extends StatelessWidget {
                           Flexible(
                             child: Text(
                               item.title,
-                              style: TextStyle(color: HubColors.textoPrincipal, fontSize: 15, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                  color: HubColors.textoPrincipal,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: _badgeColor.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               item.type.label,
-                              style: TextStyle(color: _badgeColor, fontSize: 11, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                  color: _badgeColor,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -434,7 +469,8 @@ class _FavoriteTile extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         relativeTime,
-                        style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                        style: TextStyle(
+                            color: HubColors.textoSecundario, fontSize: 12),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -442,7 +478,8 @@ class _FavoriteTile extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.star_rounded, color: HubColors.amarillo, size: 22),
+                  icon: Icon(Icons.star_rounded,
+                      color: HubColors.amarillo, size: 22),
                   tooltip: 'Quitar de favoritos',
                   onPressed: onRemove,
                   visualDensity: VisualDensity.compact,

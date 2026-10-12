@@ -55,15 +55,9 @@ class _SidebarGroupTile extends StatelessWidget {
                   ),
                 ),
               ),
-              if (group.isCustom && onEdit != null)
-                GestureDetector(
-                  onTap: onEdit,
-                  child: Icon(
-                    Icons.edit_outlined,
-                    size: 14,
-                    color: HubColors.textoSecundario.withOpacity(0.8),
-                  ),
-                ),
+              if (group.isCustom)
+                Icon(Icons.edit_outlined,
+                    size: 12, color: HubColors.textoSecundario),
               if (hidden > 0) ...[
                 const SizedBox(width: 6),
                 Text(
@@ -83,7 +77,8 @@ class _SidebarGroupTile extends StatelessWidget {
               padding: EdgeInsets.only(left: 2, top: 2),
               child: Text(
                 'Grupo vacío',
-                style: TextStyle(color: HubColors.textoSecundario, fontSize: 12),
+                style:
+                    TextStyle(color: HubColors.textoSecundario, fontSize: 12),
               ),
             )
           else ...[

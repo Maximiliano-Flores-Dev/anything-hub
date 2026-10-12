@@ -45,7 +45,8 @@ class _ProjectAdvisementModalState extends State<ProjectAdvisementModal> {
                     gradient: HubColors.degradado,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.folder_special_rounded, color: Colors.white, size: 22),
+                  child: const Icon(Icons.folder_special_rounded,
+                      color: Colors.white, size: 22),
                 ),
                 SizedBox(width: 12),
                 Expanded(
@@ -63,20 +64,27 @@ class _ProjectAdvisementModalState extends State<ProjectAdvisementModal> {
             SizedBox(height: 16),
             Text(
               'Esta función está dirigida a desarrolladores.',
-              style: TextStyle(color: HubColors.textoPrincipal, fontSize: 14.5, height: 1.35),
+              style: TextStyle(
+                  color: HubColors.textoPrincipal,
+                  fontSize: 14.5,
+                  height: 1.35),
             ),
             SizedBox(height: 10),
             Text(
               'Al activarla se creará la estructura local oculta .anythinghub/ '
               '(consumo mínimo de almacenamiento). Todo el procesamiento es 100 % on-device. '
               'No se envía telemetría ni código fuente a ningún servidor.',
-              style: TextStyle(color: HubColors.textoSecundario, fontSize: 13.2, height: 1.4),
+              style: TextStyle(
+                  color: HubColors.textoSecundario,
+                  fontSize: 13.2,
+                  height: 1.4),
             ),
             SizedBox(height: 8),
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const LocalDocsScreen()),
+                  MaterialPageRoute<void>(
+                      builder: (_) => const LocalDocsScreen()),
                 );
               },
               child: Text(
@@ -93,14 +101,16 @@ class _ProjectAdvisementModalState extends State<ProjectAdvisementModal> {
                     value: _dontShowAgain,
                     activeColor: HubColors.pomelo,
                     side: BorderSide(color: HubColors.linea),
-                    onChanged: (v) => setState(() => _dontShowAgain = v ?? false),
+                    onChanged: (v) =>
+                        setState(() => _dontShowAgain = v ?? false),
                   ),
                 ),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'No volver a mostrar este aviso',
-                    style: TextStyle(color: HubColors.textoSecundario, fontSize: 13),
+                    style: TextStyle(
+                        color: HubColors.textoSecundario, fontSize: 13),
                   ),
                 ),
               ],
@@ -116,7 +126,8 @@ class _ProjectAdvisementModalState extends State<ProjectAdvisementModal> {
                       }
                       widget.onCancelled();
                     },
-                    style: TextButton.styleFrom(foregroundColor: HubColors.textoSecundario),
+                    style: TextButton.styleFrom(
+                        foregroundColor: HubColors.textoSecundario),
                     child: const Text('Cancelar'),
                   ),
                 ),
@@ -134,9 +145,11 @@ class _ProjectAdvisementModalState extends State<ProjectAdvisementModal> {
                       backgroundColor: HubColors.pomelo,
                       foregroundColor: HubColors.fondoPrincipal,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
-                    child: const Text('Activar módulo', style: TextStyle(fontWeight: FontWeight.w600)),
+                    child: const Text('Activar módulo',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
