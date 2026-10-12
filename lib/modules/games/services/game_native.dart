@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 
-import '../../core/logger.dart';
+import '../../../core/logger.dart';
 
 /// Canal nativo de métricas gamer / overlay (anythings.hub/game_mode).
 class GameNative {
