@@ -3,14 +3,16 @@ import 'package:flutter/services.dart';
 
 import 'core/hub_colors.dart';
 import 'core/macro_customization.dart';
+import 'modules/games/services/game_mode_service.dart';
 import 'modules/projects/services/oauth_deep_link_handler.dart';
 import 'screens/main_layout_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MacroCustomization.instance.load();
+  // Auto-detect juegos en foreground (best-effort)
+  GameModeService.instance.startWatching();
   _applySystemUi();
-  // Deep-link OAuth (solo activo cuando el módulo de proyectos se use)
   OAuthDeepLinkHandler.init();
   runApp(const AnythingsHubApp());
 }
