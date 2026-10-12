@@ -17,163 +17,135 @@ class _SidebarGroupTile extends StatelessWidget {
   final VoidCallback onExpand;
   final VoidCallback? onEdit;
 
-  static const double _gap = 6;
-
   @override
   Widget build(BuildContext context) {
-    final top = group.apps.take(4).toList();
-    final hidden = group.apps.length - top.length;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              if (group.colorArgb != null) ...[
+    final expanded = progress > 0.55;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        InkWell(
+          onTap: expanded ? null : onExpand,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Row(
+              children: [
                 Container(
                   width: 8,
                   height: 8,
-                  margin: const EdgeInsets.only(right: 6),
                   decoration: BoxDecoration(
-                    color: Color(group.colorArgb!),
+                    color: Color(group.colorArgb),
                     shape: BoxShape.circle,
                   ),
                 ),
-              ],
-              Expanded(
-                child: Text(
-                  group.label,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: HubColors.textoSecundario
-                        .withOpacity(0.55 + 0.45 * progress),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
+                if (expanded) ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      group.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: HubColors.textoPrincipal.withOpacity(progress),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              if (group.isCustom)
-                Icon(Icons.edit_outlined,
-                    size: 12, color: HubColors.textoSecundario),
-              if (hidden > 0) ...[
-                const SizedBox(width: 6),
-                Text(
-                  '+$hidden',
-                  style: TextStyle(
-                    color: HubColors.pomelo.withOpacity(0.7 + 0.3 * progress),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                  if (onEdit != null)
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                      onPressed: onEdit,
+                      icon: Icon(Icons.edit_outlined,
+                          size: 16,
+                          color: HubColors.textoSecundario.withOpacity(progress)),
+                    ),
+                ],
               ],
-            ],
+            ),
           ),
-          const SizedBox(height: 6),
-          if (top.isEmpty)
-            const Padding(
-              padding: EdgeInsets.only(left: 2, top: 2),
-              child: Text(
-                'Grupo vacío',
-                style:
-                    TextStyle(color: HubColors.textoSecundario, fontSize: 12),
-              ),
-            )
-          else ...[
-            Row(children: [cell(0), const SizedBox(width: _gap), cell(1)]),
-            if (top.length > 2) ...[
-              const SizedBox(height: _gap),
-              Row(children: [cell(2), const SizedBox(width: _gap), cell(3)]),
-            ],
-          ],
-        ],
-      ),
+        ),
+        if (expanded)
+          ...group.apps.map(
+            (app) => _SidebarAppTile(
+              app: app,
+              progress: progress,
+              onTap: () => onAppTap(app),
+            ),
+          ),
+      ],
     );
   }
+}
 
-  Widget cell(int i) {
-    if (i >= group.apps.length) return const SizedBox.shrink();
-    final app = group.apps[i];
-    final size = (width - 16 - _gap) / 2;
-    return SizedBox(
-      width: size,
-      height: size,
-      child: _AppIconButton(
-        app: app,
-        size: size,
-        onTap: () {
-          if (progress < 0.5) {
-            onExpand();
-          } else {
-            onAppTap(app);
-          }
-        },
+class _SidebarAppTile extends StatelessWidget {
+  const _SidebarAppTile({
+    required this.app,
+    required this.progress,
+    required this.onTap,
+  });
+
+  final HubApp app;
+  final double progress;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 18, right: 8, top: 4, bottom: 4),
+        child: Row(
+          children: [
+            _MiniAvatar(app: app),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                app.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: HubColors.textoPrincipal.withOpacity(progress),
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _AppIconButton extends StatelessWidget {
-  const _AppIconButton({
-    required this.app,
-    required this.size,
-    required this.onTap,
-  });
-
+class _MiniAvatar extends StatelessWidget {
+  const _MiniAvatar({required this.app});
   final HubApp app;
-  final double size;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final bytes = app.iconBytes;
-    Widget child;
     if (bytes != null && bytes.isNotEmpty) {
-      child = ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: Image.memory(
-          bytes,
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-          gaplessPlayback: true,
-          errorBuilder: (_, __, ___) => _letter(),
-        ),
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(6),
+        child: Image.memory(bytes, width: 22, height: 22, fit: BoxFit.cover),
       );
-    } else if (app.icon != null) {
-      child = Icon(app.icon, color: app.foreground, size: size * 0.48);
-    } else {
-      child = _letter();
     }
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: app.background,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: HubColors.linea.withOpacity(0.5)),
-          ),
-          child: Center(child: child),
-        ),
+    return Container(
+      width: 22,
+      height: 22,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: app.background,
+        borderRadius: BorderRadius.circular(6),
       ),
-    );
-  }
-
-  Widget _letter() {
-    final t =
-        (app.letter ?? (app.name.isNotEmpty ? app.name[0] : '?')).toUpperCase();
-    return Text(
-      t,
-      style: TextStyle(
-        color: app.foreground,
-        fontWeight: FontWeight.w700,
-        fontSize: size * 0.36,
+      child: Text(
+        (app.letter ?? (app.name.isNotEmpty ? app.name[0] : '?')).toUpperCase(),
+        style: TextStyle(
+          color: app.foreground,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
