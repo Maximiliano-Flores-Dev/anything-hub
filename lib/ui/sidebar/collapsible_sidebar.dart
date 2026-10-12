@@ -9,6 +9,7 @@ import '../../core/models.dart';
 
 part 'collapsible_sidebar_state.dart';
 part 'collapsible_sidebar_tiles.dart';
+part 'collapsible_sidebar_fab.dart';
 
 class CollapsibleSidebar extends StatefulWidget {
   const CollapsibleSidebar({

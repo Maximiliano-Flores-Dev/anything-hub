@@ -5,13 +5,8 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   static const double _minWidth = 64;
   static const double _maxWidthFactor = 0.72;
 
-  // --- Sensibilidad del swipe (ajustables) ---
-  // Distancia mínima en px antes de que el gesto sea reconocido como drag.
-  // El default de Flutter es ~18 px: se siente "duro" y se pierde ese tramo.
   static const double _dragSlop = 4;
-  // Velocidad (px/s) a partir de la cual el gesto cuenta como "lanzamiento".
   static const double _flingVelocity = 250;
-  // Sin lanzamiento, se abre si pasó este porcentaje del recorrido.
   static const double _openThreshold = 0.35;
 
   late final AnimationController _controller;
@@ -19,7 +14,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
 
   OverlayEntry? _overlayEntry;
   bool _menuOpen = false;
-  Offset _pointer = Offset.zero;
   int? _hoveredIndex;
 
   double get _maxWidth => widget.screenWidth * _maxWidthFactor;
@@ -46,13 +40,12 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
     _settle(open: !_isOpen);
   }
 
-  /// Anima hasta el estado final con un resorte que hereda la velocidad del dedo.
   void _settle({required bool open, double velocityPxPerSec = 0}) {
     _isOpen = open;
     final spring = SpringDescription.withDampingRatio(
       mass: 1,
       stiffness: 520,
-      ratio: 1.0, // amortiguación crítica: sin rebote
+      ratio: 1.0,
     );
     _controller.animateWith(
       SpringSimulation(
@@ -66,21 +59,19 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   }
 
   void _onDragStart(DragStartDetails d) {
-    // Si había una animación en curso, el dedo toma el control al instante.
     _controller.stop();
   }
 
   void _onDragUpdate(DragUpdateDetails d) {
     final delta = d.primaryDelta;
     if (delta == null) return;
-    // Seguimiento 1:1 con el dedo, sin depender de un ancho capturado en build.
     _controller.value = (_controller.value + delta / _travel).clamp(0.0, 1.0);
   }
 
   void _onDragEnd(DragEndDetails d) {
     final v = d.primaryVelocity ?? 0;
     final bool open = v.abs() > _flingVelocity
-        ? v > 0 // la dirección del lanzamiento manda (también para cerrar)
+        ? v > 0
         : _controller.value > _openThreshold;
     _settle(open: open, velocityPxPerSec: v);
   }
@@ -88,7 +79,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   void _openMenu(Offset globalPos) {
     if (_menuOpen) return;
     _menuOpen = true;
-    _pointer = globalPos;
     _hoveredIndex = null;
     _overlayEntry = OverlayEntry(builder: (ctx) => _buildOverlay());
     Overlay.of(context).insert(_overlayEntry!);
@@ -97,7 +87,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
 
   void _updatePointer(Offset globalPos) {
     if (!_menuOpen) return;
-    _pointer = globalPos;
     _hoveredIndex = _closestActionIndex(globalPos);
     _overlayEntry?.markNeedsBuild();
   }
@@ -122,7 +111,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   int? _closestActionIndex(Offset globalPos) {
     final fabCenter = _fabGlobalCenter();
     if (fabCenter == null) return null;
-
     double bestDist = double.infinity;
     int? best;
     for (var i = 0; i < kFabActions.length; i++) {
@@ -139,16 +127,20 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   Offset? _fabGlobalCenter() {
     final box = context.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize) return null;
-    final local = Offset(_currentWidth / 2, box.size.height - 28 - 28);
-    return box.localToGlobal(local);
+    final origin = box.localToGlobal(Offset.zero);
+    return Offset(origin.dx + _currentWidth / 2, origin.dy + box.size.height - 18 - 28);
   }
 
-  Offset _actionPosition(Offset fabCenter, int index) {
-    const baseRadius = 72.0;
-    final angle = -math.pi / 2 + (index * 0.55);
+  Offset _actionPosition(Offset center, int index) {
+    const radius = 96.0;
+    final n = kFabActions.length;
+    final start = -2.4;
+    final sweep = 2.0;
+    final t = n == 1 ? 0.5 : index / (n - 1);
+    final angle = start + sweep * t;
     return Offset(
-      fabCenter.dx + math.cos(angle) * baseRadius,
-      fabCenter.dy + math.sin(angle) * baseRadius,
+      center.dx + radius * math.cos(angle),
+      center.dy + radius * math.sin(angle),
     );
   }
 
@@ -220,7 +212,6 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
       builder: (context, _) {
         final w = _currentWidth;
         final progress = _controller.value;
-
         return RawGestureDetector(
           behavior: HitTestBehavior.opaque,
           gestures: <Type, GestureRecognizerFactory>{
@@ -284,33 +275,33 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
                             icon: Icon(Icons.menu_rounded,
                                 color: HubColors.textoSecundario),
                           ),
-                        ),
-                ),
-                Divider(height: 1, color: HubColors.linea.withOpacity(0.6)),
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: widget.appGroups.length,
-                    itemBuilder: (context, gi) {
-                      final group = widget.appGroups[gi];
-                      return _SidebarGroupTile(
-                        group: group,
-                        progress: progress,
-                        width: w,
-                        onAppTap: widget.onAppTap,
-                        onExpand: () => _settle(open: true),
-                        onEdit: group.isCustom && widget.onEditGroup != null
-                            ? () => widget.onEditGroup!(group)
-                            : null,
-                      );
-                    },
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 18, top: 8),
-                  child: _buildFab(),
-                ),
-              ],
+                  Divider(height: 1, color: HubColors.linea.withOpacity(0.6)),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      itemCount: widget.appGroups.length,
+                      itemBuilder: (context, gi) {
+                        final group = widget.appGroups[gi];
+                        return _SidebarGroupTile(
+                          group: group,
+                          progress: progress,
+                          width: w,
+                          onAppTap: widget.onAppTap,
+                          onExpand: () => _settle(open: true),
+                          onEdit: group.isCustom && widget.onEditGroup != null
+                              ? () => widget.onEditGroup!(group)
+                              : null,
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 18, top: 8),
+                    child: _buildFab(),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -319,39 +310,11 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar>
   }
 
   Widget _buildFab() {
-    return Listener(
-      onPointerDown: (e) {
-        _openMenu(e.position);
-      },
-      onPointerMove: (e) {
-        _updatePointer(e.position);
-      },
-      onPointerUp: (e) {
-        _closeMenu(execute: true);
-      },
-      onPointerCancel: (_) {
-        _closeMenu();
-      },
-      child: SizedBox(
-        width: 56,
-        height: 56,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: HubColors.degradadoDiagonal,
-            boxShadow: [
-              BoxShadow(
-                color: HubColors.pomelo.withOpacity(0.45),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Center(
-            child: Icon(Icons.add_rounded, color: Colors.white, size: 30),
-          ),
-        ),
-      ),
+    return _SidebarFabButton(
+      onPointerDown: (e) => _openMenu(e.position),
+      onPointerMove: (e) => _updatePointer(e.position),
+      onPointerUp: (e) => _closeMenu(execute: true),
+      onPointerCancel: () => _closeMenu(),
     );
   }
 }

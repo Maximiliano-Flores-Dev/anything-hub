@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../core/hub_colors.dart';
 import '../../core/models.dart';
-import '../../ui/sidebar/collapsible_sidebar.dart' show AppAvatar;
+import '../../ui/widgets/app_avatar.dart';
+
+part 'group_editor_widgets.dart';
+part 'group_editor_body.dart';
 
 /// Resultado del editor de grupos personalizados.
 class GroupEditorResult {
