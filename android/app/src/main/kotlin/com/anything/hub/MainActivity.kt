@@ -20,6 +20,7 @@ class MainActivity : FlutterActivity() {
     private val appsChannel = "anythings.hub/device_apps"
     private val filesChannel = "anythings.hub/device_files"
     private val perfChannel = "anythings.hub/performance"
+    private val gameChannel = "anythings.hub/game_mode"
 
     val worker: ExecutorService = Executors.newSingleThreadExecutor()
 
@@ -58,6 +59,15 @@ class MainActivity : FlutterActivity() {
                     PerformanceBridge.handle(this, call, result)
                 } catch (e: Exception) {
                     result.error("PERF", e.message, null)
+                }
+            }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, gameChannel)
+            .setMethodCallHandler { call, result ->
+                try {
+                    GameModeBridge.handle(this, call, result)
+                } catch (e: Exception) {
+                    result.error("GAME", e.message, null)
                 }
             }
 
