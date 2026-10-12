@@ -102,7 +102,7 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                   Expanded(
                     child: Text(
                       widget.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: HubColors.textoPrincipal,
                         fontWeight: FontWeight.w700,
                         fontSize: 17,
@@ -120,8 +120,7 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
                     ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close,
-                        color: HubColors.textoSecundario),
+                    icon: Icon(Icons.close, color: HubColors.textoSecundario),
                   ),
                 ],
               ),
@@ -130,13 +129,13 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
                 controller: _nameCtl,
-                style: const TextStyle(color: HubColors.textoPrincipal),
+                style: TextStyle(color: HubColors.textoPrincipal),
                 decoration: InputDecoration(
                   labelText: 'Nombre del grupo',
-                  labelStyle: const TextStyle(color: HubColors.textoSecundario),
+                  labelStyle: TextStyle(color: HubColors.textoSecundario),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: HubColors.linea),
+                    borderSide: BorderSide(color: HubColors.linea),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -170,19 +169,19 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
               child: TextField(
                 controller: _searchCtl,
                 onChanged: (v) => setState(() => _query = v),
-                style: const TextStyle(color: HubColors.textoPrincipal),
+                style: TextStyle(color: HubColors.textoPrincipal),
                 decoration: InputDecoration(
                   hintText: 'Buscar apps…',
-                  hintStyle: const TextStyle(color: HubColors.textoSecundario),
-                  prefixIcon: const Icon(Icons.search,
-                      color: HubColors.textoSecundario),
+                  hintStyle: TextStyle(color: HubColors.textoSecundario),
+                  prefixIcon:
+                      Icon(Icons.search, color: HubColors.textoSecundario),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: HubColors.linea),
+                    borderSide: BorderSide(color: HubColors.linea),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: HubColors.pomelo),
+                    borderSide: BorderSide(color: HubColors.pomelo),
                   ),
                 ),
               ),
@@ -190,8 +189,8 @@ class _GroupEditorBodyState extends State<_GroupEditorBody> {
             const SizedBox(height: 8),
             Expanded(
               child: widget.catalog.isEmpty
-                  ? const Padding(
-                      padding: EdgeInsets.all(24),
+                  ? Padding(
+                      padding: const EdgeInsets.all(24),
                       child: Text(
                         'No hay apps escaneadas. Usa «Escanear Apps» en el FAB primero.',
                         textAlign: TextAlign.center,
