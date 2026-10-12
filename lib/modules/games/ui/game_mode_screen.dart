@@ -137,7 +137,7 @@ class _GameModeScreenState extends State<GameModeScreen> {
                               color: HubColors.textoSecundario, fontSize: 12),
                         ),
                         value: _svc.autoDetect,
-                        activeColor: HubColors.pomelo,
+                        activeThumbColor: HubColors.pomelo,
                         onChanged: (v) => _svc.setGlobal(autoDetect: v),
                       ),
                       SwitchListTile(
@@ -145,7 +145,7 @@ class _GameModeScreenState extends State<GameModeScreen> {
                         title: Text('HUD flotante',
                             style: TextStyle(color: HubColors.textoPrincipal)),
                         value: _svc.globalHud,
-                        activeColor: HubColors.pomelo,
+                        activeThumbColor: HubColors.pomelo,
                         onChanged: (v) => _svc.setGlobal(globalHud: v),
                       ),
                       SwitchListTile(
@@ -153,7 +153,7 @@ class _GameModeScreenState extends State<GameModeScreen> {
                         title: Text('Booster al lanzar',
                             style: TextStyle(color: HubColors.textoPrincipal)),
                         value: _svc.globalBooster,
-                        activeColor: HubColors.pomelo,
+                        activeThumbColor: HubColors.pomelo,
                         onChanged: (v) => _svc.setGlobal(globalBooster: v),
                       ),
                       if (!_overlayOk)
