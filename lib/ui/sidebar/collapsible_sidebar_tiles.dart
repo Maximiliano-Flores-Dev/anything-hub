@@ -13,7 +13,7 @@ class _SidebarGroupTile extends StatelessWidget {
   final AppGroup group;
   final double progress;
   final double width;
-  final void Function(AppItem) onAppTap;
+  final void Function(HubApp) onAppTap;
   final VoidCallback onExpand;
   final VoidCallback? onEdit;
 
@@ -31,20 +31,39 @@ class _SidebarGroupTile extends StatelessWidget {
         children: [
           Row(
             children: [
+              if (group.colorArgb != null) ...[
+                Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.only(right: 6),
+                  decoration: BoxDecoration(
+                    color: Color(group.colorArgb!),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
               Expanded(
                 child: Text(
-                  group.name,
+                  group.label,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: HubColors.textoSecundario.withOpacity(0.55 + 0.45 * progress),
+                    color: HubColors.textoSecundario
+                        .withOpacity(0.55 + 0.45 * progress),
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.3,
                   ),
                 ),
               ),
-              if (group.isCustom)
-                Icon(Icons.edit_outlined, size: 12, color: HubColors.textoSecundario),
+              if (group.isCustom && onEdit != null)
+                GestureDetector(
+                  onTap: onEdit,
+                  child: Icon(
+                    Icons.edit_outlined,
+                    size: 14,
+                    color: HubColors.textoSecundario.withOpacity(0.8),
+                  ),
+                ),
               if (hidden > 0) ...[
                 const SizedBox(width: 6),
                 Text(
@@ -60,7 +79,7 @@ class _SidebarGroupTile extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           if (top.isEmpty)
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 2, top: 2),
               child: Text(
                 'Grupo vacío',
@@ -68,10 +87,10 @@ class _SidebarGroupTile extends StatelessWidget {
               ),
             )
           else ...[
-            Row(children: [cell(0), SizedBox(width: _gap), cell(1)]),
+            Row(children: [cell(0), const SizedBox(width: _gap), cell(1)]),
             if (top.length > 2) ...[
-              SizedBox(height: _gap),
-              Row(children: [cell(2), SizedBox(width: _gap), cell(3)]),
+              const SizedBox(height: _gap),
+              Row(children: [cell(2), const SizedBox(width: _gap), cell(3)]),
             ],
           ],
         ],
@@ -108,12 +127,32 @@ class _AppIconButton extends StatelessWidget {
     required this.onTap,
   });
 
-  final AppItem app;
+  final HubApp app;
   final double size;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final bytes = app.iconBytes;
+    Widget child;
+    if (bytes != null && bytes.isNotEmpty) {
+      child = ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Image.memory(
+          bytes,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          gaplessPlayback: true,
+          errorBuilder: (_, __, ___) => _letter(),
+        ),
+      );
+    } else if (app.icon != null) {
+      child = Icon(app.icon, color: app.foreground, size: size * 0.48);
+    } else {
+      child = _letter();
+    }
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -125,8 +164,21 @@ class _AppIconButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: HubColors.linea.withOpacity(0.5)),
           ),
-          child: Icon(app.icon, color: app.foreground, size: size * 0.48),
+          child: Center(child: child),
         ),
+      ),
+    );
+  }
+
+  Widget _letter() {
+    final t =
+        (app.letter ?? (app.name.isNotEmpty ? app.name[0] : '?')).toUpperCase();
+    return Text(
+      t,
+      style: TextStyle(
+        color: app.foreground,
+        fontWeight: FontWeight.w700,
+        fontSize: size * 0.36,
       ),
     );
   }
